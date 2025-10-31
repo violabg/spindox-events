@@ -15,22 +15,23 @@ datasource db {
 }
 
 model User {
-  id            String    @id
+  id            String       @id @default(cuid())
   name          String
   email         String
-  emailVerified Boolean   @default(false)
+  emailVerified Boolean      @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @default(now()) @updatedAt
   sessions      Session[]
   accounts      Account[]
+  userAnswers   UserAnswer[]
 
   @@unique([email])
   @@map("user")
 }
 
 model Session {
-  id        String   @id
+  id        String   @id @default(cuid())
   expiresAt DateTime
   token     String
   createdAt DateTime @default(now())
@@ -45,7 +46,7 @@ model Session {
 }
 
 model Account {
-  id                    String    @id
+  id                    String    @id @default(cuid())
   accountId             String
   providerId            String
   userId                String
@@ -64,7 +65,7 @@ model Account {
 }
 
 model Verification {
-  id         String   @id
+  id         String   @id @default(cuid())
   identifier String
   value      String
   expiresAt  DateTime
@@ -72,4 +73,67 @@ model Verification {
   updatedAt  DateTime @default(now()) @updatedAt
 
   @@map("verification")
+}
+
+model Context {
+  id          String       @id @default(cuid())
+  name        String
+  slug        String       @unique
+  theme       String?
+  description String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now()) @updatedAt
+  questions   Question[]
+  userAnswers UserAnswer[]
+
+  @@map("context")
+}
+
+model Question {
+  id          String       @id @default(cuid())
+  title       String
+  content     String
+  order       Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now()) @updatedAt
+  contextId   String
+  context     Context      @relation(fields: [contextId], references: [id], onDelete: Cascade)
+  answers     Answer[]
+  userAnswers UserAnswer[]
+
+  @@map("question")
+}
+
+model Answer {
+  id          String       @id @default(cuid())
+  content     String
+  isCorrect   Boolean      @default(false)
+  order       Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now()) @updatedAt
+  questionId  String
+  question    Question     @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  userAnswers UserAnswer[]
+
+  @@map("answer")
+}
+
+model UserAnswer {
+  id         String   @id @default(cuid())
+  multiplier Decimal  @default(1.0)
+  time       Decimal  @default(0.0)
+  score      Decimal  @default(0.0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contextId  String
+  context    Context  @relation(fields: [contextId], references: [id], onDelete: Cascade)
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answerId   String
+  answer     Answer   @relation(fields: [answerId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, contextId, questionId])
+  @@map("user_answer")
 }
