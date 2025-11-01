@@ -1,9 +1,14 @@
+import { Toaster } from 'sonner';
 import './globals.css';
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className="antialiased dark">{children}</body>
+      <body className="antialiased dark">
+        {children}
+
+        <Toaster position="top-right" />
+      </body>
     </html>
   );
 }

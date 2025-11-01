@@ -1,5 +1,4 @@
 import { betterAuth } from 'better-auth';
-import { createAuthClient } from 'better-auth/react';
 
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 
@@ -20,5 +19,3 @@ export const auth = betterAuth({
     },
   },
 });
-
-export const authClient = createAuthClient();
