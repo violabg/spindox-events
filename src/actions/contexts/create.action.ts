@@ -13,7 +13,7 @@ const createContextSchema = z.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must contain only lowercase letters, numbers, and hyphens'),
   theme: z.string().max(50, 'Theme must be less than 50 characters').optional(),
   description: z.string().max(500, 'Description must be less than 500 characters').optional(),
-  status: z.nativeEnum(ContextStatus).default(ContextStatus.active),
+  status: z.enum(ContextStatus).default(ContextStatus.active),
 });
 
 export type CreateContextInput = z.infer<typeof createContextSchema>;

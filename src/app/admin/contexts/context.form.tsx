@@ -25,7 +25,7 @@ const contextSchema = z.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must contain only lowercase letters, numbers, and hyphens'),
   theme: z.string().max(50, 'Theme must be less than 50 characters').optional(),
   description: z.string().max(500, 'Description must be less than 500 characters').optional(),
-  status: z.nativeEnum(ContextStatus),
+  status: z.enum(ContextStatus),
 });
 
 type ContextFormData = z.infer<typeof contextSchema>;
