@@ -1,7 +1,7 @@
 'use client';
 
 import { Prisma } from '@/prisma/client';
-import { Authenticable } from '../components/authenticable';
+import { Authenticable } from '@/components/authenticable';
 
 type Props = {
   context: Prisma.ContextGetPayload<{}>;
