@@ -1,15 +1,15 @@
 'use client';
 
-import { useForm, useWatch, Controller } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ContextStatus } from '@/prisma/enums';
 import { ContextModel } from '@/prisma/models/Context';
 import { Button } from '@/components/ui/button';
-import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FormInput } from '@/components/form/form-input';
 import Link from 'next/link';
 import { createContextAction } from '@/actions/contexts/create.action';
 import { updateContextAction } from '@/actions/contexts/update.action';
@@ -36,7 +36,6 @@ interface ContextFormProps {
 }
 
 export default function ContextForm({ contextId, initialData }: ContextFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -44,6 +43,7 @@ export default function ContextForm({ contextId, initialData }: ContextFormProps
 
   const form = useForm<ContextFormData>({
     resolver: zodResolver(contextSchema),
+    mode: 'onChange',
     defaultValues: {
       name: initialData?.name || '',
       slug: initialData?.slug || '',
@@ -55,9 +55,6 @@ export default function ContextForm({ contextId, initialData }: ContextFormProps
 
   // Auto-generate slug from name
   const watchedName = useWatch({ control: form.control, name: 'name' });
-  const watchedSlug = useWatch({ control: form.control, name: 'slug' });
-  const watchedDescription = useWatch({ control: form.control, name: 'description' });
-  const watchedTheme = useWatch({ control: form.control, name: 'theme' });
 
   const generateSlug = (name: string) => {
     return name
@@ -76,7 +73,6 @@ export default function ContextForm({ contextId, initialData }: ContextFormProps
   }, [watchedName, form, isEditMode, initialData]);
 
   async function onSubmit(data: ContextFormData) {
-    setIsSubmitting(true);
     setError(null);
 
     try {
@@ -103,95 +99,70 @@ export default function ContextForm({ contextId, initialData }: ContextFormProps
       } else {
         // Show error from server
         setError(result.error || `Failed to ${isEditMode ? 'update' : 'create'} context`);
-        setIsSubmitting(false);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : `Failed to ${isEditMode ? 'update' : 'create'} context`);
-      setIsSubmitting(false);
     }
   }
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-      <Field>
-        <FieldLabel htmlFor="name">Name</FieldLabel>
-        <FieldContent>
-          <Input id="name" placeholder="Enter context name..." {...form.register('name')} />
-          <div className="flex items-center justify-between">
-            <FieldDescription>The display name for this context</FieldDescription>
-            <span className="text-xs text-muted-foreground">{(watchedName || '').length}/100</span>
-          </div>
-          <FieldError errors={form.formState.errors.name ? [form.formState.errors.name] : undefined} />
-        </FieldContent>
-      </Field>
+      <FormInput name="name" control={form.control} label="Name" description="The display name for this context" maxLength={100}>
+        {({ field }) => <Input id="name" placeholder="Enter context name..." {...field} />}
+      </FormInput>
 
-      <Field>
-        <FieldLabel htmlFor="slug">Slug</FieldLabel>
-        <FieldContent>
-          <Input id="slug" placeholder="context-slug" {...form.register('slug')} />
-          <div className="flex items-center justify-between">
-            <FieldDescription>URL-friendly identifier (automatically generated from name, but you can customize it)</FieldDescription>
-            <span className="text-xs text-muted-foreground">{(watchedSlug || '').length}/50</span>
-          </div>
-          <FieldError errors={form.formState.errors.slug ? [form.formState.errors.slug] : undefined} />
-        </FieldContent>
-      </Field>
+      <FormInput
+        name="slug"
+        control={form.control}
+        label="Slug"
+        description="URL-friendly identifier (automatically generated from name, but you can customize it)"
+        maxLength={50}
+      >
+        {({ field }) => <Input id={field.name} placeholder="context-slug" {...field} />}
+      </FormInput>
 
-      <Field>
-        <FieldLabel htmlFor="theme">Theme (Optional)</FieldLabel>
-        <FieldContent>
-          <Input id="theme" placeholder="Enter theme..." {...form.register('theme')} />
-          <div className="flex items-center justify-between">
-            <FieldDescription>Optional theme or category for this context</FieldDescription>
-            <span className="text-xs text-muted-foreground">{(watchedTheme || '').length}/50</span>
-          </div>
-          <FieldError errors={form.formState.errors.theme ? [form.formState.errors.theme] : undefined} />
-        </FieldContent>
-      </Field>
+      <FormInput
+        name="theme"
+        control={form.control}
+        label="Theme (Optional)"
+        description="Optional theme or category for this context"
+        maxLength={50}
+      >
+        {({ field }) => <Input id={field.name} placeholder="Enter theme..." {...field} />}
+      </FormInput>
 
-      <Field>
-        <FieldLabel htmlFor="description">Description (Optional)</FieldLabel>
-        <FieldContent>
-          <Textarea id="description" placeholder="Enter description..." className="min-h-[100px]" {...form.register('description')} />
-          <div className="flex items-center justify-between">
-            <FieldDescription>Optional description of this context</FieldDescription>
-            <span className="text-xs text-muted-foreground">{(watchedDescription || '').length}/500</span>
-          </div>
-          <FieldError errors={form.formState.errors.description ? [form.formState.errors.description] : undefined} />
-        </FieldContent>
-      </Field>
+      <FormInput
+        name="description"
+        control={form.control}
+        label="Description (Optional)"
+        description="Optional description of this context"
+        maxLength={500}
+      >
+        {({ field }) => <Textarea id={field.name} placeholder="Enter description..." className="min-h-[100px]" {...field} />}
+      </FormInput>
 
-      <Field>
-        <FieldLabel htmlFor="status">Status</FieldLabel>
-        <FieldContent>
-          <Controller
-            name="status"
-            control={form.control}
-            render={({ field }) => (
-              <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.values(ContextStatus).map(status => (
-                    <SelectItem key={status} value={status}>
-                      {status}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          <FieldDescription>When active, this context will be visible to users</FieldDescription>
-          <FieldError errors={form.formState.errors.status ? [form.formState.errors.status] : undefined} />
-        </FieldContent>
-      </Field>
+      <FormInput name="status" control={form.control} label="Status" description="Current status of this context">
+        {({ field }) => (
+          <Select onValueChange={field.onChange} value={field.value}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.values(ContextStatus).map(status => (
+                <SelectItem key={status} value={status}>
+                  {status}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </FormInput>
 
       {error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>}
 
       <div className="flex gap-4">
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? `${isEditMode ? 'Updating' : 'Creating'}...` : `${isEditMode ? 'Update' : 'Create'} Context`}
+        <Button type="submit" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? `${isEditMode ? 'Updating' : 'Creating'}...` : `${isEditMode ? 'Update' : 'Create'} Context`}
         </Button>
         <Button type="button" variant="outline" asChild>
           <Link href={isEditMode && contextId ? `/admin/contexts/${contextId}` : '/admin'}>Cancel</Link>

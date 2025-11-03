@@ -12,12 +12,12 @@ const updateQuestionSchema = z.object({
   answers: z
     .array(
       z.object({
-        id: z.string().cuid(),
+        id: z.string().cuid().optional(),
         content: z.string().min(1, 'Answer content is required').max(200, 'Answer must be less than 200 characters'),
-        isCorrect: z.boolean(),
+        score: z.number().int().min(0, 'Score must be 0 or greater'),
       })
     )
-    .length(4, 'Exactly 4 answers are required'),
+    .min(1, 'At least 1 answer is required'),
 });
 
 type UpdateQuestionData = z.infer<typeof updateQuestionSchema>;
@@ -26,15 +26,6 @@ export async function updateQuestionAction(data: UpdateQuestionData) {
   try {
     // Validate input
     const validatedData = updateQuestionSchema.parse(data);
-
-    // Validate that exactly one answer is correct
-    const correctAnswers = validatedData.answers.filter(answer => answer.isCorrect);
-    if (correctAnswers.length !== 1) {
-      return {
-        success: false,
-        error: 'Exactly one answer must be marked as correct',
-      };
-    }
 
     // Check if question exists and belongs to the context
     const existingQuestion = await prisma.question.findFirst({
@@ -62,16 +53,20 @@ export async function updateQuestionAction(data: UpdateQuestionData) {
         },
       });
 
-      // Update each answer
-      for (const answer of validatedData.answers) {
-        await tx.answer.update({
-          where: { id: answer.id },
-          data: {
-            content: answer.content,
-            isCorrect: answer.isCorrect,
-          },
-        });
-      }
+      // Delete all existing answers first
+      await tx.answer.deleteMany({
+        where: { questionId: validatedData.questionId },
+      });
+
+      // Create new answers
+      await tx.answer.createMany({
+        data: validatedData.answers.map((answer, index) => ({
+          questionId: validatedData.questionId,
+          content: answer.content,
+          score: answer.score,
+          order: index + 1,
+        })),
+      });
     });
 
     // Revalidate the context page

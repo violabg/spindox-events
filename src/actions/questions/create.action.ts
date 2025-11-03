@@ -12,10 +12,10 @@ const createQuestionSchema = z.object({
     .array(
       z.object({
         content: z.string().min(1, 'Answer content is required').max(200, 'Answer must be less than 200 characters'),
-        isCorrect: z.boolean(),
+        score: z.number().int().min(0, 'Score must be 0 or greater'),
       })
     )
-    .length(4, 'Exactly 4 answers are required'),
+    .min(1, 'At least 1 answer is required'),
 });
 
 export type CreateQuestionInput = z.infer<typeof createQuestionSchema>;
@@ -40,15 +40,6 @@ export async function createQuestionAction(data: CreateQuestionInput) {
       };
     }
 
-    // Validate that exactly one answer is correct
-    const correctAnswers = validatedData.answers.filter(answer => answer.isCorrect);
-    if (correctAnswers.length !== 1) {
-      return {
-        success: false,
-        error: 'Exactly one answer must be marked as correct',
-      };
-    }
-
     // Get the next order number for the question
     const lastQuestion = await prisma.question.findFirst({
       where: { contextId: validatedData.contextId },
@@ -68,7 +59,7 @@ export async function createQuestionAction(data: CreateQuestionInput) {
         answers: {
           create: validatedData.answers.map((answer, index) => ({
             content: answer.content,
-            isCorrect: answer.isCorrect,
+            score: answer.score,
             order: index + 1,
           })),
         },
