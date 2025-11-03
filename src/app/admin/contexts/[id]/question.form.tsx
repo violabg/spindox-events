@@ -172,8 +172,9 @@ export default function QuestionForm({ contextId, question }: QuestionFormProps)
             const hasAnswerErrors = contentError || scoreError;
 
             return (
-              <div key={field.id} className="space-y-2">
-                <div className="grid grid-cols-[1fr_120px_auto] gap-3 items-end">
+              <div key={field.id} className="space-y-3">
+                {/* Mobile: Stack all elements vertically, Desktop: Horizontal grid */}
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_auto] sm:items-end">
                   <FormInput
                     control={form.control}
                     name={`answers.${index}.content`}
@@ -193,30 +194,34 @@ export default function QuestionForm({ contextId, question }: QuestionFormProps)
                     )}
                   </FormInput>
 
-                  <FormInput control={form.control} name={`answers.${index}.score`} label="Score" disableFieldError={true}>
-                    {({ field }) => (
-                      <Input
-                        id={field.name}
-                        type="number"
-                        min="0"
-                        placeholder=""
-                        className="w-20"
-                        value={typeof field.value === 'number' ? field.value : ''}
-                        onChange={e => field.onChange(e.target.value ? parseInt(e.target.value) : 0)}
-                      />
-                    )}
-                  </FormInput>
+                  <div className="flex gap-2 sm:contents">
+                    <FormInput control={form.control} name={`answers.${index}.score`} label="Score" disableFieldError={true}>
+                      {({ field }) => (
+                        <Input
+                          id={field.name}
+                          type="number"
+                          min="0"
+                          placeholder=""
+                          className="w-full sm:w-20"
+                          value={typeof field.value === 'number' ? field.value : ''}
+                          onChange={e => field.onChange(e.target.value ? parseInt(e.target.value) : 0)}
+                        />
+                      )}
+                    </FormInput>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => removeAnswer(index)}
-                    className="p-2 self-end"
-                    disabled={fields.length === 1}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                    <div className="flex items-end">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeAnswer(index)}
+                        className="p-2 h-10 w-10 shrink-0"
+                        disabled={fields.length === 1}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Single error display for both content and score */}
@@ -245,8 +250,8 @@ export default function QuestionForm({ contextId, question }: QuestionFormProps)
       {/* Display server-side errors */}
       {error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>}
 
-      <div className="flex gap-4">
-        <Button type="submit" disabled={form.formState.isSubmitting}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+        <Button type="submit" disabled={form.formState.isSubmitting} className="w-full sm:w-auto">
           {form.formState.isSubmitting ? `${isEditMode ? 'Updating' : 'Creating'}...` : `${isEditMode ? 'Update' : 'Create'} Question`}
         </Button>
         <Button
@@ -254,6 +259,7 @@ export default function QuestionForm({ contextId, question }: QuestionFormProps)
           variant="outline"
           onClick={() => router.push(`/admin/contexts/${contextId}/questions`)}
           disabled={form.formState.isSubmitting}
+          className="w-full sm:w-auto"
         >
           Cancel
         </Button>

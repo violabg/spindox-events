@@ -36,20 +36,20 @@ export default async function AdminPage() {
   }));
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Manage your contexts and events</p>
+    <div className="container mx-auto p-4 sm:p-6">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold">Admin Dashboard</h1>
+        <p className="text-muted-foreground text-sm sm:text-base">Manage your contexts and events</p>
       </div>
 
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
+        <CardHeader className="p-4 sm:p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle>Contexts</CardTitle>
               <CardDescription>All event contexts in the system ({contextsWithUserCounts.length} total)</CardDescription>
             </div>
-            <Button asChild>
+            <Button asChild className="w-full sm:w-auto">
               <Link href="/admin/contexts/new">
                 <Plus className="mr-2 h-4 w-4" />
                 New
@@ -57,7 +57,7 @@ export default async function AdminPage() {
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6">
           <ContextsTable contexts={contextsWithUserCounts} />
         </CardContent>
       </Card>
