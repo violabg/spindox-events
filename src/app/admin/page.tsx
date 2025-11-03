@@ -11,6 +11,7 @@ export default async function AdminPage() {
     select: {
       id: true,
       name: true,
+      slug: true,
       status: true,
       createdAt: true,
       userAnswers: {
@@ -29,6 +30,7 @@ export default async function AdminPage() {
   const contextsWithUserCounts = contextsData.map(context => ({
     id: context.id,
     name: context.name,
+    slug: context.slug,
     status: context.status,
     uniqueUserCount: context.userAnswers.length,
   }));

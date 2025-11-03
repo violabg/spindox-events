@@ -16,14 +16,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Trash2, MessageSquare, Edit } from 'lucide-react';
+import { Trash2, MessageSquare, Edit, QrCode } from 'lucide-react';
 import { ContextStatus } from '@/prisma/enums';
 import { deleteContextAction } from '@/actions/contexts/delete.action';
 import { toast } from 'sonner';
+import { QRCodeModal } from '@/components/modals';
 
 type ContextWithUserCount = {
   id: string;
   name: string;
+  slug: string;
   status: ContextStatus;
   uniqueUserCount: number;
 };
@@ -31,6 +33,19 @@ type ContextWithUserCount = {
 type ContextsTableProps = {
   contexts: ContextWithUserCount[];
 };
+
+function QRCodeButton({ contextSlug, contextName }: { contextSlug: string; contextName: string }) {
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
+
+  return (
+    <>
+      <Button variant="outline" size="sm" onClick={() => setIsQRModalOpen(true)}>
+        <QrCode className="h-4 w-4" />
+      </Button>
+      <QRCodeModal contextSlug={contextSlug} contextName={contextName} open={isQRModalOpen} onOpenChange={setIsQRModalOpen} />
+    </>
+  );
+}
 
 function DeleteContextButton({ contextId, contextName }: { contextId: string; contextName: string }) {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -85,6 +100,7 @@ export default function ContextsTable({ contexts }: ContextsTableProps) {
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
+            <TableHead>Slug</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Users Answered</TableHead>
             <TableHead className="text-right">Actions</TableHead>
@@ -94,12 +110,14 @@ export default function ContextsTable({ contexts }: ContextsTableProps) {
           {contexts.map(context => (
             <TableRow key={context.id}>
               <TableCell className="font-medium">{context.name}</TableCell>
+              <TableCell className="font-mono text-sm">{context.slug}</TableCell>
               <TableCell>
                 <Badge variant={context.status === 'active' ? 'default' : 'secondary'}>{context.status === 'active' ? 'Active' : 'Inactive'}</Badge>
               </TableCell>
               <TableCell>{context.uniqueUserCount}</TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-2">
+                  <QRCodeButton contextSlug={context.slug} contextName={context.name} />
                   <Button variant="outline" size="sm" asChild>
                     <Link href={`/admin/contexts/${context.id}/questions`}>
                       <MessageSquare className="h-4 w-4" />

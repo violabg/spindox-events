@@ -65,28 +65,38 @@ export default async function QuestionDetailPage({ params }: PageProps) {
         <Card>
           <CardHeader>
             <CardTitle>Answer Options</CardTitle>
-            <CardDescription>All answer options for this question. The correct answer is highlighted.</CardDescription>
+            <CardDescription>All answer options for this question with their scores.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {question.answers.map((answer, index) => (
-                <div
-                  key={answer.id}
-                  className={`flex items-center gap-3 p-3 rounded-lg border ${answer.isCorrect ? 'bg-green-50 border-green-200' : 'bg-gray-50'}`}
-                >
-                  <div className="shrink-0 w-8 h-8 bg-white border rounded-full flex items-center justify-center font-medium">
-                    {String.fromCharCode(65 + index)}
+              {question.answers.map((answer, index) => {
+                const maxScore = Math.max(...question.answers.map(a => a.score));
+                const isHighestScore = answer.score === maxScore && maxScore > 0;
+
+                return (
+                  <div
+                    key={answer.id}
+                    className={`flex items-center gap-3 p-3 rounded-lg border ${isHighestScore ? 'bg-green-50 border-green-200' : 'bg-gray-50'}`}
+                  >
+                    <div className="shrink-0 w-8 h-8 bg-white border rounded-full flex items-center justify-center font-medium">
+                      {String.fromCharCode(65 + index)}
+                    </div>
+                    <div className="flex-1">
+                      <p className={isHighestScore ? 'font-medium text-green-800' : ''}>{answer.content}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="font-mono">
+                        Score: {answer.score}
+                      </Badge>
+                      {isHighestScore && (
+                        <Badge variant="default" className="bg-green-600">
+                          Highest Score
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <p className={answer.isCorrect ? 'font-medium text-green-800' : ''}>{answer.content}</p>
-                  </div>
-                  {answer.isCorrect && (
-                    <Badge variant="default" className="bg-green-600">
-                      Correct Answer
-                    </Badge>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
