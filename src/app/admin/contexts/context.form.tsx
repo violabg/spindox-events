@@ -4,17 +4,19 @@ import { useForm, useWatch, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ContextStatus } from '@/prisma/enums';
+import { ContextModel } from '@/prisma/models/Context';
 import { Button } from '@/components/ui/button';
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Link from 'next/link';
-import { createContextAction } from './create-context.action';
+import { createContextAction } from '@/actions/contexts/create.action';
+import { updateContextAction } from '@/actions/contexts/update.action';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-const createContextSchema = z.object({
+const contextSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
   slug: z
     .string()
@@ -26,21 +28,28 @@ const createContextSchema = z.object({
   status: z.nativeEnum(ContextStatus),
 });
 
-type CreateContextFormData = z.infer<typeof createContextSchema>;
+type ContextFormData = z.infer<typeof contextSchema>;
 
-export default function CreateContextForm() {
+interface ContextFormProps {
+  contextId?: string;
+  initialData?: ContextModel | null;
+}
+
+export default function ContextForm({ contextId, initialData }: ContextFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const form = useForm<CreateContextFormData>({
-    resolver: zodResolver(createContextSchema),
+  const isEditMode = !!contextId;
+
+  const form = useForm<ContextFormData>({
+    resolver: zodResolver(contextSchema),
     defaultValues: {
-      name: '',
-      slug: '',
-      theme: '',
-      description: '',
-      status: ContextStatus.active,
+      name: initialData?.name || '',
+      slug: initialData?.slug || '',
+      theme: initialData?.theme || '',
+      description: initialData?.description || '',
+      status: initialData?.status || ContextStatus.active,
     },
   });
 
@@ -55,30 +64,45 @@ export default function CreateContextForm() {
       .replace(/^-|-$/g, '');
   };
 
-  // Update slug when name changes
+  // Update slug when name changes (only in create mode or if slug field hasn't been manually edited)
   useEffect(() => {
-    if (watchedName && !form.formState.dirtyFields.slug) {
+    if (watchedName && !form.formState.dirtyFields.slug && (!isEditMode || !initialData)) {
       form.setValue('slug', generateSlug(watchedName));
     }
-  }, [watchedName, form]);
+  }, [watchedName, form, isEditMode, initialData]);
 
-  async function onSubmit(data: CreateContextFormData) {
+  async function onSubmit(data: ContextFormData) {
     setIsSubmitting(true);
     setError(null);
 
     try {
-      const result = await createContextAction(data);
+      let result;
+
+      if (isEditMode && contextId) {
+        // Edit mode - update existing context
+        result = await updateContextAction({
+          id: contextId,
+          ...data,
+        });
+      } else {
+        // Create mode - create new context
+        result = await createContextAction(data);
+      }
 
       if (result.success) {
-        // Success! Navigate to admin page
-        router.push('/admin');
+        // Success! Navigate to appropriate page
+        if (isEditMode && contextId) {
+          router.push(`/admin/contexts/${contextId}`);
+        } else {
+          router.push('/admin');
+        }
       } else {
         // Show error from server
-        setError(result.error || 'Failed to create context');
+        setError(result.error || `Failed to ${isEditMode ? 'update' : 'create'} context`);
         setIsSubmitting(false);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create context');
+      setError(err instanceof Error ? err.message : `Failed to ${isEditMode ? 'update' : 'create'} context`);
       setIsSubmitting(false);
     }
   }
@@ -151,10 +175,10 @@ export default function CreateContextForm() {
 
       <div className="flex gap-4">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Creating...' : 'Create Context'}
+          {isSubmitting ? `${isEditMode ? 'Updating' : 'Creating'}...` : `${isEditMode ? 'Update' : 'Create'} Context`}
         </Button>
         <Button type="button" variant="outline" asChild>
-          <Link href="/admin">Cancel</Link>
+          <Link href={isEditMode && contextId ? `/admin/contexts/${contextId}` : '/admin'}>Cancel</Link>
         </Button>
       </div>
     </form>

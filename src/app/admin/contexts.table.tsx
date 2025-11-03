@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Trash2 } from 'lucide-react';
 import { ContextStatus } from '@/prisma/enums';
-import { deleteContextAction } from './delete-context.action';
+import { deleteContextAction } from '@/actions/contexts/delete.action';
 import { toast } from 'sonner';
 
 type ContextWithUserCount = {

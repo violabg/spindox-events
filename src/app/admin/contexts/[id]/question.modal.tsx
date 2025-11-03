@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { QuestionModel } from '@/prisma/models/Question';
+import { AnswerModel } from '@/prisma/models/Answer';
 import { Button } from '@/components/ui/button';
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -12,8 +14,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Edit } from 'lucide-react';
-import { createQuestionAction } from './questions/create.action';
-import { updateQuestionAction } from './questions/update.action';
+import { createQuestionAction } from '@/actions/questions/create.action';
+import { updateQuestionAction } from '@/actions/questions/update.action';
 import { toast } from 'sonner';
 
 const questionSchema = z.object({
@@ -34,20 +36,14 @@ const questionSchema = z.object({
 
 type QuestionFormData = z.infer<typeof questionSchema>;
 
-type QuestionData = {
-  id: string;
-  title: string;
-  content: string;
-  answers: {
-    id: string;
-    content: string;
-    isCorrect: boolean;
-  }[];
+// Type for Question with its answers included (what we get from the database)
+type QuestionWithAnswers = QuestionModel & {
+  answers: AnswerModel[];
 };
 
 type QuestionModalProps = {
   contextId: string;
-  question?: QuestionData;
+  question?: QuestionWithAnswers;
   trigger?: React.ReactNode;
   onSuccess?: () => void;
 };

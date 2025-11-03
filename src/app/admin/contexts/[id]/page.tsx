@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import ContextDetailsClient from './context-details.client';
-import { getContextWithQuestions } from './get-context.action';
+import { getContextWithQuestions } from '@/actions/contexts/get.action';
 
 type ContextDetailsPageProps = {
   params: Promise<{ id: string }>;

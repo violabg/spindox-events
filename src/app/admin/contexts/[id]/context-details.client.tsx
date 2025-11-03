@@ -6,38 +6,29 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { ContextModel } from '@/prisma/models/Context';
+import { QuestionModel } from '@/prisma/models/Question';
+import { AnswerModel } from '@/prisma/models/Answer';
 import QuestionModal from './question.modal';
-import { getContextWithQuestions } from './get-context.action';
+import { getContextWithQuestions } from '@/actions/contexts/get.action';
 
-type Question = {
-  id: string;
-  title: string;
-  content: string;
-  order: number;
-  answers: {
-    id: string;
-    content: string;
-    isCorrect: boolean;
-    order: number;
-  }[];
+// Type for Question with its answers included (matches what we get from the database)
+type QuestionWithAnswers = QuestionModel & {
+  answers: AnswerModel[];
 };
 
-type Context = {
-  id: string;
-  name: string;
-  description: string | null;
-  theme: string | null;
-  status: 'active' | 'inactive';
-  questions: Question[];
+// Type for Context with its questions and answers included (matches what we get from the database)
+type ContextWithQuestions = ContextModel & {
+  questions: QuestionWithAnswers[];
 };
 
 type ContextDetailsClientProps = {
   contextId: string;
-  initialContext: Context;
+  initialContext: ContextWithQuestions;
 };
 
 export default function ContextDetailsClient({ contextId, initialContext }: ContextDetailsClientProps) {
-  const [context, setContext] = useState(initialContext);
+  const [context, setContext] = useState<ContextWithQuestions>(initialContext);
 
   const refreshContext = async () => {
     const result = await getContextWithQuestions(contextId);
@@ -65,10 +56,15 @@ export default function ContextDetailsClient({ contextId, initialContext }: Cont
         {/* Context Information */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>{context.name}</span>
-              <Badge variant={context.status === 'active' ? 'default' : 'secondary'}>{context.status}</Badge>
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-xl font-semibold">{context.name}</span>
+                <Badge variant={context.status === 'active' ? 'default' : 'secondary'}>{context.status}</Badge>
+              </div>
+              <Button variant="outline" size="sm" asChild>
+                <Link href={`/admin/contexts/${contextId}/edit`}>Edit Context</Link>
+              </Button>
+            </div>
             {context.theme && <CardDescription>Theme: {context.theme}</CardDescription>}
           </CardHeader>
           {context.description && (
@@ -94,7 +90,7 @@ export default function ContextDetailsClient({ contextId, initialContext }: Cont
               <div className="text-center py-8 text-muted-foreground">No questions added yet. Create your first question to get started.</div>
             ) : (
               <div className="space-y-4">
-                {context.questions.map((question, index) => (
+                {context.questions.map((question: QuestionWithAnswers, index: number) => (
                   <div key={question.id} className="border rounded-lg p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -105,7 +101,7 @@ export default function ContextDetailsClient({ contextId, initialContext }: Cont
                         <p className="text-sm text-muted-foreground mb-3">{question.content}</p>
                         <div className="space-y-1">
                           <p className="text-xs font-medium text-muted-foreground">Answers:</p>
-                          {question.answers.map((answer, answerIndex) => (
+                          {question.answers.map((answer: AnswerModel, answerIndex: number) => (
                             <div key={answer.id} className="flex items-center gap-2">
                               <span className="text-xs text-muted-foreground w-4">{String.fromCharCode(65 + answerIndex)}.</span>
                               <span className={`text-xs ${answer.isCorrect ? 'font-medium text-green-600' : ''}`}>

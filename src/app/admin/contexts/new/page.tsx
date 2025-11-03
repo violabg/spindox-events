@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import CreateContextForm from './create-context.form';
+import ContextForm from '../context.form';
 
 export default function NewContextPage() {
   return (
@@ -25,7 +25,7 @@ export default function NewContextPage() {
           <CardDescription>Fill in the information for the new context</CardDescription>
         </CardHeader>
         <CardContent>
-          <CreateContextForm />
+          <ContextForm />
         </CardContent>
       </Card>
     </div>
