@@ -43,7 +43,6 @@ export default function ContextForm({ contextId, initialData }: ContextFormProps
 
   const form = useForm<ContextFormData>({
     resolver: zodResolver(contextSchema),
-    mode: 'onChange',
     defaultValues: {
       name: initialData?.name || '',
       slug: initialData?.slug || '',

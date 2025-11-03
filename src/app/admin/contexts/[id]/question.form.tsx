@@ -63,7 +63,6 @@ export default function QuestionForm({ contextId, question }: QuestionFormProps)
 
   const form = useForm<QuestionFormData>({
     resolver: zodResolver(questionSchema),
-    mode: 'onChange',
     defaultValues,
   });
 
