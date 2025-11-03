@@ -83,25 +83,34 @@ export default function QuestionsTable({ contestId, questions }: QuestionsTableP
         <TableHeader>
           <TableRow>
             <TableHead>Title</TableHead>
+            <TableHead className="text-center">Answers</TableHead>
+            <TableHead className="text-center">Max Score</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {questions.map(question => (
-            <TableRow key={question.id}>
-              <TableCell className="font-medium">{question.title}</TableCell>
-              <TableCell className="text-right">
-                <div className="flex items-center justify-end gap-2">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={`/admin/contests/${contestId}/questions/${question.id}/edit`}>
-                      <Edit className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                  <DeleteQuestionButton questionId={question.id} questionTitle={question.title} />
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
+          {questions.map(question => {
+            const answerCount = question.answers.length;
+            const maxScore = question.answers.length > 0 ? Math.max(...question.answers.map(answer => answer.score)) : 0;
+
+            return (
+              <TableRow key={question.id}>
+                <TableCell className="font-medium">{question.title}</TableCell>
+                <TableCell className="text-center">{answerCount}</TableCell>
+                <TableCell className="text-center">{maxScore}</TableCell>
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/admin/contests/${contestId}/questions/${question.id}/edit`}>
+                        <Edit className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                    <DeleteQuestionButton questionId={question.id} questionTitle={question.title} />
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
       {questions.length === 0 && (
