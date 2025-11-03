@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 
@@ -11,7 +12,7 @@ export default async function AdminPage() {
     select: {
       id: true,
       name: true,
-      theme: true,
+      status: true,
       createdAt: true,
       userAnswers: {
         select: {
@@ -29,8 +30,7 @@ export default async function AdminPage() {
   const contextsWithUserCounts = contextsData.map(context => ({
     id: context.id,
     name: context.name,
-    theme: context.theme,
-    createdAt: context.createdAt,
+    status: context.status,
     uniqueUserCount: context.userAnswers.length,
   }));
 
@@ -62,18 +62,20 @@ export default async function AdminPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Theme</TableHead>
+                <TableHead>Active</TableHead>
                 <TableHead>Users Answered</TableHead>
-                <TableHead>Created At</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {contextsWithUserCounts.map(context => (
                 <TableRow key={context.id}>
                   <TableCell className="font-medium">{context.name}</TableCell>
-                  <TableCell>{context.theme || '-'}</TableCell>
+                  <TableCell>
+                    <Badge variant={context.status === 'active' ? 'default' : 'secondary'}>
+                      {context.status === 'active' ? 'Active' : 'Inactive'}
+                    </Badge>
+                  </TableCell>
                   <TableCell>{context.uniqueUserCount}</TableCell>
-                  <TableCell>{context.createdAt.toLocaleDateString()}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

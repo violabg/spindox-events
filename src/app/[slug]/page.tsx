@@ -9,7 +9,12 @@ type ContextPageParams = {
 export default async function ContextPage({ params }: ContextPageParams) {
   const { slug } = await params;
 
-  const context = await prisma.context.findUnique({ where: { slug } });
+  const context = await prisma.context.findUnique({
+    where: {
+      slug,
+      status: 'active', // Only show active contexts
+    },
+  });
   if (!context) return notFound();
 
   return <ContextPageClient context={context} />;
