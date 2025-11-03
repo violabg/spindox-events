@@ -8,5 +8,5 @@ export default async function ContextDetailsPage({ params }: ContextDetailsPageP
   const { id } = await params;
 
   // Redirect directly to the questions management page
-  redirect(`/admin/contexts/${id}/questions`);
+  redirect(`/admin/contests/${id}/questions`);
 }

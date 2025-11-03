@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { getContextAction } from '@/actions/contexts/get.action';
+import { getContestAction } from '@/actions/contests/get.action';
 import QuestionForm from '../../question.form';
 
 type PageProps = {
@@ -12,14 +12,14 @@ type PageProps = {
 export default async function NewQuestionPage({ params }: PageProps) {
   const { id } = await params;
 
-  const contextResult = await getContextAction(id);
+  const contestResult = await getContestAction(id);
 
-  if (!contextResult.success || !contextResult.data) {
+  if (!contestResult.success || !contestResult.data) {
     return (
       <div className="container mx-auto p-4 sm:p-6">
         <div className="text-center py-8">
-          <h1 className="text-2xl font-bold text-destructive">Context Not Found</h1>
-          <p className="text-muted-foreground mt-2">The requested context could not be found.</p>
+          <h1 className="text-2xl font-bold text-destructive">Contest Not Found</h1>
+          <p className="text-muted-foreground mt-2">The requested contest could not be found.</p>
           <Button asChild className="mt-4">
             <Link href="/admin">Back to Admin</Link>
           </Button>
@@ -28,20 +28,20 @@ export default async function NewQuestionPage({ params }: PageProps) {
     );
   }
 
-  const context = contextResult.data;
+  const contest = contestResult.data;
 
   return (
     <div className="container mx-auto p-4 sm:p-6">
       <div className="mb-6 sm:mb-8">
         <div className="flex items-center gap-3 sm:gap-4 mb-4">
           <Button variant="outline" size="icon" asChild>
-            <Link href={`/admin/contexts/${id}/questions`}>
+            <Link href={`/admin/contests/${id}/questions`}>
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
           <div className="min-w-0 flex-1">
             <h1 className="text-2xl sm:text-3xl font-bold">Create New Question</h1>
-            <p className="text-muted-foreground text-sm sm:text-base truncate">Add a new question to &quot;{context.name}&quot;</p>
+            <p className="text-muted-foreground text-sm sm:text-base truncate">Add a new question to &quot;{contest.name}&quot;</p>
           </div>
         </div>
       </div>
@@ -52,7 +52,7 @@ export default async function NewQuestionPage({ params }: PageProps) {
           <CardDescription>Fill in the question information and provide answer options with scores.</CardDescription>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
-          <QuestionForm contextId={id} />
+          <QuestionForm contestId={id} />
         </CardContent>
       </Card>
     </div>

@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
 const createQuestionSchema = z.object({
-  contextId: z.string().cuid(),
+  contestId: z.string().cuid(),
   title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
   content: z.string().min(1, 'Content is required').max(1000, 'Content must be less than 1000 characters'),
   answers: z
@@ -25,24 +25,24 @@ export async function createQuestionAction(data: CreateQuestionInput) {
     // Validate the data
     const validatedData = createQuestionSchema.parse(data);
 
-    // Check if context exists
-    const context = await prisma.context.findUnique({
-      where: { id: validatedData.contextId },
+    // Check if contest exists
+    const contest = await prisma.contest.findUnique({
+      where: { id: validatedData.contestId },
       select: {
         id: true,
       },
     });
 
-    if (!context) {
+    if (!contest) {
       return {
         success: false,
-        error: 'Context not found',
+        error: 'Contest not found',
       };
     }
 
     // Get the next order number for the question
     const lastQuestion = await prisma.question.findFirst({
-      where: { contextId: validatedData.contextId },
+      where: { contestId: validatedData.contestId },
       orderBy: { order: 'desc' },
       select: { order: true },
     });
@@ -55,7 +55,7 @@ export async function createQuestionAction(data: CreateQuestionInput) {
         title: validatedData.title,
         content: validatedData.content,
         order: nextOrder,
-        contextId: validatedData.contextId,
+        contestId: validatedData.contestId,
         answers: {
           create: validatedData.answers.map((answer, index) => ({
             content: answer.content,
@@ -66,8 +66,8 @@ export async function createQuestionAction(data: CreateQuestionInput) {
       },
     });
 
-    // Revalidate the context page
-    revalidatePath(`/admin/contexts/${validatedData.contextId}`);
+    // Revalidate the contest page
+    revalidatePath(`/admin/contests/${validatedData.contestId}`);
 
     return {
       success: true,

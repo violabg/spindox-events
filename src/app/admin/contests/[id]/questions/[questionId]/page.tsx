@@ -21,7 +21,7 @@ export default async function QuestionDetailPage({ params }: PageProps) {
           <h1 className="text-2xl font-bold text-destructive">Question Not Found</h1>
           <p className="text-muted-foreground mt-2">The requested question could not be found.</p>
           <Button asChild className="mt-4">
-            <Link href={`/admin/contexts/${id}/questions`}>Back to Questions</Link>
+            <Link href={`/admin/contests/${id}/questions`}>Back to Questions</Link>
           </Button>
         </div>
       </div>
@@ -35,7 +35,7 @@ export default async function QuestionDetailPage({ params }: PageProps) {
       <div className="mb-8 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="outline" size="icon" asChild>
-            <Link href={`/admin/contexts/${id}/questions`}>
+            <Link href={`/admin/contests/${id}/questions`}>
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
@@ -45,7 +45,7 @@ export default async function QuestionDetailPage({ params }: PageProps) {
           </div>
         </div>
         <Button asChild>
-          <Link href={`/admin/contexts/${id}/questions/${questionId}/edit`}>
+          <Link href={`/admin/contests/${id}/questions/${questionId}/edit`}>
             <Edit className="mr-2 h-4 w-4" />
             Edit Question
           </Link>

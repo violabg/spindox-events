@@ -6,19 +6,19 @@ import { toast } from 'sonner';
 import QRCode from 'qrcode';
 
 type QRCodeModalProps = {
-  contextSlug: string;
-  contextName: string;
+  contestSlug: string;
+  contestName: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
 
-export function QRCodeModal({ contextSlug, contextName, open, onOpenChange }: QRCodeModalProps) {
+export function QRCodeModal({ contestSlug, contestName, open, onOpenChange }: QRCodeModalProps) {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
 
   useEffect(() => {
     if (open) {
       const baseUrl = window.location.origin;
-      const fullUrl = `${baseUrl}/${contextSlug}`;
+      const fullUrl = `${baseUrl}/${contestSlug}`;
 
       QRCode.toDataURL(fullUrl, {
         width: 256,
@@ -36,20 +36,20 @@ export function QRCodeModal({ contextSlug, contextName, open, onOpenChange }: QR
           toast.error('Failed to generate QR code');
         });
     }
-  }, [open, contextSlug]);
+  }, [open, contestSlug]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>QR Code for {contextName}</DialogTitle>
-          <DialogDescription>Scan this QR code or share the link to access this context</DialogDescription>
+          <DialogTitle>QR Code for {contestName}</DialogTitle>
+          <DialogDescription>Scan this QR code or share the link to access this contest</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col items-center space-y-4">
           {qrCodeDataUrl && <img src={qrCodeDataUrl} alt="QR Code" className="w-64 h-64 border rounded-lg" />}
           <div className="text-center">
             <p className="text-sm text-muted-foreground mb-2">Direct link:</p>
-            <code className="text-xs bg-muted px-2 py-1 rounded">{typeof window !== 'undefined' && `${window.location.origin}/${contextSlug}`}</code>
+            <code className="text-xs bg-muted px-2 py-1 rounded">{typeof window !== 'undefined' && `${window.location.origin}/${contestSlug}`}</code>
           </div>
         </div>
       </DialogContent>

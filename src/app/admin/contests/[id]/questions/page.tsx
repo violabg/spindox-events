@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { ArrowLeft, Plus, Edit } from 'lucide-react';
-import { getContextWithQuestions } from '@/actions/contexts/get.action';
+import { getContestWithQuestions } from '@/actions/contests/get.action';
 import QuestionsTable from './questions.table';
 
 type PageProps = {
@@ -13,14 +13,14 @@ type PageProps = {
 export default async function QuestionsPage({ params }: PageProps) {
   const { id } = await params;
 
-  const contextResult = await getContextWithQuestions(id);
+  const contestResult = await getContestWithQuestions(id);
 
-  if (!contextResult.success || !contextResult.data) {
+  if (!contestResult.success || !contestResult.data) {
     return (
       <div className="container mx-auto p-6">
         <div className="text-center py-8">
-          <h1 className="text-2xl font-bold text-destructive">Context Not Found</h1>
-          <p className="text-muted-foreground mt-2">The requested context could not be found.</p>
+          <h1 className="text-2xl font-bold text-destructive">Contest Not Found</h1>
+          <p className="text-muted-foreground mt-2">The requested contest could not be found.</p>
           <Button asChild className="mt-4">
             <Link href="/admin">Back to Admin</Link>
           </Button>
@@ -29,7 +29,7 @@ export default async function QuestionsPage({ params }: PageProps) {
     );
   }
 
-  const context = contextResult.data;
+  const contest = contestResult.data;
 
   return (
     <div className="container mx-auto p-6">
@@ -41,31 +41,31 @@ export default async function QuestionsPage({ params }: PageProps) {
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">{context.name}</h1>
-            <p className="text-muted-foreground">Context Management</p>
+            <h1 className="text-3xl font-bold">{contest.name}</h1>
+            <p className="text-muted-foreground">Contest Management</p>
           </div>
         </div>
 
-        {/* Context Information Card */}
+        {/* Contest Information Card */}
         <Card className="mb-6">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <CardTitle>Context Information</CardTitle>
-                <Badge variant={context.status === 'active' ? 'default' : 'secondary'}>{context.status === 'active' ? 'Active' : 'Inactive'}</Badge>
+                <CardTitle>Contest Information</CardTitle>
+                <Badge variant={contest.status === 'active' ? 'default' : 'secondary'}>{contest.status === 'active' ? 'Active' : 'Inactive'}</Badge>
               </div>
               <Button variant="outline" size="sm" asChild>
-                <Link href={`/admin/contexts/${id}/edit`}>
+                <Link href={`/admin/contests/${id}/edit`}>
                   <Edit className="mr-2 h-4 w-4" />
-                  Edit Context
+                  Edit Contest
                 </Link>
               </Button>
             </div>
-            {context.theme && <CardDescription>Theme: {context.theme}</CardDescription>}
+            {contest.theme && <CardDescription>Theme: {contest.theme}</CardDescription>}
           </CardHeader>
-          {context.description && (
+          {contest.description && (
             <CardContent>
-              <p className="text-sm text-muted-foreground">{context.description}</p>
+              <p className="text-sm text-muted-foreground">{contest.description}</p>
             </CardContent>
           )}
         </Card>
@@ -73,11 +73,11 @@ export default async function QuestionsPage({ params }: PageProps) {
         {/* Questions Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold">Questions ({context.questions.length})</h2>
-            <p className="text-muted-foreground">Manage questions for this context</p>
+            <h2 className="text-2xl font-bold">Questions ({contest.questions.length})</h2>
+            <p className="text-muted-foreground">Manage questions for this contest</p>
           </div>
           <Button asChild>
-            <Link href={`/admin/contexts/${id}/questions/new`}>
+            <Link href={`/admin/contests/${id}/questions/new`}>
               <Plus className="mr-2 h-4 w-4" />
               Add Question
             </Link>
@@ -87,7 +87,7 @@ export default async function QuestionsPage({ params }: PageProps) {
 
       <Card>
         <CardContent className="pt-6">
-          <QuestionsTable contextId={id} questions={context.questions} />
+          <QuestionsTable contestId={id} questions={contest.questions} />
         </CardContent>
       </Card>
     </div>

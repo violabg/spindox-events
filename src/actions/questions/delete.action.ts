@@ -15,7 +15,7 @@ export async function deleteQuestionAction(questionId: string) {
     const existingQuestion = await prisma.question.findUnique({
       where: { id: validatedQuestionId },
       include: {
-        context: true,
+        contest: true,
       },
     });
 
@@ -31,9 +31,9 @@ export async function deleteQuestionAction(questionId: string) {
       where: { id: validatedQuestionId },
     });
 
-    // Revalidate the context page and questions page
-    revalidatePath(`/admin/contexts/${existingQuestion.contextId}`);
-    revalidatePath(`/admin/contexts/${existingQuestion.contextId}/questions`);
+    // Revalidate the contest page and questions page
+    revalidatePath(`/admin/contests/${existingQuestion.contestId}`);
+    revalidatePath(`/admin/contests/${existingQuestion.contestId}/questions`);
 
     return {
       success: true,

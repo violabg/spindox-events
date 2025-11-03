@@ -21,7 +21,7 @@ export default async function EditQuestionPage({ params }: PageProps) {
           <h1 className="text-2xl font-bold text-destructive">Question Not Found</h1>
           <p className="text-muted-foreground mt-2">The requested question could not be found.</p>
           <Button asChild className="mt-4">
-            <Link href={`/admin/contexts/${id}/questions`}>Back to Questions</Link>
+            <Link href={`/admin/contests/${id}/questions`}>Back to Questions</Link>
           </Button>
         </div>
       </div>
@@ -35,7 +35,7 @@ export default async function EditQuestionPage({ params }: PageProps) {
       <div className="mb-6 sm:mb-8">
         <div className="flex items-center gap-3 sm:gap-4 mb-4">
           <Button variant="outline" size="icon" asChild>
-            <Link href={`/admin/contexts/${id}/questions`}>
+            <Link href={`/admin/contests/${id}/questions`}>
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
@@ -52,7 +52,7 @@ export default async function EditQuestionPage({ params }: PageProps) {
           <CardDescription>Update the question information and answer options with scores.</CardDescription>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
-          <QuestionForm contextId={id} question={question} />
+          <QuestionForm contestId={id} question={question} />
         </CardContent>
       </Card>
     </div>

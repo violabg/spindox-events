@@ -1,21 +1,21 @@
 import prisma from '@/lib/prisma';
 import { notFound } from 'next/navigation';
-import ContextPageClient from './page.client';
+import ContestPageClient from './page.client';
 
-type ContextPageParams = {
+type ContestPageParams = {
   params: Promise<{ slug: string }>;
 };
 
-export default async function ContextPage({ params }: ContextPageParams) {
+export default async function ContestPage({ params }: ContestPageParams) {
   const { slug } = await params;
 
-  const context = await prisma.context.findUnique({
+  const contest = await prisma.contest.findUnique({
     where: {
       slug,
-      status: 'active', // Only show active contexts
+      status: 'active', // Only show active contests
     },
   });
-  if (!context) return notFound();
+  if (!contest) return notFound();
 
-  return <ContextPageClient context={context} />;
+  return <ContestPageClient contest={contest} />;
 }

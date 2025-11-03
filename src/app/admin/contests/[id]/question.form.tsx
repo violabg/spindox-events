@@ -20,7 +20,7 @@ import { toast } from 'sonner';
 import { FormInput } from '@/components/form/form-input';
 
 const questionSchema = z.object({
-  contextId: z.string().cuid(),
+  contestId: z.string().cuid(),
   questionId: z.string().cuid().optional(),
   title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
   content: z.string().min(1, 'Content is required').max(1000, 'Content must be less than 1000 characters'),
@@ -43,18 +43,18 @@ type QuestionWithAnswers = QuestionModel & {
 };
 
 type QuestionFormProps = {
-  contextId: string;
+  contestId: string;
   question?: QuestionWithAnswers;
 };
 
-export default function QuestionForm({ contextId, question }: QuestionFormProps) {
+export default function QuestionForm({ contestId, question }: QuestionFormProps) {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const isEditMode = !!question;
 
   const defaultValues: QuestionFormData = {
-    contextId,
+    contestId,
     questionId: question?.id,
     title: question?.title || '',
     content: question?.content || '',
@@ -89,7 +89,7 @@ export default function QuestionForm({ contextId, question }: QuestionFormProps)
         // Update existing question
         result = await updateQuestionAction({
           questionId: question.id,
-          contextId: data.contextId,
+          contestId: data.contestId,
           title: data.title,
           content: data.content,
           answers: data.answers.map(answer => ({
@@ -100,7 +100,7 @@ export default function QuestionForm({ contextId, question }: QuestionFormProps)
       } else {
         // Create new question
         result = await createQuestionAction({
-          contextId: data.contextId,
+          contestId: data.contestId,
           title: data.title,
           content: data.content,
           answers: data.answers.map(answer => ({
@@ -113,7 +113,7 @@ export default function QuestionForm({ contextId, question }: QuestionFormProps)
       if (result.success) {
         toast.success(isEditMode ? 'Question updated successfully' : 'Question created successfully');
         form.reset(defaultValues);
-        router.push(`/admin/contexts/${contextId}/questions`);
+        router.push(`/admin/contests/${contestId}/questions`);
       } else {
         setError(result.error || `Failed to ${isEditMode ? 'update' : 'create'} question`);
       }
@@ -257,7 +257,7 @@ export default function QuestionForm({ contextId, question }: QuestionFormProps)
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push(`/admin/contexts/${contextId}/questions`)}
+          onClick={() => router.push(`/admin/contests/${contestId}/questions`)}
           disabled={form.formState.isSubmitting}
           className="w-full sm:w-auto"
         >

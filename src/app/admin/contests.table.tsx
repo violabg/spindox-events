@@ -17,24 +17,24 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Trash2, MessageSquare, Edit, QrCode } from 'lucide-react';
-import { ContextStatus } from '@/prisma/enums';
-import { deleteContextAction } from '@/actions/contexts/delete.action';
+import { ContestStatus } from '@/prisma/enums';
+import { deleteContestAction } from '@/actions/contests/delete.action';
 import { toast } from 'sonner';
 import { QRCodeModal } from '@/components/modals';
 
-type ContextWithUserCount = {
+type ContestWithUserCount = {
   id: string;
   name: string;
   slug: string;
-  status: ContextStatus;
+  status: ContestStatus;
   uniqueUserCount: number;
 };
 
-type ContextsTableProps = {
-  contexts: ContextWithUserCount[];
+type ContestsTableProps = {
+  contests: ContestWithUserCount[];
 };
 
-function QRCodeButton({ contextSlug, contextName }: { contextSlug: string; contextName: string }) {
+function QRCodeButton({ contestSlug, contestName }: { contestSlug: string; contestName: string }) {
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
 
   return (
@@ -42,25 +42,25 @@ function QRCodeButton({ contextSlug, contextName }: { contextSlug: string; conte
       <Button variant="outline" size="sm" onClick={() => setIsQRModalOpen(true)}>
         <QrCode className="h-4 w-4" />
       </Button>
-      <QRCodeModal contextSlug={contextSlug} contextName={contextName} open={isQRModalOpen} onOpenChange={setIsQRModalOpen} />
+      <QRCodeModal contestSlug={contestSlug} contestName={contestName} open={isQRModalOpen} onOpenChange={setIsQRModalOpen} />
     </>
   );
 }
 
-function DeleteContextButton({ contextId, contextName }: { contextId: string; contextName: string }) {
+function DeleteContestButton({ contestId, contestName }: { contestId: string; contestName: string }) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      const result = await deleteContextAction(contextId);
+      const result = await deleteContestAction(contestId);
       if (result.success) {
-        toast.success('Context deleted successfully');
+        toast.success('Contest deleted successfully');
       } else {
-        toast.error(result.error || 'Failed to delete context');
+        toast.error(result.error || 'Failed to delete contest');
       }
     } catch {
-      toast.error('Failed to delete context');
+      toast.error('Failed to delete contest');
     } finally {
       setIsDeleting(false);
     }
@@ -75,9 +75,9 @@ function DeleteContextButton({ contextId, contextName }: { contextId: string; co
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Context</AlertDialogTitle>
+          <AlertDialogTitle>Delete Contest</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete &quot;{contextName}&quot;? This action cannot be undone and will fail if the context has associated
+            Are you sure you want to delete &quot;{contestName}&quot;? This action cannot be undone and will fail if the contest has associated
             questions or user answers.
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -92,11 +92,11 @@ function DeleteContextButton({ contextId, contextName }: { contextId: string; co
   );
 }
 
-export default function ContextsTable({ contexts }: ContextsTableProps) {
+export default function ContestsTable({ contests }: ContestsTableProps) {
   return (
     <>
       <Table>
-        <TableCaption>A list of all event contexts.</TableCaption>
+        <TableCaption>A list of all event contests.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
@@ -107,36 +107,36 @@ export default function ContextsTable({ contexts }: ContextsTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {contexts.map(context => (
-            <TableRow key={context.id}>
-              <TableCell className="font-medium">{context.name}</TableCell>
-              <TableCell className="font-mono text-sm">{context.slug}</TableCell>
+          {contests.map(contest => (
+            <TableRow key={contest.id}>
+              <TableCell className="font-medium">{contest.name}</TableCell>
+              <TableCell className="font-mono text-sm">{contest.slug}</TableCell>
               <TableCell>
-                <Badge variant={context.status === 'active' ? 'default' : 'secondary'}>{context.status === 'active' ? 'Active' : 'Inactive'}</Badge>
+                <Badge variant={contest.status === 'active' ? 'default' : 'secondary'}>{contest.status === 'active' ? 'Active' : 'Inactive'}</Badge>
               </TableCell>
-              <TableCell>{context.uniqueUserCount}</TableCell>
+              <TableCell>{contest.uniqueUserCount}</TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-2">
-                  <QRCodeButton contextSlug={context.slug} contextName={context.name} />
+                  <QRCodeButton contestSlug={contest.slug} contestName={contest.name} />
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/admin/contexts/${context.id}/questions`}>
+                    <Link href={`/admin/contests/${contest.id}/questions`}>
                       <MessageSquare className="h-4 w-4" />
                     </Link>
                   </Button>
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/admin/contexts/${context.id}/edit`}>
+                    <Link href={`/admin/contests/${contest.id}/edit`}>
                       <Edit className="h-4 w-4" />
                     </Link>
                   </Button>
-                  <DeleteContextButton contextId={context.id} contextName={context.name} />
+                  <DeleteContestButton contestId={contest.id} contestName={contest.name} />
                 </div>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      {contexts.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground">No contexts found. Create your first context to get started.</div>
+      {contests.length === 0 && (
+        <div className="text-center py-8 text-muted-foreground">No contests found. Create your first contest to get started.</div>
       )}
     </>
   );

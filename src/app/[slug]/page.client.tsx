@@ -4,13 +4,13 @@ import { Prisma } from '@/prisma/client';
 import { Authenticable } from '@/components/authenticable';
 
 type Props = {
-  context: Prisma.ContextGetPayload<{}>;
+  contest: Prisma.ContestGetPayload<{}>;
 };
 
-export default function ContextPageClient({ context }: Props) {
+export default function ContextPageClient({ contest }: Props) {
   return (
     <Authenticable
-      callbackURL={`/${context.slug}`}
+      callbackURL={`/${contest.slug}`}
       render={({ user }) => {
         return <div>Welcome, {user.name}!</div>;
       }}

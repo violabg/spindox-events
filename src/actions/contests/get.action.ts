@@ -2,30 +2,30 @@
 
 import prisma from '@/lib/prisma';
 
-export async function getContextAction(contextId: string) {
+export async function getContestAction(contestId: string) {
   try {
-    const context = await prisma.context.findUnique({
-      where: { id: contextId },
+    const contest = await prisma.contest.findUnique({
+      where: { id: contestId },
     });
 
     return {
       success: true,
-      data: context,
+      data: contest,
     };
   } catch (error) {
-    console.error('Error fetching context:', error);
+    console.error('Error fetching contest:', error);
     return {
       success: false,
-      error: 'Failed to fetch context',
+      error: 'Failed to fetch contest',
       data: null,
     };
   }
 }
 
-export async function getContextWithQuestions(contextId: string) {
+export async function getContestWithQuestions(contestId: string) {
   try {
-    const context = await prisma.context.findUnique({
-      where: { id: contextId },
+    const contest = await prisma.contest.findUnique({
+      where: { id: contestId },
       include: {
         questions: {
           orderBy: { order: 'asc' },
@@ -40,13 +40,13 @@ export async function getContextWithQuestions(contextId: string) {
 
     return {
       success: true,
-      data: context,
+      data: contest,
     };
   } catch (error) {
-    console.error('Error fetching context:', error);
+    console.error('Error fetching contest:', error);
     return {
       success: false,
-      error: 'Failed to fetch context',
+      error: 'Failed to fetch contest',
       data: null,
     };
   }

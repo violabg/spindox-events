@@ -14,7 +14,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum ContextStatus {
+enum ContestStatus {
   active
   inactive
 }
@@ -87,19 +87,19 @@ model Verification {
   @@map("verification")
 }
 
-model Context {
+model Contest {
   id          String        @id @default(cuid())
   name        String
   slug        String        @unique
   theme       String?
   description String?
-  status      ContextStatus @default(active)
+  status      ContestStatus @default(active)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @default(now()) @updatedAt
   questions   Question[]
   userAnswers UserAnswer[]
 
-  @@map("context")
+  @@map("contest")
 }
 
 model Question {
@@ -109,8 +109,8 @@ model Question {
   order       Int          @default(0)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @default(now()) @updatedAt
-  contextId   String
-  context     Context      @relation(fields: [contextId], references: [id], onDelete: Cascade)
+  contestId   String
+  contest     Contest      @relation(fields: [contestId], references: [id], onDelete: Cascade)
   answers     Answer[]
   userAnswers UserAnswer[]
 
@@ -140,13 +140,13 @@ model UserAnswer {
   updatedAt  DateTime @default(now()) @updatedAt
   userId     String
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  contextId  String
-  context    Context  @relation(fields: [contextId], references: [id], onDelete: Cascade)
+  contestId  String
+  contest    Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
   questionId String
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
   answerId   String
   answer     Answer   @relation(fields: [answerId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, contextId, questionId])
+  @@unique([userId, contestId, questionId])
   @@map("user_answer")
 }

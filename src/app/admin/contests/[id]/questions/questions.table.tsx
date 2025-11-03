@@ -26,7 +26,7 @@ type QuestionWithAnswers = QuestionModel & {
 };
 
 type QuestionsTableProps = {
-  contextId: string;
+  contestId: string;
   questions: QuestionWithAnswers[];
 };
 
@@ -75,11 +75,11 @@ function DeleteQuestionButton({ questionId, questionTitle }: { questionId: strin
   );
 }
 
-export default function QuestionsTable({ contextId, questions }: QuestionsTableProps) {
+export default function QuestionsTable({ contestId, questions }: QuestionsTableProps) {
   return (
     <>
       <Table>
-        <TableCaption>A list of all questions for this context.</TableCaption>
+        <TableCaption>A list of all questions for this contest.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Title</TableHead>
@@ -93,7 +93,7 @@ export default function QuestionsTable({ contextId, questions }: QuestionsTableP
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-2">
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/admin/contexts/${contextId}/questions/${question.id}/edit`}>
+                    <Link href={`/admin/contests/${contestId}/questions/${question.id}/edit`}>
                       <Edit className="h-4 w-4" />
                     </Link>
                   </Button>

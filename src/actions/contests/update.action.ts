@@ -2,10 +2,10 @@
 
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
-import { ContextStatus } from '@/prisma/enums';
+import { ContestStatus } from '@/prisma/enums';
 import { revalidatePath } from 'next/cache';
 
-const updateContextSchema = z.object({
+const updateContestSchema = z.object({
   id: z.string().cuid(),
   name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
   slug: z
@@ -15,33 +15,33 @@ const updateContextSchema = z.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must contain only lowercase letters, numbers, and hyphens'),
   theme: z.string().max(50, 'Theme must be less than 50 characters').optional(),
   description: z.string().max(500, 'Description must be less than 500 characters').optional(),
-  status: z.enum(ContextStatus),
+  status: z.enum(ContestStatus),
 });
 
-type UpdateContextData = z.infer<typeof updateContextSchema>;
+type UpdateContestData = z.infer<typeof updateContestSchema>;
 
-export async function updateContextAction(data: UpdateContextData) {
+export async function updateContestAction(data: UpdateContestData) {
   try {
     // Validate the data
-    const validatedData = updateContextSchema.parse(data);
+    const validatedData = updateContestSchema.parse(data);
 
-    // Check if context exists
-    const existingContext = await prisma.context.findUnique({
+    // Check if contest exists
+    const existingContest = await prisma.contest.findUnique({
       where: { id: validatedData.id },
     });
 
-    if (!existingContext) {
+    if (!existingContest) {
       return {
         success: false,
-        error: 'Context not found',
+        error: 'Contest not found',
       };
     }
 
-    // Check if slug is already taken by another context
-    const existingSlug = await prisma.context.findFirst({
+    // Check if slug is already taken by another contest
+    const existingSlug = await prisma.contest.findFirst({
       where: {
         slug: validatedData.slug,
-        id: { not: validatedData.id }, // Exclude current context
+        id: { not: validatedData.id }, // Exclude current contest
       },
     });
 
@@ -52,8 +52,8 @@ export async function updateContextAction(data: UpdateContextData) {
       };
     }
 
-    // Update the context
-    const updatedContext = await prisma.context.update({
+    // Update the contest
+    const updatedContest = await prisma.contest.update({
       where: { id: validatedData.id },
       data: {
         name: validatedData.name,
@@ -64,16 +64,16 @@ export async function updateContextAction(data: UpdateContextData) {
       },
     });
 
-    // Revalidate the admin page and context details page
+    // Revalidate the admin page and contest details page
     revalidatePath('/admin');
-    revalidatePath(`/admin/contexts/${validatedData.id}`);
+    revalidatePath(`/admin/contests/${validatedData.id}`);
 
     return {
       success: true,
-      data: updatedContext,
+      data: updatedContest,
     };
   } catch (error) {
-    console.error('Error updating context:', error);
+    console.error('Error updating contest:', error);
 
     if (error instanceof z.ZodError) {
       return {
@@ -84,7 +84,7 @@ export async function updateContextAction(data: UpdateContextData) {
 
     return {
       success: false,
-      error: 'Failed to update context',
+      error: 'Failed to update contest',
     };
   }
 }

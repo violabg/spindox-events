@@ -6,7 +6,7 @@ import prisma from '@/lib/prisma';
 
 const updateQuestionSchema = z.object({
   questionId: z.string().cuid(),
-  contextId: z.string().cuid(),
+  contestId: z.string().cuid(),
   title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
   content: z.string().min(1, 'Content is required').max(1000, 'Content must be less than 1000 characters'),
   answers: z
@@ -27,18 +27,18 @@ export async function updateQuestionAction(data: UpdateQuestionData) {
     // Validate input
     const validatedData = updateQuestionSchema.parse(data);
 
-    // Check if question exists and belongs to the context
+    // Check if question exists and belongs to the contest
     const existingQuestion = await prisma.question.findFirst({
       where: {
         id: validatedData.questionId,
-        contextId: validatedData.contextId,
+        contestId: validatedData.contestId,
       },
     });
 
     if (!existingQuestion) {
       return {
         success: false,
-        error: 'Question not found or does not belong to this context',
+        error: 'Question not found or does not belong to this contest',
       };
     }
 
@@ -69,8 +69,8 @@ export async function updateQuestionAction(data: UpdateQuestionData) {
       });
     });
 
-    // Revalidate the context page
-    revalidatePath(`/admin/contexts/${validatedData.contextId}`);
+    // Revalidate the contest page
+    revalidatePath(`/admin/contests/${validatedData.contestId}`);
 
     return {
       success: true,
