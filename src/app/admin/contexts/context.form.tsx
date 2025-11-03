@@ -55,6 +55,10 @@ export default function ContextForm({ contextId, initialData }: ContextFormProps
 
   // Auto-generate slug from name
   const watchedName = useWatch({ control: form.control, name: 'name' });
+  const watchedSlug = useWatch({ control: form.control, name: 'slug' });
+  const watchedDescription = useWatch({ control: form.control, name: 'description' });
+  const watchedTheme = useWatch({ control: form.control, name: 'theme' });
+
   const generateSlug = (name: string) => {
     return name
       .toLowerCase()
@@ -113,7 +117,10 @@ export default function ContextForm({ contextId, initialData }: ContextFormProps
         <FieldLabel htmlFor="name">Name</FieldLabel>
         <FieldContent>
           <Input id="name" placeholder="Enter context name..." {...form.register('name')} />
-          <FieldDescription>The display name for this context</FieldDescription>
+          <div className="flex items-center justify-between">
+            <FieldDescription>The display name for this context</FieldDescription>
+            <span className="text-xs text-muted-foreground">{(watchedName || '').length}/100</span>
+          </div>
           <FieldError errors={form.formState.errors.name ? [form.formState.errors.name] : undefined} />
         </FieldContent>
       </Field>
@@ -122,7 +129,10 @@ export default function ContextForm({ contextId, initialData }: ContextFormProps
         <FieldLabel htmlFor="slug">Slug</FieldLabel>
         <FieldContent>
           <Input id="slug" placeholder="context-slug" {...form.register('slug')} />
-          <FieldDescription>URL-friendly identifier (automatically generated from name, but you can customize it)</FieldDescription>
+          <div className="flex items-center justify-between">
+            <FieldDescription>URL-friendly identifier (automatically generated from name, but you can customize it)</FieldDescription>
+            <span className="text-xs text-muted-foreground">{(watchedSlug || '').length}/50</span>
+          </div>
           <FieldError errors={form.formState.errors.slug ? [form.formState.errors.slug] : undefined} />
         </FieldContent>
       </Field>
@@ -131,7 +141,10 @@ export default function ContextForm({ contextId, initialData }: ContextFormProps
         <FieldLabel htmlFor="theme">Theme (Optional)</FieldLabel>
         <FieldContent>
           <Input id="theme" placeholder="Enter theme..." {...form.register('theme')} />
-          <FieldDescription>Optional theme or category for this context</FieldDescription>
+          <div className="flex items-center justify-between">
+            <FieldDescription>Optional theme or category for this context</FieldDescription>
+            <span className="text-xs text-muted-foreground">{(watchedTheme || '').length}/50</span>
+          </div>
           <FieldError errors={form.formState.errors.theme ? [form.formState.errors.theme] : undefined} />
         </FieldContent>
       </Field>
@@ -140,7 +153,10 @@ export default function ContextForm({ contextId, initialData }: ContextFormProps
         <FieldLabel htmlFor="description">Description (Optional)</FieldLabel>
         <FieldContent>
           <Textarea id="description" placeholder="Enter description..." className="min-h-[100px]" {...form.register('description')} />
-          <FieldDescription>Optional description of this context</FieldDescription>
+          <div className="flex items-center justify-between">
+            <FieldDescription>Optional description of this context</FieldDescription>
+            <span className="text-xs text-muted-foreground">{(watchedDescription || '').length}/500</span>
+          </div>
           <FieldError errors={form.formState.errors.description ? [form.formState.errors.description] : undefined} />
         </FieldContent>
       </Field>

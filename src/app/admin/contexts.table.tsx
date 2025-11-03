@@ -16,7 +16,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Trash2 } from 'lucide-react';
+import { Trash2, MessageSquare, Edit } from 'lucide-react';
 import { ContextStatus } from '@/prisma/enums';
 import { deleteContextAction } from '@/actions/contexts/delete.action';
 import { toast } from 'sonner';
@@ -87,23 +87,31 @@ export default function ContextsTable({ contexts }: ContextsTableProps) {
             <TableHead>Name</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Users Answered</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {contexts.map(context => (
             <TableRow key={context.id}>
-              <TableCell className="font-medium">
-                <Link href={`/admin/contexts/${context.id}`} className="text-blue-600 hover:text-blue-800 hover:underline transition-colors">
-                  {context.name}
-                </Link>
-              </TableCell>
+              <TableCell className="font-medium">{context.name}</TableCell>
               <TableCell>
                 <Badge variant={context.status === 'active' ? 'default' : 'secondary'}>{context.status === 'active' ? 'Active' : 'Inactive'}</Badge>
               </TableCell>
               <TableCell>{context.uniqueUserCount}</TableCell>
-              <TableCell>
-                <DeleteContextButton contextId={context.id} contextName={context.name} />
+              <TableCell className="text-right">
+                <div className="flex items-center justify-end gap-2">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/admin/contexts/${context.id}/questions`}>
+                      <MessageSquare className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/admin/contexts/${context.id}/edit`}>
+                      <Edit className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                  <DeleteContextButton contextId={context.id} contextName={context.name} />
+                </div>
               </TableCell>
             </TableRow>
           ))}

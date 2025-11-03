@@ -1,6 +1,4 @@
-import { notFound } from 'next/navigation';
-import ContextDetailsClient from './context-details.client';
-import { getContextWithQuestions } from '@/actions/contexts/get.action';
+import { redirect } from 'next/navigation';
 
 type ContextDetailsPageProps = {
   params: Promise<{ id: string }>;
@@ -9,11 +7,6 @@ type ContextDetailsPageProps = {
 export default async function ContextDetailsPage({ params }: ContextDetailsPageProps) {
   const { id } = await params;
 
-  const result = await getContextWithQuestions(id);
-
-  if (!result.success || !result.data) {
-    return notFound();
-  }
-
-  return <ContextDetailsClient contextId={id} initialContext={result.data} />;
+  // Redirect directly to the questions management page
+  redirect(`/admin/contexts/${id}/questions`);
 }
