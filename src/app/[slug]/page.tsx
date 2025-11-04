@@ -15,7 +15,6 @@ export default async function ContestPage({ params }: ContestPageParams) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-  console.log('🚀 ~ ContestPage ~ session:', session);
   if (!session?.user) {
     redirect(`/${slug}/login`);
   }
