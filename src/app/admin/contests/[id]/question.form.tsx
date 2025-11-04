@@ -1,22 +1,24 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
-import { useRouter } from 'next/navigation';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { QuestionModel } from '@/prisma/models/Question';
-import { AnswerModel } from '@/prisma/models/Answer';
 import { Button } from '@/components/ui/button';
 import { FieldDescription } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Plus, Trash2 } from 'lucide-react';
+import { AnswerModel } from '@/prisma/models/Answer';
+import { QuestionModel } from '@/prisma/models/Question';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Plus, Trash2, Wand2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { createQuestionAction } from '@/actions/questions/create.action';
 import { updateQuestionAction } from '@/actions/questions/update.action';
-import { toast } from 'sonner';
 import { FieldBase, FieldInput, FieldTextarea } from '@/components/form/form-input';
+import { AIQuestionModal } from '@/components/modals';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { GeneratedQuestion } from '@/lib/schemas/ai-question.schema';
 import { questionSchema, type QuestionData } from '@/schemas/question.schema';
+import { toast } from 'sonner';
 
 type QuestionFormData = QuestionData;
 
@@ -32,6 +34,7 @@ type QuestionFormProps = {
 
 export default function QuestionForm({ contestId, question }: QuestionFormProps) {
   const [error, setError] = useState<string | null>(null);
+  const [aiModalOpen, setAIModalOpen] = useState(false);
   const router = useRouter();
 
   const isEditMode = !!question;
@@ -61,6 +64,20 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
     remove(index);
   };
 
+  const handleAIGenerated = (generatedQuestion: GeneratedQuestion) => {
+    // Update form with generated data
+    form.setValue('title', generatedQuestion.title);
+    form.setValue('content', generatedQuestion.content);
+    form.setValue(
+      'answers',
+      generatedQuestion.answers.map(answer => ({
+        content: answer.content,
+        score: answer.score,
+      }))
+    );
+    toast.success('Question populated with AI-generated content');
+  };
+
   async function onSubmit(data: QuestionFormData) {
     setError(null);
 
@@ -88,120 +105,126 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-      <FieldInput
-        name="title"
-        control={form.control}
-        label="Question Title"
-        description="A brief title for the question"
-        placeholder="Enter question title..."
-        maxLength={200}
-      />
+    <>
+      <AIQuestionModal open={aiModalOpen} onOpenChange={setAIModalOpen} contestId={contestId} onGenerated={handleAIGenerated} />{' '}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <Button type="button" variant="outline" onClick={() => setAIModalOpen(true)} title="Generate question with AI">
+          <Wand2 className="h-4 w-4" /> Generate Questions
+        </Button>
+        <FieldInput
+          name="title"
+          control={form.control}
+          label="Question Title"
+          description="A brief title for the question"
+          placeholder="Enter question title..."
+          maxLength={200}
+        />
 
-      <FieldTextarea
-        name="content"
-        control={form.control}
-        label="Question Content"
-        description="The complete question text that users will see"
-        placeholder="Enter the full question..."
-        className="min-h-[100px]"
-        maxLength={1000}
-      />
+        <FieldTextarea
+          name="content"
+          control={form.control}
+          label="Question Content"
+          description="The complete question text that users will see"
+          placeholder="Enter the full question..."
+          className="min-h-[100px]"
+          maxLength={1000}
+        />
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Answer Options</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {fields.map((field, index) => {
-            // Get errors for this specific answer
-            const contentError = form.formState.errors.answers?.[index]?.content;
-            const scoreError = form.formState.errors.answers?.[index]?.score;
-            const hasAnswerErrors = contentError || scoreError;
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Answer Options</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {fields.map((field, index) => {
+              // Get errors for this specific answer
+              const contentError = form.formState.errors.answers?.[index]?.content;
+              const scoreError = form.formState.errors.answers?.[index]?.score;
+              const hasAnswerErrors = contentError || scoreError;
 
-            return (
-              <div key={field.id} className="space-y-3">
-                {/* Mobile: Stack all elements vertically, Desktop: Horizontal grid */}
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_auto] sm:items-end">
-                  <FieldInput
-                    control={form.control}
-                    name={`answers.${index}.content`}
-                    label={`Answer ${String.fromCharCode(65 + index)}`}
-                    placeholder={`Enter answer ${String.fromCharCode(65 + index)}...`}
-                    maxLength={200}
-                    disableFieldError={true}
-                  />
+              return (
+                <div key={field.id} className="space-y-3">
+                  {/* Mobile: Stack all elements vertically, Desktop: Horizontal grid */}
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_auto] sm:items-end">
+                    <FieldInput
+                      control={form.control}
+                      name={`answers.${index}.content`}
+                      label={`Answer ${String.fromCharCode(65 + index)}`}
+                      placeholder={`Enter answer ${String.fromCharCode(65 + index)}...`}
+                      maxLength={200}
+                      disableFieldError={true}
+                    />
 
-                  <div className="flex gap-2 sm:contents">
-                    <FieldBase control={form.control} name={`answers.${index}.score`} label="Score" disableFieldError={true}>
-                      {({ field }) => (
-                        <Input
-                          id={field.name}
-                          type="number"
-                          min="0"
-                          placeholder=""
-                          className="w-full sm:w-20"
-                          value={typeof field.value === 'number' ? field.value : ''}
-                          onChange={e => field.onChange(e.target.value ? parseInt(e.target.value) : 0)}
-                        />
-                      )}
-                    </FieldBase>
+                    <div className="flex gap-2 sm:contents">
+                      <FieldBase control={form.control} name={`answers.${index}.score`} label="Score" disableFieldError={true}>
+                        {({ field }) => (
+                          <Input
+                            id={field.name}
+                            type="number"
+                            min="0"
+                            placeholder=""
+                            className="w-full sm:w-20"
+                            value={typeof field.value === 'number' ? field.value : ''}
+                            onChange={e => field.onChange(e.target.value ? parseInt(e.target.value) : 0)}
+                          />
+                        )}
+                      </FieldBase>
 
-                    <div className="flex items-end">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => removeAnswer(index)}
-                        className="p-2 h-10 w-10 shrink-0"
-                        disabled={fields.length === 1}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-end">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeAnswer(index)}
+                          className="p-2 h-10 w-10 shrink-0"
+                          disabled={fields.length === 1}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
+
+                  {/* Single error display for both content and score */}
+                  {hasAnswerErrors && (
+                    <div className="text-sm text-destructive">
+                      {contentError && <div>Content: {contentError.message}</div>}
+                      {scoreError && <div>Score: {scoreError.message}</div>}
+                    </div>
+                  )}
                 </div>
+              );
+            })}
+            <FieldDescription>
+              Assign scores to each answer (0 or higher). Higher scores indicate better answers. Add more answers as needed. Users will see these
+              options in random order.
+            </FieldDescription>
+            <div className="pt-2">
+              <Button type="button" variant="outline" onClick={addAnswer} className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Add Answer
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-                {/* Single error display for both content and score */}
-                {hasAnswerErrors && (
-                  <div className="text-sm text-destructive">
-                    {contentError && <div>Content: {contentError.message}</div>}
-                    {scoreError && <div>Score: {scoreError.message}</div>}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-          <FieldDescription>
-            Assign scores to each answer (0 or higher). Higher scores indicate better answers. Add more answers as needed. Users will see these
-            options in random order.
-          </FieldDescription>
-          <div className="pt-2">
-            <Button type="button" variant="outline" onClick={addAnswer} className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Add Answer
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Display server-side errors */}
+        {error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>}
 
-      {/* Display server-side errors */}
-      {error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>}
-
-      <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
-        <Button type="submit" disabled={form.formState.isSubmitting} className="w-full sm:w-auto">
-          {form.formState.isSubmitting ? `${isEditMode ? 'Updating' : 'Creating'}...` : `${isEditMode ? 'Update' : 'Create'} Question`}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.push(`/admin/contests/${contestId}/questions`)}
-          disabled={form.formState.isSubmitting}
-          className="w-full sm:w-auto"
-        >
-          Cancel
-        </Button>
-      </div>
-    </form>
+        <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+          <Button type="submit" disabled={form.formState.isSubmitting} className="w-full sm:w-auto">
+            {form.formState.isSubmitting ? `${isEditMode ? 'Updating' : 'Creating'}...` : `${isEditMode ? 'Update' : 'Create'} Question`}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.push(`/admin/contests/${contestId}/questions`)}
+            disabled={form.formState.isSubmitting}
+            className="w-full sm:w-auto"
+          >
+            Cancel
+          </Button>
+        </div>
+      </form>
+    </>
   );
 }
