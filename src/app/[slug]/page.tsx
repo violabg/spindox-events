@@ -1,5 +1,7 @@
+import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
+import { notFound, redirect } from 'next/navigation';
 import ContestPageClient from './page.client';
 
 type ContestPageParams = {
@@ -9,13 +11,50 @@ type ContestPageParams = {
 export default async function ContestPage({ params }: ContestPageParams) {
   const { slug } = await params;
 
+  // Check authentication
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  console.log('🚀 ~ ContestPage ~ session:', session);
+  if (!session?.user) {
+    redirect(`/${slug}/login`);
+  }
+
   const contest = await prisma.contest.findUnique({
     where: {
       slug,
-      status: 'active', // Only show active contests
+      status: 'active',
+    },
+    include: {
+      questions: {
+        orderBy: { order: 'asc' },
+        include: {
+          answers: {
+            orderBy: { order: 'asc' },
+            select: {
+              id: true,
+              content: true,
+              score: true,
+            },
+          },
+        },
+      },
     },
   });
+
   if (!contest) return notFound();
+
+  // Check if user already submitted
+  const existingSubmission = await prisma.userAnswer.findFirst({
+    where: {
+      userId: session.user.id,
+      contestId: contest.id,
+    },
+  });
+
+  if (existingSubmission) {
+    redirect(`/${slug}/results`);
+  }
 
   return <ContestPageClient contest={contest} />;
 }

@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { FaGithub } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 
-import { authClient } from '@/lib/auth-client';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { authClient } from '@/lib/auth-client';
 
 export default function LoginForm({ callbackURL }: { callbackURL?: string }) {
+  console.log('🚀 ~ LoginForm ~ callbackURL:', callbackURL);
   const handleSignIn = async (provider: 'github' | 'google') => {
     await authClient.signIn.social({ provider, callbackURL });
   };
