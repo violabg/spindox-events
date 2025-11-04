@@ -1,26 +1,10 @@
 'use server';
 
-import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { createQuestionSchema, type CreateQuestionData } from '@/schemas/question.schema';
 
-const createQuestionSchema = z.object({
-  contestId: z.string().cuid(),
-  title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
-  content: z.string().min(1, 'Content is required').max(1000, 'Content must be less than 1000 characters'),
-  answers: z
-    .array(
-      z.object({
-        content: z.string().min(1, 'Answer content is required').max(200, 'Answer must be less than 200 characters'),
-        score: z.number().int().min(0, 'Score must be 0 or greater'),
-      })
-    )
-    .min(1, 'At least 1 answer is required'),
-});
-
-export type CreateQuestionInput = z.infer<typeof createQuestionSchema>;
-
-export async function createQuestionAction(data: CreateQuestionInput) {
+export async function createQuestionAction(data: CreateQuestionData) {
   try {
     // Validate the data
     const validatedData = createQuestionSchema.parse(data);

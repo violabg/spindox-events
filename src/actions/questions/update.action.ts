@@ -3,34 +3,18 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
+import { questionSchema, type QuestionData } from '@/schemas/question.schema';
 
-const updateQuestionSchema = z.object({
-  questionId: z.string().cuid(),
-  contestId: z.string().cuid(),
-  title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
-  content: z.string().min(1, 'Content is required').max(1000, 'Content must be less than 1000 characters'),
-  answers: z
-    .array(
-      z.object({
-        id: z.string().cuid().optional(),
-        content: z.string().min(1, 'Answer content is required').max(200, 'Answer must be less than 200 characters'),
-        score: z.number().int().min(0, 'Score must be 0 or greater'),
-      })
-    )
-    .min(1, 'At least 1 answer is required'),
-});
-
-type UpdateQuestionData = z.infer<typeof updateQuestionSchema>;
-
-export async function updateQuestionAction(data: UpdateQuestionData) {
+export async function updateQuestionAction(questionId: string, data: QuestionData) {
   try {
     // Validate input
-    const validatedData = updateQuestionSchema.parse(data);
+    const validatedQuestionId = z.cuid().parse(questionId);
+    const validatedData = questionSchema.parse(data);
 
     // Check if question exists and belongs to the contest
     const existingQuestion = await prisma.question.findFirst({
       where: {
-        id: validatedData.questionId,
+        id: validatedQuestionId,
         contestId: validatedData.contestId,
       },
     });
@@ -46,7 +30,7 @@ export async function updateQuestionAction(data: UpdateQuestionData) {
     await prisma.$transaction(async tx => {
       // Update the question
       await tx.question.update({
-        where: { id: validatedData.questionId },
+        where: { id: validatedQuestionId },
         data: {
           title: validatedData.title,
           content: validatedData.content,
@@ -55,13 +39,13 @@ export async function updateQuestionAction(data: UpdateQuestionData) {
 
       // Delete all existing answers first
       await tx.answer.deleteMany({
-        where: { questionId: validatedData.questionId },
+        where: { questionId: validatedQuestionId },
       });
 
       // Create new answers
       await tx.answer.createMany({
         data: validatedData.answers.map((answer, index) => ({
-          questionId: validatedData.questionId,
+          questionId: validatedQuestionId,
           content: answer.content,
           score: answer.score,
           order: index + 1,

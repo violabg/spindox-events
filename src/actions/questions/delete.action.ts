@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
 
-const deleteQuestionSchema = z.string().cuid();
+const deleteQuestionSchema = z.cuid();
 
 export async function deleteQuestionAction(questionId: string) {
   try {
