@@ -10,14 +10,9 @@
     "lint:fix": "eslint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-<<<<<<< HEAD
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts"
-=======
-    "db:push": "prisma db push",
-    "db:generate": "prisma generate"
->>>>>>> 6446938198364a7b036b56135955a9ba0119c672
   },
   "dependencies": {
     "@ai-sdk/groq": "^2.0.28",
