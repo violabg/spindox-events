@@ -69,7 +69,7 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
 
       if (isEditMode && question) {
         // Update existing question
-        result = await updateQuestionAction(question.id, data);
+        result = await updateQuestionAction(contestId, question.id, data);
       } else {
         // Create new question
         result = await createQuestionAction(data);

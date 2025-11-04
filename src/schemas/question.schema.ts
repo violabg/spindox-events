@@ -18,6 +18,10 @@ export const questionSchema = z.object({
 // Schema for creation
 export const createQuestionSchema = questionSchema;
 
+// Schema for updates (without contestId since question already belongs to a contest)
+export const updateQuestionSchema = questionSchema.omit({ contestId: true });
+
 // Type exports
 export type QuestionData = z.infer<typeof questionSchema>;
 export type CreateQuestionData = z.infer<typeof createQuestionSchema>;
+export type UpdateQuestionData = z.infer<typeof updateQuestionSchema>;
