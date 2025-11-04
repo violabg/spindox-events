@@ -4,6 +4,10 @@ import { z } from 'zod';
 export const DifficultyEnum = z.enum(['easy', 'medium', 'difficult', 'hard']);
 export type Difficulty = z.infer<typeof DifficultyEnum>;
 
+// Language enum
+export const LanguageEnum = z.enum(['italian', 'english']);
+export type Language = z.infer<typeof LanguageEnum>;
+
 // Score mapping for difficulty levels
 export const DIFFICULTY_SCORES: Record<Difficulty, number> = {
   easy: 100,
@@ -18,6 +22,7 @@ export const GenerateQuestionInputSchema = z.object({
   numAnswers: z.number().int().min(2, 'Must have at least 2 answers').max(6, 'Cannot exceed 6 answers'),
   isMultipleCorrect: z.boolean(),
   difficulty: DifficultyEnum,
+  language: LanguageEnum,
   contestId: z.string().cuid('Invalid contest ID'),
 });
 

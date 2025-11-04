@@ -31,6 +31,7 @@ export function AIQuestionModal({ open, onOpenChange, contestId, onGenerated }: 
       numAnswers: 4,
       isMultipleCorrect: false,
       difficulty: 'medium' as const,
+      language: 'english' as const,
       contestId,
     },
   });
@@ -121,6 +122,28 @@ export function AIQuestionModal({ open, onOpenChange, contestId, onGenerated }: 
                         <SelectItem value="medium">Medium (200 points)</SelectItem>
                         <SelectItem value="difficult">Difficult (300 points)</SelectItem>
                         <SelectItem value="hard">Hard (400 points)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="language"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Language</FormLabel>
+                  <FormControl>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger disabled={isGenerating}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="italian">Italian</SelectItem>
+                        <SelectItem value="english">English</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>

@@ -19,7 +19,13 @@ export async function generateQuestion(input: unknown): Promise<GenerateQuestion
     const validated = GenerateQuestionInputSchema.parse(input);
 
     // Call AI to generate content
-    const aiResponse = await generateQuestionWithAI(validated.prompt, validated.numAnswers, validated.isMultipleCorrect, validated.difficulty);
+    const aiResponse = await generateQuestionWithAI(
+      validated.prompt,
+      validated.numAnswers,
+      validated.isMultipleCorrect,
+      validated.difficulty,
+      validated.language
+    );
 
     // Calculate scores based on type and difficulty
     const maxScore = DIFFICULTY_SCORES[validated.difficulty];
