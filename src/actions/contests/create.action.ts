@@ -1,25 +1,9 @@
 'use server';
 
-import { z } from 'zod';
 import prisma from '@/lib/prisma';
-import { ContestStatus } from '@/prisma/enums';
+import { createContestSchema, type CreateContestData } from '@/schemas/contest.schema';
 
-const createContestSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(100, 'Name must be 100 characters or less'),
-  slug: z
-    .string()
-    .min(1, 'Slug is required')
-    .max(50, 'Slug must be 50 characters or less')
-    .regex(/^[a-z0-9-]+$/, 'Slug must contain only lowercase letters, numbers, and hyphens')
-    .refine(slug => !slug.startsWith('-') && !slug.endsWith('-'), 'Slug cannot start or end with a hyphen'),
-  theme: z.string().max(100, 'Theme must be 100 characters or less').optional(),
-  description: z.string().max(500, 'Description must be 500 characters or less').optional(),
-  status: z.enum(ContestStatus).default(ContestStatus.active),
-});
-
-export type CreateContestInput = z.infer<typeof createContestSchema>;
-
-export async function createContestAction(data: CreateContestInput) {
+export async function createContestAction(data: CreateContestData) {
   try {
     // Validate the data (extra safety even though client already validates)
     const validatedData = createContestSchema.parse(data);

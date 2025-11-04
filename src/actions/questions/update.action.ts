@@ -3,74 +3,55 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
+import { updateQuestionSchema, type UpdateQuestionData } from '@/schemas/question.schema';
 
-const updateQuestionSchema = z.object({
-  questionId: z.string().cuid(),
-  contestId: z.string().cuid(),
-  title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
-  content: z.string().min(1, 'Content is required').max(1000, 'Content must be less than 1000 characters'),
-  answers: z
-    .array(
-      z.object({
-        id: z.string().cuid().optional(),
-        content: z.string().min(1, 'Answer content is required').max(200, 'Answer must be less than 200 characters'),
-        score: z.number().int().min(0, 'Score must be 0 or greater'),
-      })
-    )
-    .min(1, 'At least 1 answer is required'),
-});
-
-type UpdateQuestionData = z.infer<typeof updateQuestionSchema>;
-
-export async function updateQuestionAction(data: UpdateQuestionData) {
+export async function updateQuestionAction(contestId: string, questionId: string, data: UpdateQuestionData) {
   try {
     // Validate input
+    const validatedContestId = z.cuid().parse(contestId);
+    const validatedQuestionId = z.cuid().parse(questionId);
     const validatedData = updateQuestionSchema.parse(data);
-
-    // Check if question exists and belongs to the contest
-    const existingQuestion = await prisma.question.findFirst({
-      where: {
-        id: validatedData.questionId,
-        contestId: validatedData.contestId,
-      },
-    });
-
-    if (!existingQuestion) {
-      return {
-        success: false,
-        error: 'Question not found or does not belong to this contest',
-      };
-    }
 
     // Update question and answers in a transaction
     await prisma.$transaction(async tx => {
       // Update the question
       await tx.question.update({
-        where: { id: validatedData.questionId },
+        where: { id: validatedQuestionId, contestId: validatedContestId },
         data: {
           title: validatedData.title,
           content: validatedData.content,
         },
       });
 
-      // Delete all existing answers first
-      await tx.answer.deleteMany({
-        where: { questionId: validatedData.questionId },
-      });
+      // Upsert answers
+      const keepIds: string[] = [];
 
-      // Create new answers
-      await tx.answer.createMany({
-        data: validatedData.answers.map((answer, index) => ({
-          questionId: validatedData.questionId,
-          content: answer.content,
-          score: answer.score,
-          order: index + 1,
-        })),
+      for (const [index, answer] of validatedData.answers.entries()) {
+        const result = answer.id
+          ? await tx.answer.update({
+              where: { id: answer.id },
+              data: { content: answer.content, score: answer.score, order: index + 1 },
+            })
+          : await tx.answer.create({
+              data: {
+                questionId: validatedQuestionId,
+                content: answer.content,
+                score: answer.score,
+                order: index + 1,
+              },
+            });
+
+        keepIds.push(result.id);
+      }
+
+      // Delete removed answers
+      await tx.answer.deleteMany({
+        where: { questionId: validatedQuestionId, id: { notIn: keepIds } },
       });
     });
 
     // Revalidate the contest page
-    revalidatePath(`/admin/contests/${validatedData.contestId}`);
+    revalidatePath(`/admin/contests/${validatedContestId}`);
 
     return {
       success: true,

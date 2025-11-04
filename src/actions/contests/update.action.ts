@@ -2,32 +2,18 @@
 
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
-import { ContestStatus } from '@/prisma/enums';
 import { revalidatePath } from 'next/cache';
+import { contestSchema, type ContestData } from '@/schemas/contest.schema';
 
-const updateContestSchema = z.object({
-  id: z.string().cuid(),
-  name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
-  slug: z
-    .string()
-    .min(1, 'Slug is required')
-    .max(50, 'Slug must be less than 50 characters')
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must contain only lowercase letters, numbers, and hyphens'),
-  theme: z.string().max(50, 'Theme must be less than 50 characters').optional(),
-  description: z.string().max(500, 'Description must be less than 500 characters').optional(),
-  status: z.enum(ContestStatus),
-});
-
-type UpdateContestData = z.infer<typeof updateContestSchema>;
-
-export async function updateContestAction(data: UpdateContestData) {
+export async function updateContestAction(id: string, data: ContestData) {
   try {
-    // Validate the data
-    const validatedData = updateContestSchema.parse(data);
+    // Validate the ID and data separately
+    const validatedId = z.cuid().parse(id);
+    const validatedData = contestSchema.parse(data);
 
     // Check if contest exists
     const existingContest = await prisma.contest.findUnique({
-      where: { id: validatedData.id },
+      where: { id: validatedId },
     });
 
     if (!existingContest) {
@@ -41,7 +27,7 @@ export async function updateContestAction(data: UpdateContestData) {
     const existingSlug = await prisma.contest.findFirst({
       where: {
         slug: validatedData.slug,
-        id: { not: validatedData.id }, // Exclude current contest
+        id: { not: validatedId }, // Exclude current contest
       },
     });
 
@@ -54,7 +40,7 @@ export async function updateContestAction(data: UpdateContestData) {
 
     // Update the contest
     const updatedContest = await prisma.contest.update({
-      where: { id: validatedData.id },
+      where: { id: validatedId },
       data: {
         name: validatedData.name,
         slug: validatedData.slug,
@@ -66,7 +52,7 @@ export async function updateContestAction(data: UpdateContestData) {
 
     // Revalidate the admin page and contest details page
     revalidatePath('/admin');
-    revalidatePath(`/admin/contests/${validatedData.id}`);
+    revalidatePath(`/admin/contests/${validatedId}`);
 
     return {
       success: true,

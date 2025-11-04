@@ -1,42 +1,26 @@
 'use client';
 
-import { createQuestionAction } from '@/actions/questions/create.action';
-import { updateQuestionAction } from '@/actions/questions/update.action';
-import { FormInput } from '@/components/form/form-input';
-import { AIQuestionModal } from '@/components/modals';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
+import { FieldDescription } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import type { GeneratedQuestion } from '@/lib/schemas/ai-question.schema';
 import { AnswerModel } from '@/prisma/models/Answer';
 import { QuestionModel } from '@/prisma/models/Question';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Trash2, Wand2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
+
+import { createQuestionAction } from '@/actions/questions/create.action';
+import { updateQuestionAction } from '@/actions/questions/update.action';
+import { FieldBase, FieldInput, FieldTextarea } from '@/components/form/form-input';
+import { AIQuestionModal } from '@/components/modals';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { GeneratedQuestion } from '@/lib/schemas/ai-question.schema';
+import { questionSchema, type QuestionData } from '@/schemas/question.schema';
 import { toast } from 'sonner';
-import { z } from 'zod';
 
-const questionSchema = z.object({
-  contestId: z.string().cuid(),
-  questionId: z.string().cuid().optional(),
-  title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
-  content: z.string().min(1, 'Content is required').max(1000, 'Content must be less than 1000 characters'),
-  answers: z
-    .array(
-      z.object({
-        id: z.string().cuid().optional(),
-        content: z.string().min(1, 'Answer content is required').max(200, 'Answer must be less than 200 characters'),
-        score: z.number().int().min(0, 'Score must be 0 or greater'),
-      })
-    )
-    .min(1, 'At least 1 answer is required'),
-});
-
-type QuestionFormData = z.infer<typeof questionSchema>;
+type QuestionFormData = QuestionData;
 
 // Type for Question with its answers included (what we get from the database)
 type QuestionWithAnswers = QuestionModel & {
@@ -57,7 +41,6 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
 
   const defaultValues: QuestionFormData = {
     contestId,
-    questionId: question?.id,
     title: question?.title || '',
     content: question?.content || '',
     answers: question?.answers || [{ content: '', score: 0 }],
@@ -103,27 +86,10 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
 
       if (isEditMode && question) {
         // Update existing question
-        result = await updateQuestionAction({
-          questionId: question.id,
-          contestId: data.contestId,
-          title: data.title,
-          content: data.content,
-          answers: data.answers.map(answer => ({
-            content: answer.content,
-            score: answer.score,
-          })),
-        });
+        result = await updateQuestionAction(contestId, question.id, data);
       } else {
         // Create new question
-        result = await createQuestionAction({
-          contestId: data.contestId,
-          title: data.title,
-          content: data.content,
-          answers: data.answers.map(answer => ({
-            content: answer.content,
-            score: answer.score,
-          })),
-        });
+        result = await createQuestionAction(data);
       }
 
       if (result.success) {
@@ -140,47 +106,28 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
 
   return (
     <>
-      <AIQuestionModal open={aiModalOpen} onOpenChange={setAIModalOpen} contestId={contestId} onGenerated={handleAIGenerated} />
+      <AIQuestionModal open={aiModalOpen} onOpenChange={setAIModalOpen} contestId={contestId} onGenerated={handleAIGenerated} />{' '}
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <Controller
+        <Button type="button" variant="outline" onClick={() => setAIModalOpen(true)} title="Generate question with AI">
+          <Wand2 className="h-4 w-4" /> Generate Questions
+        </Button>
+        <FieldInput
           name="title"
           control={form.control}
-          render={({ field, fieldState }) => (
-            <Field>
-              <FieldLabel htmlFor="title">Question Title</FieldLabel>
-              <FieldContent>
-                <div className="flex gap-2">
-                  <Input id="title" placeholder="Enter question title..." {...field} className="flex-1" />
-                  <Button type="button" variant="outline" size="icon" onClick={() => setAIModalOpen(true)} title="Generate question with AI">
-                    <Wand2 className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="flex items-center justify-between">
-                  <FieldDescription>A brief title for the question</FieldDescription>
-                  <span className="text-xs text-muted-foreground">{(field.value || '').length}/200</span>
-                </div>
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </FieldContent>
-            </Field>
-          )}
+          label="Question Title"
+          description="A brief title for the question"
+          placeholder="Enter question title..."
+          maxLength={200}
         />
 
-        <Controller
+        <FieldTextarea
           name="content"
           control={form.control}
-          render={({ field, fieldState }) => (
-            <Field>
-              <FieldLabel htmlFor="content">Question Content</FieldLabel>
-              <FieldContent>
-                <Textarea id="content" placeholder="Enter the full question..." className="min-h-[100px]" {...field} />
-                <div className="flex items-center justify-between">
-                  <FieldDescription>The complete question text that users will see</FieldDescription>
-                  <span className="text-xs text-muted-foreground">{(field.value || '').length}/1000</span>
-                </div>
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </FieldContent>
-            </Field>
-          )}
+          label="Question Content"
+          description="The complete question text that users will see"
+          placeholder="Enter the full question..."
+          className="min-h-[100px]"
+          maxLength={1000}
         />
 
         <Card>
@@ -198,27 +145,17 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
                 <div key={field.id} className="space-y-3">
                   {/* Mobile: Stack all elements vertically, Desktop: Horizontal grid */}
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_auto] sm:items-end">
-                    <FormInput
+                    <FieldInput
                       control={form.control}
                       name={`answers.${index}.content`}
                       label={`Answer ${String.fromCharCode(65 + index)}`}
+                      placeholder={`Enter answer ${String.fromCharCode(65 + index)}...`}
+                      maxLength={200}
                       disableFieldError={true}
-                    >
-                      {({ field }) => (
-                        <Input
-                          id={field.name}
-                          placeholder={`Enter answer ${String.fromCharCode(65 + index)}...`}
-                          value={typeof field.value === 'string' ? field.value : ''}
-                          onChange={field.onChange}
-                          onBlur={field.onBlur}
-                          name={field.name}
-                          ref={field.ref}
-                        />
-                      )}
-                    </FormInput>
+                    />
 
                     <div className="flex gap-2 sm:contents">
-                      <FormInput control={form.control} name={`answers.${index}.score`} label="Score" disableFieldError={true}>
+                      <FieldBase control={form.control} name={`answers.${index}.score`} label="Score" disableFieldError={true}>
                         {({ field }) => (
                           <Input
                             id={field.name}
@@ -230,7 +167,7 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
                             onChange={e => field.onChange(e.target.value ? parseInt(e.target.value) : 0)}
                           />
                         )}
-                      </FormInput>
+                      </FieldBase>
 
                       <div className="flex items-end">
                         <Button
