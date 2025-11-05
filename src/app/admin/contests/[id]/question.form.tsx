@@ -74,6 +74,10 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
     // Update form with generated data
     form.setValue('title', generatedQuestion.title);
     form.setValue('content', generatedQuestion.content);
+    // If the generated question includes a `type`, use it to set the form's question type
+    if (generatedQuestion.type) {
+      form.setValue('type', generatedQuestion.type as 'SINGLE_CHOICE' | 'MULTIPLE_CHOICES');
+    }
     form.setValue(
       'answers',
       generatedQuestion.answers.map(answer => ({
@@ -112,7 +116,7 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
 
   return (
     <>
-      <AIQuestionModal open={aiModalOpen} onOpenChange={setAIModalOpen} contestId={contestId} onGenerated={handleAIGenerated} />{' '}
+      <AIQuestionModal open={aiModalOpen} onOpenChange={setAIModalOpen} contestId={contestId} onGenerated={handleAIGenerated} />
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Button type="button" variant="outline" onClick={() => setAIModalOpen(true)} title="Generate question with AI">
           <Wand2 className="h-4 w-4" /> Generate Questions

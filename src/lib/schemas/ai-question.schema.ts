@@ -55,6 +55,8 @@ export const GeneratedQuestionSchema = z.object({
       score: z.number().int().min(0),
     })
   ),
+  // Question type used by the form: SINGLE_CHOICE | MULTIPLE_CHOICES
+  type: z.enum(['SINGLE_CHOICE', 'MULTIPLE_CHOICES']).optional(),
 });
 
 export type GeneratedQuestion = z.infer<typeof GeneratedQuestionSchema>;

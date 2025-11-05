@@ -47,7 +47,11 @@ export function AIQuestionModal({ open, onOpenChange, contestId, onGenerated }: 
       }
 
       toast.success('Question generated successfully');
-      onGenerated(result.data);
+      // Attach the question `type` based on the user's choice for multiple correct answers
+      // So the question form can set its `type` field appropriately.
+      const isMultiple = (form.getValues().isMultipleCorrect as boolean) === true;
+      const generatedWithType = result.data ? { ...result.data, type: isMultiple ? 'MULTIPLE_CHOICES' : 'SINGLE_CHOICE' } : result.data;
+      onGenerated(generatedWithType as GeneratedQuestion & { type?: 'SINGLE_CHOICE' | 'MULTIPLE_CHOICES' });
       onOpenChange(false);
       form.reset();
     } catch (error) {
