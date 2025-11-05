@@ -27,7 +27,12 @@ export default async function ContestPage({ params }: ContestPageParams) {
     include: {
       questions: {
         orderBy: { order: 'asc' },
-        include: {
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          type: true,
+          order: true,
           answers: {
             orderBy: { order: 'asc' },
             select: {

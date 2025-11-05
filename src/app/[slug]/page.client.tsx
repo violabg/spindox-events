@@ -14,7 +14,12 @@ import { z } from 'zod';
 type Contest = Prisma.ContestGetPayload<{
   include: {
     questions: {
-      include: {
+      select: {
+        id: true;
+        title: true;
+        content: true;
+        type: true;
+        order: true;
         answers: {
           select: {
             id: true;
@@ -113,6 +118,8 @@ export default function ContestPageClient({ contest }: Props) {
               <QuestionInput
                 key={question.id}
                 questionId={question.id}
+                title={question.title}
+                content={question.content}
                 type={question.type as 'SINGLE_CHOICE' | 'MULTIPLE_CHOICES'}
                 answers={question.answers}
                 disabled={loading}
