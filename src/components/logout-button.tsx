@@ -1,17 +1,22 @@
-'use client';
-
 import { Button } from '@/components/ui/button';
-import { authClient } from '@/lib/auth-client';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 
-export default function LogoutButton() {
-  const handleLogout = async () => {
-    await authClient.signOut();
-    window.location.replace('/');
-  };
+const logout = async () => {
+  'use server';
+  await auth.api.signOut({
+    headers: await headers(),
+  });
+  redirect('/');
+};
 
+export default async function LogoutButton() {
   return (
-    <Button onClick={handleLogout} className="w-full">
-      Sign Out
-    </Button>
+    <form action={logout}>
+      <Button type="submit" className="w-full">
+        Sign Out
+      </Button>
+    </form>
   );
 }

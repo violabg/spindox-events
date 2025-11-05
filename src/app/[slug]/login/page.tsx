@@ -4,6 +4,6 @@ type ContestPageParams = {
 };
 export default async function LoginPage({ params }: ContestPageParams) {
   const { slug } = await params;
-  console.log('🚀 ~ LoginPage ~ slug:', slug);
+
   return <LoginForm callbackURL={`/${slug}`}></LoginForm>;
 }
