@@ -1,9 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
+import { deleteQuestionAction } from '@/actions/questions/delete.action';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,10 +12,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Trash2, Edit } from 'lucide-react';
-import { QuestionModel } from '@/prisma/models/Question';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AnswerModel } from '@/prisma/models/Answer';
-import { deleteQuestionAction } from '@/actions/questions/delete.action';
+import { QuestionModel } from '@/prisma/models/Question';
+import { Edit, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 type QuestionWithAnswers = QuestionModel & {
@@ -91,7 +91,7 @@ export default function QuestionsTable({ contestId, questions }: QuestionsTableP
         <TableBody>
           {questions.map(question => {
             const answerCount = question.answers.length;
-            const maxScore = question.answers.length > 0 ? Math.max(...question.answers.map(answer => answer.score)) : 0;
+            const maxScore = question.answers.length > 0 ? question.answers.reduce((sum, answer) => sum + (answer.score ?? 0), 0) : 0;
 
             return (
               <TableRow key={question.id}>
