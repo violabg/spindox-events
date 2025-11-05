@@ -1,8 +1,8 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Controller, useFormContext } from 'react-hook-form';
 import { QuestionDisplay } from './question-display';
 
@@ -41,28 +41,32 @@ export function QuestionInput({
           name={`answers.${questionId}.answerIds`}
           control={control}
           render={({ field }) => (
-            <div className="space-y-2">
-              {answers.map(answer => (
-                <Button
-                  key={answer.id}
-                  type="button"
-                  variant={Array.isArray(field.value) && field.value.includes(answer.id) ? 'default' : 'outline'}
-                  className={`w-full justify-start ${
-                    showCorrectAnswers
-                      ? correctAnswerIds.includes(answer.id)
-                        ? 'bg-green-600 hover:bg-green-700'
-                        : Array.isArray(field.value) && field.value.includes(answer.id)
-                          ? 'bg-red-600 hover:bg-red-700'
-                          : ''
-                      : ''
-                  }`}
-                  onClick={() => field.onChange([answer.id])}
-                  disabled={disabled}
-                >
-                  {answer.content}
-                </Button>
-              ))}
-            </div>
+            <RadioGroup
+              value={Array.isArray(field.value) && field.value.length ? field.value[0] : undefined}
+              onValueChange={val => field.onChange(val ? [val] : [])}
+              className="space-y-2"
+            >
+              {answers.map(answer => {
+                const selected = Array.isArray(field.value) && field.value[0] === answer.id;
+                const isCorrect = correctAnswerIds.includes(answer.id);
+                let containerClass = '';
+                if (showCorrectAnswers) {
+                  if (isCorrect) containerClass = 'bg-green-600 hover:bg-green-700 text-white';
+                  else if (selected) containerClass = 'bg-red-600 hover:bg-red-700 text-white';
+                }
+                return (
+                  <div
+                    key={answer.id}
+                    role="button"
+                    onClick={() => !disabled && field.onChange([answer.id])}
+                    className={`w-full flex items-center space-x-3 px-2 rounded-md cursor-pointer ${containerClass}`}
+                  >
+                    <RadioGroupItem value={answer.id} id={answer.id} disabled={disabled} />
+                    <span>{answer.content}</span>
+                  </div>
+                );
+              })}
+            </RadioGroup>
           )}
         />
       </QuestionDisplay>
@@ -72,44 +76,44 @@ export function QuestionInput({
   // Multiple choices
   return (
     <QuestionDisplay title={title} content={content}>
-      {answers.map(answer => (
-        <Controller
-          key={answer.id}
-          name={`answers.${questionId}.answerIds`}
-          control={control}
-          render={({ field }) => {
-            const isChecked = Array.isArray(field.value) && field.value.includes(answer.id);
-            return (
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id={answer.id}
-                  checked={isChecked}
-                  onCheckedChange={checked => {
-                    const currentAnswers = Array.isArray(field.value) ? field.value : [];
-                    const newAnswers = checked ? [...currentAnswers, answer.id] : currentAnswers.filter((id: string) => id !== answer.id);
-                    field.onChange(newAnswers);
-                  }}
-                  disabled={disabled}
-                />
-                <Label
-                  htmlFor={answer.id}
-                  className={`cursor-pointer ${
-                    showCorrectAnswers
-                      ? correctAnswerIds.includes(answer.id)
-                        ? 'text-green-600 font-semibold'
-                        : isChecked
-                          ? 'text-red-600 font-semibold'
-                          : ''
-                      : ''
-                  }`}
-                >
-                  {answer.content}
-                </Label>
-              </div>
-            );
-          }}
-        />
-      ))}
+      <div className="mb-2">
+        <div className="text-sm text-muted-foreground">Multiple answers allowed</div>
+      </div>
+      <div className="space-y-2">
+        {answers.map(answer => (
+          <Controller
+            key={answer.id}
+            name={`answers.${questionId}.answerIds`}
+            control={control}
+            render={({ field }) => {
+              const isChecked = Array.isArray(field.value) && field.value.includes(answer.id);
+              const isCorrect = correctAnswerIds.includes(answer.id);
+              let containerClass = '';
+              if (showCorrectAnswers) {
+                if (isCorrect) containerClass = 'bg-green-600 hover:bg-green-700 text-white';
+                else if (isChecked) containerClass = 'bg-red-600 hover:bg-red-700 text-white';
+              }
+              return (
+                <div className={`w-full flex items-center space-x-3 p-2 rounded-md cursor-pointer ${containerClass}`}>
+                  <Checkbox
+                    id={answer.id}
+                    checked={isChecked}
+                    onCheckedChange={checked => {
+                      const currentAnswers = Array.isArray(field.value) ? field.value : [];
+                      const newAnswers = checked ? [...currentAnswers, answer.id] : currentAnswers.filter((id: string) => id !== answer.id);
+                      field.onChange(newAnswers);
+                    }}
+                    disabled={disabled}
+                  />
+                  <Label htmlFor={answer.id} className="flex-1 text-sm cursor-pointer">
+                    {answer.content}
+                  </Label>
+                </div>
+              );
+            }}
+          />
+        ))}
+      </div>
     </QuestionDisplay>
   );
 }
