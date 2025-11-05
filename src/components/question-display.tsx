@@ -1,6 +1,9 @@
 'use client';
 
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface QuestionDisplayProps {
   title: string;
@@ -10,14 +13,43 @@ interface QuestionDisplayProps {
 
 export function QuestionDisplay({ title, content, children }: QuestionDisplayProps) {
   return (
-    <div className="space-y-4">
-      <div className="space-y-4">
-        <h3 className="font-semibold">{title}</h3>
-        <div className="text-sm">
-          <ReactMarkdown>{content}</ReactMarkdown>
-        </div>
+    <div className="bg-background/5 border border-border rounded-md p-4">
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold">{title}</h3>
       </div>
-      <div className="space-y-2">{children}</div>
+
+      <div className="prose max-w-none mb-4 text-sm text-muted-foreground">
+        <ReactMarkdown
+          components={{
+            // use `any` here because react-markdown's types for components differ
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            code: (props: any) => {
+              const { inline, className, children: codeChildren } = props;
+              const classAttr = className || '';
+              const match = /language-(\w+)/.exec(classAttr);
+              const code = String(codeChildren || '');
+
+              if (!inline && match) {
+                return (
+                  <SyntaxHighlighter style={oneDark} language={match[1]} PreTag="div" {...props}>
+                    {code.replace(/\n$/, '')}
+                  </SyntaxHighlighter>
+                );
+              }
+
+              return (
+                <code className={className} {...props}>
+                  {codeChildren}
+                </code>
+              );
+            },
+          }}
+        >
+          {content}
+        </ReactMarkdown>
+      </div>
+
+      <div className="pt-4 border-t border-border">{children}</div>
     </div>
   );
 }
