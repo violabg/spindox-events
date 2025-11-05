@@ -1,13 +1,14 @@
 'use client';
 
-import { ContestResults } from '@/components/contest-results';
+import { submitAnswersAction } from '@/actions/answers/submit-answers';
 import { QuestionInput } from '@/components/question-input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { submitAnswersSchema } from '@/lib/schemas/contest.schema';
 import { Prisma } from '@/prisma/client';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTransition } from 'react';
 import { FormProvider, useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -38,24 +39,11 @@ type Props = {
 
 type FormData = z.infer<typeof submitAnswersSchema>;
 
-interface ResultItem {
-  questionId: string;
-  questionContent: string;
-  userAnswerIds: string[];
-  correctAnswerIds: string[];
-  isCorrect: boolean;
-}
-
-type SubmitResult = {
-  score: number;
-  totalQuestions: number;
-  correctCount: number;
-  results: ResultItem[];
-};
+// result types are not needed in this client file anymore
 
 export default function ContestPageClient({ contest }: Props) {
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<SubmitResult | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const methods = useForm<FormData>({
     resolver: zodResolver(submitAnswersSchema),
@@ -70,40 +58,20 @@ export default function ContestPageClient({ contest }: Props) {
     },
   });
 
-  const onSubmit: SubmitHandler<FormData> = async data => {
-    setLoading(true);
-    try {
-      const submitData = {
-        answers: Object.entries(data.answers).map(([questionId, { answerIds }]) => ({
-          questionId,
-          answerIds,
-        })),
-      };
+  const onSubmit: SubmitHandler<FormData> = data => {
+    const submitData = {
+      answers: Object.entries(data.answers).map(([questionId, { answerIds }]) => ({ questionId, answerIds })),
+    };
 
-      const response = await fetch(`/api/contests/${contest.slug}/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(submitData),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to submit answers');
-      }
-
-      const results = await response.json();
-      setResult(results);
-    } catch (error) {
-      console.error('Error submitting answers:', error);
-      alert(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    } finally {
-      setLoading(false);
-    }
+    startTransition(() => {
+      submitAnswersAction(submitData, contest.slug)
+        .then(() => router.push(`/${contest.slug}/results`))
+        .catch(error => {
+          console.error('Error submitting answers:', error);
+          alert(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        });
+    });
   };
-
-  if (result) {
-    return <ContestResults {...result} />;
-  }
 
   return (
     <Card>
@@ -122,11 +90,11 @@ export default function ContestPageClient({ contest }: Props) {
                 content={question.content}
                 type={question.type as 'SINGLE_CHOICE' | 'MULTIPLE_CHOICES'}
                 answers={question.answers}
-                disabled={loading}
+                disabled={isPending}
               />
             ))}
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading ? 'Submitting...' : 'Submit Answers'}
+            <Button type="submit" disabled={isPending} className="w-full">
+              {isPending ? 'Submitting...' : 'Submit Answers'}
             </Button>
           </form>
         </FormProvider>

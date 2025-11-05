@@ -40,33 +40,36 @@ export function QuestionInput({
         <Controller
           name={`answers.${questionId}.answerIds`}
           control={control}
-          render={({ field }) => (
-            <RadioGroup
-              value={Array.isArray(field.value) && field.value.length ? field.value[0] : undefined}
-              onValueChange={val => field.onChange(val ? [val] : [])}
-              className="space-y-2"
-            >
-              {answers.map(answer => {
-                const selected = Array.isArray(field.value) && field.value[0] === answer.id;
-                const isCorrect = correctAnswerIds.includes(answer.id);
-                let containerClass = '';
-                if (showCorrectAnswers) {
-                  if (isCorrect) containerClass = 'bg-green-600 hover:bg-green-700 text-white';
-                  else if (selected) containerClass = 'bg-red-600 hover:bg-red-700 text-white';
-                }
-                return (
-                  <div
-                    key={answer.id}
-                    role="button"
-                    onClick={() => !disabled && field.onChange([answer.id])}
-                    className={`w-full flex items-center space-x-3 px-2 rounded-md cursor-pointer ${containerClass}`}
-                  >
-                    <RadioGroupItem value={answer.id} id={answer.id} disabled={disabled} />
-                    <span>{answer.content}</span>
-                  </div>
-                );
-              })}
-            </RadioGroup>
+          render={({ field, fieldState }) => (
+            <>
+              <RadioGroup
+                value={Array.isArray(field.value) && field.value.length ? field.value[0] : undefined}
+                onValueChange={val => field.onChange(val ? [val] : [])}
+                className="space-y-2"
+              >
+                {answers.map(answer => {
+                  const selected = Array.isArray(field.value) && field.value[0] === answer.id;
+                  const isCorrect = correctAnswerIds.includes(answer.id);
+                  let containerClass = '';
+                  if (showCorrectAnswers) {
+                    if (isCorrect) containerClass = 'bg-green-600 hover:bg-green-700 text-white';
+                    else if (selected) containerClass = 'bg-red-600 hover:bg-red-700 text-white';
+                  }
+                  return (
+                    <div
+                      key={answer.id}
+                      role="button"
+                      onClick={() => !disabled && field.onChange([answer.id])}
+                      className={`w-full flex items-center space-x-3 px-2 rounded-md cursor-pointer ${containerClass}`}
+                    >
+                      <RadioGroupItem value={answer.id} id={answer.id} disabled={disabled} />
+                      <span>{answer.content}</span>
+                    </div>
+                  );
+                })}
+              </RadioGroup>
+              {fieldState.error?.message && <p className="text-sm text-destructive mt-1">{String(fieldState.error.message)}</p>}
+            </>
           )}
         />
       </QuestionDisplay>
@@ -85,7 +88,7 @@ export function QuestionInput({
             key={answer.id}
             name={`answers.${questionId}.answerIds`}
             control={control}
-            render={({ field }) => {
+            render={({ field, fieldState }) => {
               const isChecked = Array.isArray(field.value) && field.value.includes(answer.id);
               const isCorrect = correctAnswerIds.includes(answer.id);
               let containerClass = '';
@@ -94,21 +97,24 @@ export function QuestionInput({
                 else if (isChecked) containerClass = 'bg-red-600 hover:bg-red-700 text-white';
               }
               return (
-                <div className={`w-full flex items-center space-x-3 p-2 rounded-md cursor-pointer ${containerClass}`}>
-                  <Checkbox
-                    id={answer.id}
-                    checked={isChecked}
-                    onCheckedChange={checked => {
-                      const currentAnswers = Array.isArray(field.value) ? field.value : [];
-                      const newAnswers = checked ? [...currentAnswers, answer.id] : currentAnswers.filter((id: string) => id !== answer.id);
-                      field.onChange(newAnswers);
-                    }}
-                    disabled={disabled}
-                  />
-                  <Label htmlFor={answer.id} className="flex-1 text-sm cursor-pointer">
-                    {answer.content}
-                  </Label>
-                </div>
+                <>
+                  <div className={`w-full flex items-center space-x-3 p-2 rounded-md cursor-pointer ${containerClass}`}>
+                    <Checkbox
+                      id={answer.id}
+                      checked={isChecked}
+                      onCheckedChange={checked => {
+                        const currentAnswers = Array.isArray(field.value) ? field.value : [];
+                        const newAnswers = checked ? [...currentAnswers, answer.id] : currentAnswers.filter((id: string) => id !== answer.id);
+                        field.onChange(newAnswers);
+                      }}
+                      disabled={disabled}
+                    />
+                    <Label htmlFor={answer.id} className="flex-1 text-sm cursor-pointer">
+                      {answer.content}
+                    </Label>
+                  </div>
+                  {fieldState.error?.message && <p className="text-sm text-destructive mt-1">{String(fieldState.error.message)}</p>}
+                </>
               );
             }}
           />
