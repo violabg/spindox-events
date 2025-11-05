@@ -1,17 +1,18 @@
-import { ReactNode, InputHTMLAttributes } from 'react';
 import * as React from 'react';
+import { InputHTMLAttributes, ReactNode } from 'react';
 import {
   Control,
   Controller,
-  useWatch,
+  ControllerFieldState,
+  ControllerRenderProps,
   FieldPath,
   FieldValues,
-  ControllerRenderProps,
-  ControllerFieldState,
   UseFormStateReturn,
+  useWatch,
 } from 'react-hook-form';
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '../ui/field';
 import { Input } from '../ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Textarea } from '../ui/textarea';
 
 interface ControllerRenderParams<T extends FieldValues> {
@@ -123,6 +124,45 @@ export function FieldTextarea<T extends FieldValues>({
             </div>
           )}
         </div>
+      )}
+    </FieldBase>
+  );
+}
+
+interface FieldSelectProps<T extends FieldValues> {
+  control: Control<T>;
+  name: FieldPath<T>;
+  label: string;
+  description?: string;
+  placeholder?: string;
+  options: { value: string; label: string }[];
+  disableFieldError?: boolean;
+}
+
+export function FieldSelect<T extends FieldValues>({
+  control,
+  name,
+  label,
+  description,
+  placeholder,
+  options,
+  disableFieldError = false,
+}: FieldSelectProps<T>) {
+  return (
+    <FieldBase control={control} name={name} label={label} description={description} disableFieldError={disableFieldError}>
+      {({ field }) => (
+        <Select value={field.value} onValueChange={field.onChange}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map(option => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       )}
     </FieldBase>
   );

@@ -1,9 +1,9 @@
+import { getContestWithQuestions } from '@/actions/contests/get.action';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, Edit, ExternalLink, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { ArrowLeft, Plus, Edit } from 'lucide-react';
-import { getContestWithQuestions } from '@/actions/contests/get.action';
 import QuestionsTable from './questions.table';
 
 type PageProps = {
@@ -54,12 +54,19 @@ export default async function QuestionsPage({ params }: PageProps) {
                 <CardTitle>Contest Information</CardTitle>
                 <Badge variant={contest.status === 'active' ? 'default' : 'secondary'}>{contest.status === 'active' ? 'Active' : 'Inactive'}</Badge>
               </div>
-              <Button variant="outline" size="sm" asChild>
-                <Link href={`/admin/contests/${id}/edit`}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit Contest
-                </Link>
-              </Button>
+              <div className="flex items-center space-x-2">
+                <Button variant="outline" size="icon" asChild aria-label="Open link">
+                  <Link href={`/${contest.slug}`}>
+                    <ExternalLink size={'sm'} />
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href={`/admin/contests/${id}/edit`}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit Contest
+                  </Link>
+                </Button>
+              </div>
             </div>
             {contest.theme && <CardDescription>Theme: {contest.theme}</CardDescription>}
           </CardHeader>

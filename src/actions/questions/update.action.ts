@@ -1,9 +1,9 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
-import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { updateQuestionSchema, type UpdateQuestionData } from '@/schemas/question.schema';
+import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
 
 export async function updateQuestionAction(contestId: string, questionId: string, data: UpdateQuestionData) {
   try {
@@ -20,6 +20,7 @@ export async function updateQuestionAction(contestId: string, questionId: string
         data: {
           title: validatedData.title,
           content: validatedData.content,
+          type: validatedData.type,
         },
       });
 

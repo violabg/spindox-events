@@ -1,8 +1,8 @@
 'use server';
 
 import prisma from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
 import { createQuestionSchema, type CreateQuestionData } from '@/schemas/question.schema';
+import { revalidatePath } from 'next/cache';
 
 export async function createQuestionAction(data: CreateQuestionData) {
   try {
@@ -38,6 +38,7 @@ export async function createQuestionAction(data: CreateQuestionData) {
       data: {
         title: validatedData.title,
         content: validatedData.content,
+        type: validatedData.type,
         order: nextOrder,
         contestId: validatedData.contestId,
         answers: {

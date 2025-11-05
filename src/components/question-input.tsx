@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Controller, useFormContext } from 'react-hook-form';
+import { QuestionDisplay } from './question-display';
 
 interface Answer {
   id: string;
@@ -35,11 +36,7 @@ export function QuestionInput({
 
   if (type === 'SINGLE_CHOICE') {
     return (
-      <div className="space-y-2">
-        <div>
-          <h3 className="font-semibold">{title}</h3>
-          <p className="text-sm text-gray-600">{content}</p>
-        </div>
+      <QuestionDisplay title={title} content={content}>
         <Controller
           name={`answers.${questionId}.answerIds`}
           control={control}
@@ -68,57 +65,51 @@ export function QuestionInput({
             </div>
           )}
         />
-      </div>
+      </QuestionDisplay>
     );
   }
 
   // Multiple choices
   return (
-    <div className="space-y-2">
-      <div>
-        <h3 className="font-semibold">{title}</h3>
-        <p className="text-sm text-gray-600">{content}</p>
-      </div>
-      <div className="space-y-2">
-        {answers.map(answer => (
-          <Controller
-            key={answer.id}
-            name={`answers.${questionId}.answerIds`}
-            control={control}
-            render={({ field }) => {
-              const isChecked = Array.isArray(field.value) && field.value.includes(answer.id);
-              return (
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id={answer.id}
-                    checked={isChecked}
-                    onCheckedChange={checked => {
-                      const currentAnswers = Array.isArray(field.value) ? field.value : [];
-                      const newAnswers = checked ? [...currentAnswers, answer.id] : currentAnswers.filter((id: string) => id !== answer.id);
-                      field.onChange(newAnswers);
-                    }}
-                    disabled={disabled}
-                  />
-                  <Label
-                    htmlFor={answer.id}
-                    className={`cursor-pointer ${
-                      showCorrectAnswers
-                        ? correctAnswerIds.includes(answer.id)
-                          ? 'text-green-600 font-semibold'
-                          : isChecked
-                            ? 'text-red-600 font-semibold'
-                            : ''
-                        : ''
-                    }`}
-                  >
-                    {answer.content}
-                  </Label>
-                </div>
-              );
-            }}
-          />
-        ))}
-      </div>
-    </div>
+    <QuestionDisplay title={title} content={content}>
+      {answers.map(answer => (
+        <Controller
+          key={answer.id}
+          name={`answers.${questionId}.answerIds`}
+          control={control}
+          render={({ field }) => {
+            const isChecked = Array.isArray(field.value) && field.value.includes(answer.id);
+            return (
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id={answer.id}
+                  checked={isChecked}
+                  onCheckedChange={checked => {
+                    const currentAnswers = Array.isArray(field.value) ? field.value : [];
+                    const newAnswers = checked ? [...currentAnswers, answer.id] : currentAnswers.filter((id: string) => id !== answer.id);
+                    field.onChange(newAnswers);
+                  }}
+                  disabled={disabled}
+                />
+                <Label
+                  htmlFor={answer.id}
+                  className={`cursor-pointer ${
+                    showCorrectAnswers
+                      ? correctAnswerIds.includes(answer.id)
+                        ? 'text-green-600 font-semibold'
+                        : isChecked
+                          ? 'text-red-600 font-semibold'
+                          : ''
+                      : ''
+                  }`}
+                >
+                  {answer.content}
+                </Label>
+              </div>
+            );
+          }}
+        />
+      ))}
+    </QuestionDisplay>
   );
 }

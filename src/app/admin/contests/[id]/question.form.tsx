@@ -9,11 +9,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Trash2, Wand2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 
 import { createQuestionAction } from '@/actions/questions/create.action';
 import { updateQuestionAction } from '@/actions/questions/update.action';
-import { FieldBase, FieldInput, FieldTextarea } from '@/components/form/form-input';
+import { FieldBase, FieldInput, FieldSelect, FieldTextarea } from '@/components/form/form-input';
 import { AIQuestionModal } from '@/components/modals';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { GeneratedQuestion } from '@/lib/schemas/ai-question.schema';
@@ -43,6 +43,7 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
     contestId,
     title: question?.title || '',
     content: question?.content || '',
+    type: question?.type || 'SINGLE_CHOICE',
     answers: question?.answers || [{ content: '', score: 0 }],
   };
 
@@ -54,6 +55,11 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'answers',
+  });
+
+  const watchedType = useWatch({
+    control: form.control,
+    name: 'type',
   });
 
   const addAnswer = () => {
@@ -130,6 +136,18 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
           maxLength={1000}
         />
 
+        <FieldSelect
+          name="type"
+          control={form.control}
+          label="Question Type"
+          description="Choose whether users can select one answer or multiple answers"
+          placeholder="Select question type"
+          options={[
+            { value: 'SINGLE_CHOICE', label: 'Single Choice (one correct answer)' },
+            { value: 'MULTIPLE_CHOICES', label: 'Multiple Choices (multiple correct answers)' },
+          ]}
+        />
+
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Answer Options</CardTitle>
@@ -195,8 +213,10 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
               );
             })}
             <FieldDescription>
-              Assign scores to each answer (0 or higher). Higher scores indicate better answers. Add more answers as needed. Users will see these
-              options in random order.
+              {watchedType === 'SINGLE_CHOICE'
+                ? 'Assign a score to exactly one answer (the correct one should have a score > 0, others 0).'
+                : 'Assign scores to each answer (0 or higher). Higher scores indicate better answers.'}
+              {' Add more answers as needed. Users will see these options in random order.'}
             </FieldDescription>
             <div className="pt-2">
               <Button type="button" variant="outline" onClick={addAnswer} className="flex items-center gap-2">
