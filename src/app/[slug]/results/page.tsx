@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { headers } from 'next/headers';
+import { Suspense } from 'react';
 
 type Params = {
   params: {
@@ -11,6 +12,17 @@ type Params = {
 };
 
 export default async function Page({ params }: Params) {
+  return (
+    <section>
+      <h1>This will be pre-rendered</h1>
+      <Suspense fallback={<div>Loading...</div>}>
+        <DynamicContent params={params} />
+      </Suspense>
+    </section>
+  );
+}
+
+async function DynamicContent({ params }: Params) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) {
     throw new Error('Unauthorized');
@@ -98,36 +110,36 @@ export default async function Page({ params }: Params) {
           <CardDescription>Final results</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="rounded-lg bg-slate-100 p-4 text-center">
-              <div className="text-3xl font-bold text-slate-900">{totalScore}</div>
-              <div className="text-sm text-slate-600">Points</div>
+          <div className="gap-4 grid grid-cols-3">
+            <div className="bg-slate-100 p-4 rounded-lg text-center">
+              <div className="font-bold text-slate-900 text-3xl">{totalScore}</div>
+              <div className="text-slate-600 text-sm">Points</div>
             </div>
-            <div className="rounded-lg bg-blue-100 p-4 text-center">
-              <div className="text-3xl font-bold text-blue-900">{percentage}%</div>
-              <div className="text-sm text-blue-600">Percentage</div>
+            <div className="bg-blue-100 p-4 rounded-lg text-center">
+              <div className="font-bold text-blue-900 text-3xl">{percentage}%</div>
+              <div className="text-blue-600 text-sm">Percentage</div>
             </div>
-            <div className="rounded-lg bg-slate-100 p-4 text-center">
-              <div className="text-3xl font-bold text-slate-900">
+            <div className="bg-slate-100 p-4 rounded-lg text-center">
+              <div className="font-bold text-slate-900 text-3xl">
                 {correctCount}/{totalQuestions}
               </div>
-              <div className="text-sm text-slate-600">Correct</div>
+              <div className="text-slate-600 text-sm">Correct</div>
             </div>
           </div>
         </CardContent>
       </Card>
 
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Question Review</h3>
+        <h3 className="font-semibold text-lg">Question Review</h3>
         {results.map((result, index) => (
           <Card key={result.questionId} className={result.isCorrect ? 'border-green-200' : 'border-red-200'}>
             <CardHeader>
-              <div className="flex items-start justify-between">
+              <div className="flex justify-between items-start">
                 <div className="flex items-start gap-3">
                   {result.isCorrect ? (
-                    <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-green-600" />
+                    <CheckCircle className="flex-shrink-0 mt-1 w-5 h-5 text-green-600" />
                   ) : (
-                    <XCircle className="mt-1 h-5 w-5 flex-shrink-0 text-red-600" />
+                    <XCircle className="flex-shrink-0 mt-1 w-5 h-5 text-red-600" />
                   )}
                   <div>
                     <CardTitle className="text-base">Question {index + 1}</CardTitle>
@@ -146,13 +158,13 @@ export default async function Page({ params }: Params) {
             <CardContent className="space-y-3">
               {!result.isCorrect && (
                 <div>
-                  <p className="mb-2 text-sm font-medium text-slate-700">Your Answer:</p>
+                  <p className="mb-2 font-medium text-slate-700 text-sm">Your Answer:</p>
                   <div className="space-y-1">
                     {result.submissionIds.length === 0 ? (
-                      <p className="text-sm italic text-red-600">No answer selected</p>
+                      <p className="text-red-600 text-sm italic">No answer selected</p>
                     ) : (
                       result.submissionIds.map(id => (
-                        <p key={id} className="text-sm text-red-600">
+                        <p key={id} className="text-red-600 text-sm">
                           • {id}
                         </p>
                       ))
@@ -161,13 +173,13 @@ export default async function Page({ params }: Params) {
                 </div>
               )}
               <div>
-                <p className="mb-2 text-sm font-medium text-slate-700">
+                <p className="mb-2 font-medium text-slate-700 text-sm">
                   Correct Answer
                   {result.correctAnswerIds.length > 1 ? 's' : ''}:
                 </p>
                 <div className="space-y-1">
                   {result.correctAnswerIds.map(id => (
-                    <p key={id} className="text-sm font-medium text-green-600">
+                    <p key={id} className="font-medium text-green-600 text-sm">
                       ✓ {id}
                     </p>
                   ))}

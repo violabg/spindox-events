@@ -1,64 +1,55 @@
-import { auth } from '@/lib/auth';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import prisma from '@/lib/prisma';
-import { headers } from 'next/headers';
-import { notFound, redirect } from 'next/navigation';
-import ContestPageClient from './page.client';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
 type ContestPageParams = {
   params: Promise<{ slug: string }>;
 };
 
 export default async function ContestPage({ params }: ContestPageParams) {
-  const { slug } = await params;
+  return (
+    <section>
+      <h1>This will be pre-rendered</h1>
+      <Suspense fallback={<div>Loading...</div>}>
+        <DynamicContent params={params} />
+      </Suspense>
+    </section>
+  );
+}
 
-  // Check authentication
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  if (!session?.user) {
-    redirect(`/${slug}/login`);
-  }
+async function DynamicContent({ params }: ContestPageParams) {
+  const { slug } = await params;
 
   const contest = await prisma.contest.findUnique({
     where: {
       slug,
       status: 'active',
     },
-    include: {
-      questions: {
-        orderBy: { order: 'asc' },
-        select: {
-          id: true,
-          title: true,
-          content: true,
-          type: true,
-          order: true,
-          answers: {
-            orderBy: { order: 'asc' },
-            select: {
-              id: true,
-              content: true,
-              score: true,
-            },
-          },
-        },
-      },
+    select: {
+      id: true,
+      name: true,
+      description: true,
     },
   });
 
   if (!contest) return notFound();
-
-  // Check if user already submitted
-  const existingSubmission = await prisma.submission.findFirst({
-    where: {
-      userId: session.user.id,
-      contestId: contest.id,
-    },
-  });
-
-  if (existingSubmission) {
-    redirect(`/${slug}/results`);
-  }
-
-  return <ContestPageClient contest={contest} />;
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{contest.name}</CardTitle>
+        <CardDescription>ID: {contest.id}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p>{contest.description}</p>
+      </CardContent>
+      <CardFooter>
+        <Button asChild>
+          <Link href={`/${slug}/questions`}>Questions</Link>
+        </Button>
+      </CardFooter>
+    </Card>
+  );
 }
