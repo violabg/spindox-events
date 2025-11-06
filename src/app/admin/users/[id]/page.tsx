@@ -3,7 +3,7 @@ import { AdminLayout } from '@/components/admin';
 import { notFound } from 'next/navigation';
 import { getUserById } from '@/queries/users';
 import { Badge } from '@/components/ui/badge';
-import LinkedAccounts_ from '../_linked-accounts';
+import LinkedAccounts from '../linked-accounts';
 import ToggleAdminButton from './toggle-admin-button';
 
 const formatDate = (date: Date) => {
@@ -111,7 +111,7 @@ export default async function UserDetailPage({ params }: PageProps) {
         </Card>
 
         {/* Linked Accounts */}
-        <LinkedAccounts_
+        <LinkedAccounts
           accounts={user.accounts.map(account => ({
             id: account.id,
             providerId: account.providerId,

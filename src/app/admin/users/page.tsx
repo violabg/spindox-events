@@ -2,9 +2,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { AdminLayout, EmptyTable } from '@/components/admin';
 import UsersTable from './users.table';
 import { getUsers } from '@/queries/users';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { LayoutGrid } from 'lucide-react';
 
 export default async function UsersPage() {
   const users = await getUsers({

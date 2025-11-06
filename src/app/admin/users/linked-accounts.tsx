@@ -18,7 +18,7 @@ interface _LinkedAccountsProps {
   accounts: Account[];
 }
 
-export default function LinkedAccounts_({ accounts }: _LinkedAccountsProps) {
+export default function LinkedAccounts({ accounts }: _LinkedAccountsProps) {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   const handleDeleteAccount = async (accountId: string) => {
