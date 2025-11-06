@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import AdminLayout from '@/components/admin-layout';
+import { AdminLayout } from '@/components/admin';
 import { notFound } from 'next/navigation';
 import { getContestById } from '@/queries/contests';
 import ContestForm from '../../contest.form';

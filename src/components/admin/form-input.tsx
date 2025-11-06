@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { InputHTMLAttributes, ReactNode } from 'react';
 import {
@@ -10,10 +12,10 @@ import {
   UseFormStateReturn,
   useWatch,
 } from 'react-hook-form';
-import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '../ui/field';
-import { Input } from '../ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Textarea } from '../ui/textarea';
+import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 interface ControllerRenderParams<T extends FieldValues> {
   field: ControllerRenderProps<T, FieldPath<T>>;

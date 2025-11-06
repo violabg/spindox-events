@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
-import AdminLayout from '@/components/admin-layout';
+import { AdminLayout } from '@/components/admin';
 import { getQuestionWithAnswersAction } from '@/actions/questions/get.action';
 import QuestionForm from '../../../question.form';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import AdminHeader from './admin-header';
+import AdminHeader from './header';
 
 interface AdminLayoutProps {
   title: string;

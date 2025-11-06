@@ -1,13 +1,11 @@
 import { getContestById } from '@/queries/contests';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import AdminLayout from '@/components/admin-layout';
-import EmptyTable from '@/components/empty-table';
+import { AdminLayout, EmptyTable, ContestInformationCard } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import QuestionsTable from './questions.table';
 import { notFound } from 'next/navigation';
-import ContestInformationCard from '@/components/contest-information-card';
 
 type PageProps = {
   params: Promise<{ id: string }>;

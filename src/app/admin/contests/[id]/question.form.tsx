@@ -13,7 +13,7 @@ import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 
 import { createQuestionAction } from '@/actions/questions/create.action';
 import { updateQuestionAction } from '@/actions/questions/update.action';
-import { FieldBase, FieldInput, FieldSelect, FieldTextarea } from '@/components/form/form-input';
+import { FieldBase, FieldInput, FieldSelect, FieldTextarea } from '@/components/admin';
 import { AIQuestionModal } from '@/components/modals';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { GeneratedQuestion } from '@/lib/schemas/ai-question.schema';

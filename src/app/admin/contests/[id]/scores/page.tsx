@@ -1,11 +1,9 @@
 import { getContestById } from '@/queries/contests';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import AdminLayout from '@/components/admin-layout';
-import EmptyTable from '@/components/empty-table';
+import { AdminLayout, EmptyTable, ContestInformationCard } from '@/components/admin';
 import ScoresTable from './users.table';
 import { notFound } from 'next/navigation';
 import { getScoresByContest } from '@/queries/scores';
-import ContestInformationCard from '@/components/contest-information-card';
 
 type PageProps = {
   params: Promise<{ id: string }>;

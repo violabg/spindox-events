@@ -1,19 +1,9 @@
 'use client';
 
 import { deleteQuestionAction } from '@/actions/questions/delete.action';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ConfirmationDialog } from '@/components/admin';
 import { AnswerModel } from '@/prisma/models/Answer';
 import { QuestionModel } from '@/prisma/models/Question';
 import { Edit, Trash2 } from 'lucide-react';
@@ -50,28 +40,18 @@ function DeleteQuestionButton({ questionId, questionTitle }: { questionId: strin
   };
 
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="outline" size="sm" disabled={isDeleting}>
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete Question</AlertDialogTitle>
-          <AlertDialogDescription>
-            Are you sure you want to delete &quot;{questionTitle}&quot;? This action cannot be undone and will also delete all associated answers and
-            user responses.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
-            {isDeleting ? 'Deleting...' : 'Delete'}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <ConfirmationDialog
+      title="Delete Question"
+      description={`Are you sure you want to delete "${questionTitle}"? This action cannot be undone and will also delete all associated answers and user responses.`}
+      actionText="Delete"
+      onAction={handleDelete}
+      isLoading={isDeleting}
+      isDangerous
+    >
+      <Button variant="outline" size="sm" disabled={isDeleting}>
+        <Trash2 className="h-4 w-4" />
+      </Button>
+    </ConfirmationDialog>
   );
 }
 

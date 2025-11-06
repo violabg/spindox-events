@@ -5,21 +5,11 @@ import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { Trash2, MessageSquare, Edit, QrCode, Users } from 'lucide-react';
 import { deleteContestAction } from '@/actions/contests/delete.action';
 import { toast } from 'sonner';
 import { QRCodeModal } from '@/components/modals';
+import { ConfirmationDialog } from '@/components/admin';
 import { getContests } from '@/queries/contests';
 
 type ContestsTableProps = {
@@ -59,28 +49,18 @@ function DeleteContestButton({ contestId, contestName }: { contestId: string; co
   };
 
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="outline" size="sm" disabled={isDeleting}>
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete Contest</AlertDialogTitle>
-          <AlertDialogDescription>
-            Are you sure you want to delete &quot;{contestName}&quot;? This action cannot be undone and will fail if the contest has associated
-            questions or user answers.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
-            {isDeleting ? 'Deleting...' : 'Delete'}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <ConfirmationDialog
+      title="Delete Contest"
+      description={`Are you sure you want to delete "${contestName}"? This action cannot be undone and will fail if the contest has associated questions or user answers.`}
+      actionText="Delete"
+      onAction={handleDelete}
+      isLoading={isDeleting}
+      isDangerous
+    >
+      <Button variant="outline" size="sm" disabled={isDeleting}>
+        <Trash2 className="h-4 w-4" />
+      </Button>
+    </ConfirmationDialog>
   );
 }
 
