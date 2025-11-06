@@ -6,10 +6,10 @@ import type { Session, User } from 'better-auth';
 
 interface AuthenticableProps {
   callbackURL?: string;
-  render: ({ user, session }: { user: User; session: Session }) => React.ReactNode;
+  children: ({ user, session }: { user: User; session: Session }) => React.ReactNode;
 }
 
-export function Authenticable({ callbackURL, render }: AuthenticableProps) {
+export function Authenticable({ callbackURL, children }: AuthenticableProps) {
   const { data, isPending } = authClient.useSession();
 
   if (isPending) return null;
@@ -18,5 +18,5 @@ export function Authenticable({ callbackURL, render }: AuthenticableProps) {
     return <LoginForm callbackURL={callbackURL} />;
   }
 
-  return render({ user: data.user, session: data.session });
+  return children({ user: data.user, session: data.session });
 }

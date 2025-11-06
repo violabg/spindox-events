@@ -7,6 +7,7 @@ import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
+import Image from 'next/image';
 
 type QRCodeModalProps = {
   contestSlug: string;
@@ -49,7 +50,7 @@ export function QRCodeModal({ contestSlug, contestName, open, onOpenChange }: QR
           <DialogDescription>Scan this QR code or share the link to access this contest</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col items-center space-y-4">
-          {qrCodeDataUrl && <img src={qrCodeDataUrl} alt="QR Code" className="w-64 h-64 border rounded-lg" />}
+          {qrCodeDataUrl && <Image src={qrCodeDataUrl} width={512} height={512} alt="QR Code" className="border rounded-lg" />}
           <div className="text-center">
             <div className="flex items-center justify-center gap-3 mb-2">
               <p className="text-sm text-muted-foreground mb-0">Direct link:</p>

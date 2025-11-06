@@ -82,7 +82,6 @@ export async function submitAnswersAction(data: { answers: { questionId: string;
           contestId: contest.id,
           questionId: question.id,
           answerId: selectedAnswer.id,
-          score: selectedAnswer.score > 0 ? selectedAnswer.score : 0,
         },
       });
     }

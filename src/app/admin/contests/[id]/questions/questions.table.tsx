@@ -13,7 +13,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AnswerModel } from '@/prisma/models/Answer';
 import { QuestionModel } from '@/prisma/models/Question';
 import { Edit, Trash2 } from 'lucide-react';
@@ -77,45 +77,39 @@ function DeleteQuestionButton({ questionId, questionTitle }: { questionId: strin
 
 export default function QuestionsTable({ contestId, questions }: QuestionsTableProps) {
   return (
-    <>
-      <Table>
-        <TableCaption>A list of all questions for this contest.</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Title</TableHead>
-            <TableHead className="text-center">Answers</TableHead>
-            <TableHead className="text-center">Max Score</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {questions.map(question => {
-            const answerCount = question.answers.length;
-            const maxScore = question.answers.length > 0 ? question.answers.reduce((sum, answer) => sum + (answer.score ?? 0), 0) : 0;
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Title</TableHead>
+          <TableHead className="text-center">Answers</TableHead>
+          <TableHead className="text-center">Max Score</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {questions.map(question => {
+          const answerCount = question.answers.length;
+          const maxScore = question.answers.length > 0 ? Math.max(...question.answers.map(answer => answer.score)) : 0;
 
-            return (
-              <TableRow key={question.id}>
-                <TableCell className="font-medium">{question.title}</TableCell>
-                <TableCell className="text-center">{answerCount}</TableCell>
-                <TableCell className="text-center">{maxScore}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={`/admin/contests/${contestId}/questions/${question.id}/edit`}>
-                        <Edit className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                    <DeleteQuestionButton questionId={question.id} questionTitle={question.title} />
-                  </div>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-      {questions.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground">No questions found. Create your first question to get started.</div>
-      )}
-    </>
+          return (
+            <TableRow key={question.id}>
+              <TableCell className="font-medium">{question.title}</TableCell>
+              <TableCell className="text-center">{answerCount}</TableCell>
+              <TableCell className="text-center">{maxScore}</TableCell>
+              <TableCell className="text-right">
+                <div className="flex items-center justify-end gap-2">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/admin/contests/${contestId}/questions/${question.id}/edit`}>
+                      <Edit className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                  <DeleteQuestionButton questionId={question.id} questionTitle={question.title} />
+                </div>
+              </TableCell>
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
   );
 }
