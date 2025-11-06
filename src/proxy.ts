@@ -14,6 +14,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
+  if (pathname === '/admin') {
+    return NextResponse.redirect(new URL('/admin/contests', request.url));
+  }
+
   return NextResponse.next();
 }
 
