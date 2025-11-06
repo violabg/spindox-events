@@ -13,7 +13,6 @@ import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 
 import { createQuestionAction } from '@/actions/questions/create.action';
 import { updateQuestionAction } from '@/actions/questions/update.action';
-import { PlateEditor } from '@/components/editor/plate-editor';
 import { FieldBase, FieldInput, FieldSelect, FieldTextarea } from '@/components/form/form-input';
 import { AIQuestionModal } from '@/components/modals';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -120,7 +119,7 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
       <AIQuestionModal open={aiModalOpen} onOpenChange={setAIModalOpen} contestId={contestId} onGenerated={handleAIGenerated} />
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Button type="button" variant="outline" onClick={() => setAIModalOpen(true)} title="Generate question with AI">
-          <Wand2 className="w-4 h-4" /> Generate Questions
+          <Wand2 className="h-4 w-4" /> Generate Questions
         </Button>
         <FieldInput
           name="title"
@@ -140,7 +139,6 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
           className="min-h-[100px]"
           maxLength={1000}
         />
-        <PlateEditor />
 
         <FieldSelect
           name="type"
@@ -168,7 +166,7 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
               return (
                 <div key={field.id} className="space-y-3">
                   {/* Mobile: Stack all elements vertically, Desktop: Horizontal grid */}
-                  <div className="sm:items-end gap-3 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto]">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_auto] sm:items-end">
                     <FieldInput
                       control={form.control}
                       name={`answers.${index}.content`}
@@ -178,7 +176,7 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
                       disableFieldError={true}
                     />
 
-                    <div className="sm:contents flex gap-2">
+                    <div className="flex gap-2 sm:contents">
                       <FieldBase control={form.control} name={`answers.${index}.score`} label="Score" disableFieldError={true}>
                         {({ field }) => (
                           <Input
@@ -199,10 +197,10 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
                           variant="outline"
                           size="sm"
                           onClick={() => removeAnswer(index)}
-                          className="p-2 w-10 h-10 shrink-0"
+                          className="p-2 h-10 w-10 shrink-0"
                           disabled={fields.length === 1}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
@@ -210,7 +208,7 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
 
                   {/* Single error display for both content and score */}
                   {hasAnswerErrors && (
-                    <div className="text-destructive text-sm">
+                    <div className="text-sm text-destructive">
                       {contentError && <div>Content: {contentError.message}</div>}
                       {scoreError && <div>Score: {scoreError.message}</div>}
                     </div>
@@ -226,7 +224,7 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
             </FieldDescription>
             <div className="pt-2">
               <Button type="button" variant="outline" onClick={addAnswer} className="flex items-center gap-2">
-                <Plus className="w-4 h-4" />
+                <Plus className="h-4 w-4" />
                 Add Answer
               </Button>
             </div>
@@ -234,9 +232,9 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
         </Card>
 
         {/* Display server-side errors */}
-        {error && <div className="bg-destructive/10 p-3 rounded-md text-destructive text-sm">{error}</div>}
+        {error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>}
 
-        <div className="flex sm:flex-row flex-col gap-3 sm:gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Button type="submit" disabled={form.formState.isSubmitting} className="w-full sm:w-auto">
             {form.formState.isSubmitting ? `${isEditMode ? 'Updating' : 'Creating'}...` : `${isEditMode ? 'Update' : 'Create'} Question`}
           </Button>
