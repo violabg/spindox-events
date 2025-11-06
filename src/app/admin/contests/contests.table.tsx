@@ -4,14 +4,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react';
 import { getContests } from '@/queries/contests';
 import { MoreHorizontal, Eye, MessageSquare, Users, Edit, QrCode, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -57,51 +50,54 @@ function ContestActionsMenu({ contest }: { contest: ContestsTableProps['contests
 
   return (
     <>
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <Link href={`/admin/contests/${contest.id}`}>
+      <Menu>
+        <MenuButton as={Button} variant="ghost" size="sm">
+          <MoreHorizontal className="h-4 w-4" />
+        </MenuButton>
+        <MenuItems anchor="bottom end" className="z-50 rounded-md border bg-popover p-1 shadow-md">
+          <MenuItem>
+            <Link href={`/admin/contests/${contest.id}`} className="flex items-center px-2 py-1.5 text-sm hover:bg-accent rounded">
               <Eye className="mr-2 h-4 w-4" />
               View Details
             </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href={`/admin/contests/${contest.id}/questions`}>
+          </MenuItem>
+          <MenuItem>
+            <Link href={`/admin/contests/${contest.id}/questions`} className="flex items-center px-2 py-1.5 text-sm hover:bg-accent rounded">
               <MessageSquare className="mr-2 h-4 w-4" />
               Manage Questions
             </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href={`/admin/contests/${contest.id}/submissions`}>
+          </MenuItem>
+          <MenuItem>
+            <Link href={`/admin/contests/${contest.id}/submissions`} className="flex items-center px-2 py-1.5 text-sm hover:bg-accent rounded">
               <Users className="mr-2 h-4 w-4" />
               View Submissions
             </Link>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <Link href={`/admin/contests/${contest.id}/edit`}>
+          </MenuItem>
+          <div className="my-1 h-px bg-border" />
+          <MenuItem>
+            <Link href={`/admin/contests/${contest.id}/edit`} className="flex items-center px-2 py-1.5 text-sm hover:bg-accent rounded">
               <Edit className="mr-2 h-4 w-4" />
               Edit Contest
             </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setIsQRModalOpen(true)}>
-            <QrCode className="mr-2 h-4 w-4" />
-            Generate QR Code
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={() => setIsDeleteDialogOpen(true)} className="text-destructive">
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete Contest
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </MenuItem>
+          <MenuItem>
+            <button onClick={() => setIsQRModalOpen(true)} className="w-full flex items-center px-2 py-1.5 text-sm hover:bg-accent rounded text-left">
+              <QrCode className="mr-2 h-4 w-4" />
+              Generate QR Code
+            </button>
+          </MenuItem>
+          <div className="my-1 h-px bg-border" />
+          <MenuItem>
+            <button
+              onClick={() => setIsDeleteDialogOpen(true)}
+              className="w-full flex items-center px-2 py-1.5 text-sm hover:bg-destructive/10 rounded text-destructive text-left"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete Contest
+            </button>
+          </MenuItem>
+        </MenuItems>
+      </Menu>
       <QRCodeModal contestSlug={contest.slug} contestName={contest.name} open={isQRModalOpen} onOpenChange={setIsQRModalOpen} />
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
