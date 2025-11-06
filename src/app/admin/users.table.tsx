@@ -1,10 +1,8 @@
-'use client';
-
-import Link from 'next/link';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Eye } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { getUsers } from '@/queries/users';
+import { Eye } from 'lucide-react';
+import Link from 'next/link';
 
 type UsersTableProps = {
   users: Awaited<ReturnType<typeof getUsers<{ userAnswers: true; sessions: true }>>>;
@@ -32,7 +30,7 @@ export default function UsersTable({ users }: UsersTableProps) {
             <TableCell className="text-right">
               <Button variant="outline" size="sm" asChild>
                 <Link href={`/admin/users/${user.id}`}>
-                  <Eye className="h-4 w-4" />
+                  <Eye className="w-4 h-4" />
                 </Link>
               </Button>
             </TableCell>

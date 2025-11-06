@@ -1,68 +1,15 @@
-'use client';
-
-import { useState } from 'react';
-import Link from 'next/link';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { DeleteContestButton } from '@/components/admin/delete-contest-button';
+import { QRCodeButton } from '@/components/admin/qr-code-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Trash2, MessageSquare, Edit, QrCode, Users } from 'lucide-react';
-import { deleteContestAction } from '@/actions/contests/delete.action';
-import { toast } from 'sonner';
-import { QRCodeModal } from '@/components/modals';
-import { ConfirmationDialog } from '@/components/admin';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { getContests } from '@/queries/contests';
+import { Edit, MessageSquare, Users } from 'lucide-react';
+import Link from 'next/link';
 
 type ContestsTableProps = {
   contests: Awaited<ReturnType<typeof getContests<{ userAnswers: true; questions: true }>>>;
 };
-
-function QRCodeButton({ contestSlug, contestName }: { contestSlug: string; contestName: string }) {
-  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
-
-  return (
-    <>
-      <Button variant="outline" size="sm" onClick={() => setIsQRModalOpen(true)}>
-        <QrCode className="h-4 w-4" />
-      </Button>
-      <QRCodeModal contestSlug={contestSlug} contestName={contestName} open={isQRModalOpen} onOpenChange={setIsQRModalOpen} />
-    </>
-  );
-}
-
-function DeleteContestButton({ contestId, contestName }: { contestId: string; contestName: string }) {
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      const result = await deleteContestAction(contestId);
-      if (result.success) {
-        toast.success('Contest deleted successfully');
-      } else {
-        toast.error(result.error || 'Failed to delete contest');
-      }
-    } catch {
-      toast.error('Failed to delete contest');
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  return (
-    <ConfirmationDialog
-      title="Delete Contest"
-      description={`Are you sure you want to delete "${contestName}"? This action cannot be undone and will fail if the contest has associated questions or user answers.`}
-      actionText="Delete"
-      onAction={handleDelete}
-      isLoading={isDeleting}
-      isDangerous
-    >
-      <Button variant="outline" size="sm" disabled={isDeleting}>
-        <Trash2 className="h-4 w-4" />
-      </Button>
-    </ConfirmationDialog>
-  );
-}
 
 export default function ContestsTable({ contests }: ContestsTableProps) {
   return (
@@ -88,21 +35,21 @@ export default function ContestsTable({ contests }: ContestsTableProps) {
             <TableCell>{contest.questions.length}</TableCell>
             <TableCell>{new Set(contest.userAnswers.map(ua => ua.userId)).size}</TableCell>
             <TableCell className="text-right">
-              <div className="flex items-center justify-end gap-2">
+              <div className="flex justify-end items-center gap-2">
                 <QRCodeButton contestSlug={contest.slug} contestName={contest.name} />
                 <Button variant="outline" size="sm" asChild>
                   <Link href={`/admin/contests/${contest.id}/scores`}>
-                    <Users className="h-4 w-4" />
+                    <Users className="w-4 h-4" />
                   </Link>
                 </Button>
                 <Button variant="outline" size="sm" asChild>
                   <Link href={`/admin/contests/${contest.id}/questions`}>
-                    <MessageSquare className="h-4 w-4" />
+                    <MessageSquare className="w-4 h-4" />
                   </Link>
                 </Button>
                 <Button variant="outline" size="sm" asChild>
                   <Link href={`/admin/contests/${contest.id}/edit`}>
-                    <Edit className="h-4 w-4" />
+                    <Edit className="w-4 h-4" />
                   </Link>
                 </Button>
                 <DeleteContestButton contestId={contest.id} contestName={contest.name} />
