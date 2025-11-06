@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { headers } from 'next/headers';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import ContestPageClient from './page.client';
 
@@ -62,5 +62,10 @@ async function DynamicContent({ params }: ContestPageParams) {
       contestId: contest.id,
     },
   });
+
+  if (existingSubmission) {
+    redirect(`/${slug}/results`);
+  }
+
   return <ContestPageClient contest={contest} />;
 }
