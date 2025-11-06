@@ -11,28 +11,13 @@ export const answerSchema = z.object({
 export const questionTypeSchema = z.enum(['SINGLE_CHOICE', 'MULTIPLE_CHOICES']);
 
 // Base question schema (without ID) for creation and updates
-export const questionSchema = z
-  .object({
-    contestId: z.cuid(),
-    title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
-    content: z.string().min(1, 'Content is required').max(1000, 'Content must be less than 1000 characters'),
-    type: questionTypeSchema,
-    answers: z.array(answerSchema).min(1, 'At least 1 answer is required'),
-  })
-  .refine(
-    data => {
-      // For SINGLE_CHOICE, only one answer can have score > 0
-      if (data.type === 'SINGLE_CHOICE') {
-        const positiveScores = data.answers.filter(answer => answer.score > 0);
-        return positiveScores.length === 1;
-      }
-      return true;
-    },
-    {
-      message: 'For single choice questions, exactly one answer must have a score greater than 0',
-      path: ['answers'],
-    }
-  );
+export const questionSchema = z.object({
+  contestId: z.cuid(),
+  title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
+  content: z.string().min(1, 'Content is required').max(1000, 'Content must be less than 1000 characters'),
+  type: questionTypeSchema,
+  answers: z.array(answerSchema).min(1, 'At least 1 answer is required'),
+});
 
 // Schema for creation
 export const createQuestionSchema = questionSchema;
