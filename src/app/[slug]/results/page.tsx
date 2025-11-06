@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { CheckCircle, XCircle } from 'lucide-react';
+import { cacheLife } from 'next/cache';
 import { headers } from 'next/headers';
 import { Suspense } from 'react';
 
@@ -23,6 +24,8 @@ export default async function Page({ params }: Params) {
 }
 
 async function DynamicContent({ params }: Params) {
+  'use cache';
+  cacheLife('hours');
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) {
     throw new Error('Unauthorized');

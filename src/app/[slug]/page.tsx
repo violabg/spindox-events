@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import prisma from '@/lib/prisma';
+import { cacheLife } from 'next/cache';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -21,6 +22,8 @@ export default async function ContestPage({ params }: ContestPageParams) {
 }
 
 async function DynamicContent({ params }: ContestPageParams) {
+  'use cache';
+  cacheLife('hours');
   const { slug } = await params;
 
   const contest = await prisma.contest.findUnique({
