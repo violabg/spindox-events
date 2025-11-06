@@ -1,7 +1,7 @@
 import { getContestById } from '@/queries/contests';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AdminLayout from '@/components/admin-layout';
-import { Empty, EmptyContent, EmptyDescription, EmptyTitle } from '@/components/ui/empty';
+import EmptyTable from '@/components/empty-table';
 import ScoresTable from './users.table';
 import { notFound } from 'next/navigation';
 import { getScoresByContest } from '@/queries/scores';
@@ -30,12 +30,7 @@ export default async function UsersPage({ params }: PageProps) {
         </CardHeader>
         <CardContent>
           {scores.length === 0 ? (
-            <Empty>
-              <EmptyContent>
-                <EmptyTitle>No participants</EmptyTitle>
-                <EmptyDescription>Users will appear here once they start answering questions.</EmptyDescription>
-              </EmptyContent>
-            </Empty>
+            <EmptyTable title="No participants" description="Users will appear here once they start answering questions." />
           ) : (
             <ScoresTable scores={scores} />
           )}

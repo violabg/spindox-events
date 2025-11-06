@@ -1,7 +1,7 @@
 import { getContestById } from '@/queries/contests';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AdminLayout from '@/components/admin-layout';
-import { Empty, EmptyContent, EmptyDescription, EmptyTitle } from '@/components/ui/empty';
+import EmptyTable from '@/components/empty-table';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
@@ -51,12 +51,7 @@ export default async function QuestionsPage({ params }: PageProps) {
         </CardHeader>
         <CardContent>
           {contest.questions.length === 0 ? (
-            <Empty>
-              <EmptyContent>
-                <EmptyTitle>No questions yet</EmptyTitle>
-                <EmptyDescription>Add your first question to get started.</EmptyDescription>
-              </EmptyContent>
-            </Empty>
+            <EmptyTable title="No questions yet" description="Add your first question to get started." />
           ) : (
             <QuestionsTable contestId={id} questions={contest.questions} />
           )}

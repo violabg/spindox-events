@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { Empty, EmptyContent, EmptyDescription, EmptyTitle } from '@/components/ui/empty';
 import AdminLayout from '@/components/admin-layout';
+import EmptyTable from '@/components/empty-table';
 import ContestsTable from './contests.table';
 import { getContests } from '@/queries/contests';
 
@@ -13,12 +13,7 @@ export default async function AdminPage() {
       <Card>
         <CardContent className="p-4 sm:p-6">
           {contests.length === 0 ? (
-            <Empty>
-              <EmptyContent>
-                <EmptyTitle>No contests yet</EmptyTitle>
-                <EmptyDescription>Create your first contest to get started.</EmptyDescription>
-              </EmptyContent>
-            </Empty>
+            <EmptyTable title="No contests yet" description="Create your first contest to get started." />
           ) : (
             <ContestsTable contests={contests} />
           )}
