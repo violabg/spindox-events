@@ -6,7 +6,7 @@ import { ContestStatus } from '@/prisma/enums';
 import { ContestModel } from '@/prisma/models/Contest';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FieldBase, FieldInput, FieldTextarea } from '@/components/form/form-input';
+import { FieldBase, FieldInput, FieldSelect, FieldTextarea } from '@/components/form/form-input';
 import Link from 'next/link';
 import { createContestAction } from '@/actions/contests/create.action';
 import { updateContestAction } from '@/actions/contests/update.action';
@@ -89,32 +89,45 @@ export default function ContestForm({ contestId, initialData }: ContestFormProps
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-      <FieldInput
-        name="name"
-        control={form.control}
-        label="Name"
-        description="The display name for this contest"
-        placeholder="Enter contest name..."
-        maxLength={100}
-      />
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <FieldInput
+          name="name"
+          control={form.control}
+          label="Name"
+          description="The display name for this contest"
+          placeholder="Enter contest name..."
+          maxLength={100}
+        />
 
-      <FieldInput
-        name="slug"
-        control={form.control}
-        label="Slug"
-        description="URL-friendly identifier (automatically generated from name, but you can customize it)"
-        placeholder="contest-slug"
-        maxLength={50}
-      />
+        <FieldInput
+          name="slug"
+          control={form.control}
+          label="Slug"
+          description="URL-friendly identifier (automatically generated from name, but you can customize it)"
+          placeholder="contest-slug"
+          maxLength={50}
+        />
+      </div>
 
-      <FieldInput
-        name="theme"
-        control={form.control}
-        label="Theme (Optional)"
-        description="Optional theme or category for this contest"
-        placeholder="Enter theme..."
-        maxLength={50}
-      />
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <FieldInput
+          name="theme"
+          control={form.control}
+          label="Theme (Optional)"
+          description="Optional theme or category for this contest"
+          placeholder="Enter theme..."
+          maxLength={50}
+        />
+
+        <FieldSelect
+          name="status"
+          control={form.control}
+          label="Status"
+          description="Current status of this contest"
+          placeholder="Select status"
+          options={Object.values(ContestStatus).map(status => ({ value: status, label: status }))}
+        />
+      </div>
 
       <FieldTextarea
         name="description"
@@ -125,23 +138,6 @@ export default function ContestForm({ contestId, initialData }: ContestFormProps
         className="min-h-[100px]"
         maxLength={500}
       />
-
-      <FieldBase name="status" control={form.control} label="Status" description="Current status of this contest">
-        {({ field }) => (
-          <Select onValueChange={field.onChange} value={field.value}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.values(ContestStatus).map(status => (
-                <SelectItem key={status} value={status}>
-                  {status}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-      </FieldBase>
 
       {error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>}
 

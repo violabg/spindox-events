@@ -19,12 +19,12 @@ export default async function EditContestPage({ params }: EditContestPageProps) 
 
   return (
     <AdminLayout title="Edit Contest" subtitle="Update the contest information" backHref={`/admin/contests/${id}`}>
-      <Card className="w-full max-w-2xl mx-auto">
-        <CardHeader className="p-4 sm:p-6">
+      <Card>
+        <CardHeader>
           <CardTitle>Contest Details</CardTitle>
           <CardDescription>Update the information for &ldquo;{contest.name}&rdquo;</CardDescription>
         </CardHeader>
-        <CardContent className="p-4 sm:p-6">
+        <CardContent>
           <ContestForm contestId={id} initialData={contest} />
         </CardContent>
       </Card>

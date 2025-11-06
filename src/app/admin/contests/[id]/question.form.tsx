@@ -121,14 +121,29 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
         <Button type="button" variant="outline" onClick={() => setAIModalOpen(true)} title="Generate question with AI">
           <Wand2 className="h-4 w-4" /> Generate Questions
         </Button>
-        <FieldInput
-          name="title"
-          control={form.control}
-          label="Question Title"
-          description="A brief title for the question"
-          placeholder="Enter question title..."
-          maxLength={200}
-        />
+
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <FieldInput
+            name="title"
+            control={form.control}
+            label="Question Title"
+            description="A brief title for the question"
+            placeholder="Enter question title..."
+            maxLength={200}
+          />
+
+          <FieldSelect
+            name="type"
+            control={form.control}
+            label="Question Type"
+            description="Choose whether users can select one answer or multiple answers"
+            placeholder="Select question type"
+            options={[
+              { value: 'SINGLE_CHOICE', label: 'Single Choice (one correct answer)' },
+              { value: 'MULTIPLE_CHOICES', label: 'Multiple Choices (multiple correct answers)' },
+            ]}
+          />
+        </div>
 
         <FieldTextarea
           name="content"
@@ -138,18 +153,6 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
           placeholder="Enter the full question..."
           className="min-h-[100px]"
           maxLength={1000}
-        />
-
-        <FieldSelect
-          name="type"
-          control={form.control}
-          label="Question Type"
-          description="Choose whether users can select one answer or multiple answers"
-          placeholder="Select question type"
-          options={[
-            { value: 'SINGLE_CHOICE', label: 'Single Choice (one correct answer)' },
-            { value: 'MULTIPLE_CHOICES', label: 'Multiple Choices (multiple correct answers)' },
-          ]}
         />
 
         <Card>

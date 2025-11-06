@@ -30,12 +30,12 @@ export default async function EditQuestionPage({ params }: PageProps) {
 
   return (
     <AdminLayout title="Edit Question" subtitle={`Update "${question.title}"`} backHref={`/admin/contests/${id}/questions`}>
-      <Card className="w-full max-w-4xl mx-auto">
-        <CardHeader className="p-4 sm:p-6">
+      <Card>
+        <CardHeader>
           <CardTitle>Question Details</CardTitle>
           <CardDescription>Update the question information and answer options with scores.</CardDescription>
         </CardHeader>
-        <CardContent className="p-4 sm:p-6">
+        <CardContent>
           <QuestionForm contestId={id} question={question} />
         </CardContent>
       </Card>

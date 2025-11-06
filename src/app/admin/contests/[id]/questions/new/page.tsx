@@ -28,12 +28,12 @@ export default async function NewQuestionPage({ params }: PageProps) {
 
   return (
     <AdminLayout title="Create New Question" subtitle={`Add a new question to "${contest.name}"`} backHref={`/admin/contests/${id}/questions`}>
-      <Card className="w-full max-w-4xl mx-auto">
-        <CardHeader className="p-4 sm:p-6">
+      <Card>
+        <CardHeader>
           <CardTitle>Question Details</CardTitle>
           <CardDescription>Fill in the question information and provide answer options with scores.</CardDescription>
         </CardHeader>
-        <CardContent className="p-4 sm:p-6">
+        <CardContent>
           <QuestionForm contestId={id} />
         </CardContent>
       </Card>
