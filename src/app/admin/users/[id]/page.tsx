@@ -1,20 +1,11 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { AdminLayout } from '@/components/admin';
 import { notFound } from 'next/navigation';
 import { getUserById } from '@/queries/users';
 import { Badge } from '@/components/ui/badge';
+import { formatDate } from '@/lib/date';
 import LinkedAccounts from '../linked-accounts';
-import ToggleAdminButton from './toggle-admin-button';
-
-const formatDate = (date: Date) => {
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(date));
-};
+import AdminRoleSelect from './admin-role-select';
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -82,10 +73,12 @@ export default async function UserDetailPage({ params }: PageProps) {
                 <p className="font-medium text-sm">{formatDate(user.createdAt)}</p>
               </div>
             </div>
-            <div className="pt-4 border-t">
-              <ToggleAdminButton userId={userId} isAdmin={user.role === 'admin'} />
-            </div>
           </CardContent>
+          <CardFooter>
+            <CardAction>
+              <AdminRoleSelect userId={userId} isAdmin={user.role === 'admin'} />
+            </CardAction>
+          </CardFooter>
         </Card>
 
         {/* Contests Participated */}
