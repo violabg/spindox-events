@@ -43,8 +43,9 @@ export default function AdminHeader({ title, subtitle, backHref }: AdminHeaderPr
               <span className="hidden sm:inline ml-2">New Contest</span>
             </Link>
           </Button>
-          <Button type="button" variant="ghost" size="sm" onClick={handleLogout}>
+          <Button type="button" variant="outline" onClick={handleLogout}>
             <LogOut className="h-4 w-4" />
+            <span className="hidden sm:inline ml-2">Logout</span>
           </Button>
         </div>
       </div>
