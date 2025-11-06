@@ -1,26 +1,26 @@
 import prisma from '@/lib/prisma';
 
 export async function getScoresByContest(contestId: string) {
-  const contest = await prisma.contest.findUnique({
-    where: { id: contestId },
-    include: { userAnswers: { include: { user: true, answer: true } } },
+  const submissions = await prisma.submission.findMany({
+    where: { contestId },
+    include: { user: true },
   });
 
-  if (!contest) return [];
+  if (!submissions.length) return [];
 
   // Calculate scores for each user
-  const userScoresMap = new Map<string, { user: (typeof contest.userAnswers)[number]['user']; totalScore: number }>();
+  const userScoresMap = new Map<string, { user: (typeof submissions)[number]['user']; totalScore: number }>();
 
-  contest.userAnswers.forEach(ua => {
-    const userId = ua.user.id;
-    const answerScore = ua.answer.score;
+  submissions.forEach(submission => {
+    const userId = submission.userId;
+    const score = submission.score;
 
     if (!userScoresMap.has(userId)) {
-      userScoresMap.set(userId, { user: ua.user, totalScore: 0 });
+      userScoresMap.set(userId, { user: submission.user, totalScore: 0 });
     }
 
     const userScore = userScoresMap.get(userId)!;
-    userScore.totalScore += answerScore;
+    userScore.totalScore += score;
   });
 
   // Convert map to array and sort by total score descending

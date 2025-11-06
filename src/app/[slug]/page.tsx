@@ -49,7 +49,7 @@ export default async function ContestPage({ params }: ContestPageParams) {
   if (!contest) return notFound();
 
   // Check if user already submitted
-  const existingSubmission = await prisma.userAnswer.findFirst({
+  const existingSubmission = await prisma.submission.findFirst({
     where: {
       userId: session.user.id,
       contestId: contest.id,

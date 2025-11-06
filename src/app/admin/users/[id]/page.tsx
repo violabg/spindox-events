@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { getUserById } from '@/queries/users';
 import { Badge } from '@/components/ui/badge';
 import LinkedAccounts_ from '../_linked-accounts';
+import ToggleAdminButton from './toggle-admin-button';
 
 const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat('en-US', {
@@ -16,15 +17,15 @@ const formatDate = (date: Date) => {
 };
 
 type PageProps = {
-  params: Promise<{ userId: string }>;
+  params: Promise<{ id: string }>;
 };
 
 export default async function UserDetailPage({ params }: PageProps) {
-  const { userId } = await params;
+  const { id: userId } = await params;
 
   const user = await getUserById(userId, {
     include: {
-      userAnswers: {
+      submissions: {
         include: {
           contest: true,
           question: true,
@@ -40,7 +41,7 @@ export default async function UserDetailPage({ params }: PageProps) {
   }
 
   const contestsParticipated = new Map<string, { name: string; count: number }>();
-  user.userAnswers.forEach(ua => {
+  user.submissions.forEach(ua => {
     if (!contestsParticipated.has(ua.contestId)) {
       contestsParticipated.set(ua.contestId, { name: ua.contest.name, count: 0 });
     }
@@ -60,30 +61,29 @@ export default async function UserDetailPage({ params }: PageProps) {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Name</p>
-                <p className="font-medium">{user.name}</p>
+              <div className="flex items-end gap-2">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Name</p>
+                  <p className="font-medium">{user.name}</p>
+                </div>
+                <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>{user.role === 'admin' ? 'Admin' : 'User'}</Badge>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Email</p>
-                <p className="font-medium">{user.email}</p>
+              <div className="flex items-end gap-2">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Email</p>
+                  <p className="font-medium">{user.email}</p>
+                </div>
+                <Badge variant="outline">{user.emailVerified ? 'Verified' : 'Unverified'}</Badge>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Status</p>
-                <Badge variant={user.banned ? 'destructive' : 'default'}>{user.banned ? 'Banned' : 'Active'}</Badge>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Email Verified</p>
-                <Badge variant={user.emailVerified ? 'default' : 'secondary'}>{user.emailVerified ? 'Verified' : 'Unverified'}</Badge>
-              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Joined</p>
                 <p className="font-medium text-sm">{formatDate(user.createdAt)}</p>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Active Sessions</p>
-                <p className="font-medium">{user.sessions.length}</p>
-              </div>
+            </div>
+            <div className="pt-4 border-t">
+              <ToggleAdminButton userId={userId} isAdmin={user.role === 'admin'} />
             </div>
           </CardContent>
         </Card>

@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, LogOut, Plus } from 'lucide-react';
+import { ArrowLeft, LogOut, Grid2x2, Users } from 'lucide-react';
 import Link from 'next/link';
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
@@ -37,10 +37,16 @@ export default function AdminHeader({ title, subtitle, backHref }: AdminHeaderPr
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button asChild>
-            <Link href="/admin/contests/new">
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline ml-2">New Contest</span>
+          <Button asChild variant="outline">
+            <Link href="/admin/contests">
+              <Grid2x2 className="h-4 w-4" />
+              <span className="hidden sm:inline ml-2">Contests</span>
+            </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/admin/users">
+              <Users className="h-4 w-4" />
+              <span className="hidden sm:inline ml-2">Users</span>
             </Link>
           </Button>
           <Button type="button" variant="outline" onClick={handleLogout}>

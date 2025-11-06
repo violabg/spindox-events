@@ -36,7 +36,7 @@ export async function submitAnswersAction(data: { answers: { questionId: string;
   if (!contest) throw new Error('Contest not found');
 
   // Check duplicate submission
-  const existingSubmission = await prisma.userAnswer.findFirst({
+  const existingSubmission = await prisma.submission.findFirst({
     where: { userId: session.user.id, contestId: contest.id },
   });
   if (existingSubmission) throw new Error('Already submitted');
@@ -47,7 +47,7 @@ export async function submitAnswersAction(data: { answers: { questionId: string;
   const results: {
     questionId: string;
     questionContent: string;
-    userAnswerIds: string[];
+    submissionIds: string[];
     correctAnswerIds: string[];
     isCorrect: boolean;
   }[] = [];
@@ -76,12 +76,13 @@ export async function submitAnswersAction(data: { answers: { questionId: string;
     }
 
     for (const selectedAnswer of selectedAnswers) {
-      await prisma.userAnswer.create({
+      await prisma.submission.create({
         data: {
           userId: session.user.id,
           contestId: contest.id,
           questionId: question.id,
           answerId: selectedAnswer.id,
+          score: selectedAnswer.score,
         },
       });
     }
@@ -89,7 +90,7 @@ export async function submitAnswersAction(data: { answers: { questionId: string;
     results.push({
       questionId: question.id,
       questionContent: question.content,
-      userAnswerIds: selectedAnswers.map(a => a.id),
+      submissionIds: selectedAnswers.map(a => a.id),
       correctAnswerIds: correctAnswers.map(a => a.id),
       isCorrect,
     });

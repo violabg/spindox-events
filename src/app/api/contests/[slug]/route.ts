@@ -37,7 +37,7 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
     }
 
     // Check if user has already submitted answers for this contest
-    const existingSubmission = await prisma.userAnswer.findFirst({
+    const existingSubmission = await prisma.submission.findFirst({
       where: {
         userId: session.user.id,
         contestId: contest.id,

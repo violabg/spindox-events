@@ -1,8 +1,8 @@
 # Feature Specification: Contest Questions Page
 
-**Feature Branch**: `001-contest-questions-page`  
-**Created**: 4 novembre 2025  
-**Status**: Draft  
+**Feature Branch**: `001-contest-questions-page`
+**Created**: 4 novembre 2025
+**Status**: Draft
 **Input**: User description: "create the [slug] page, it needs to retrive contest info and questions, and allow the user to anwser and submit questions, use radio buttons for single correct answer and checkboxes for multiple"
 
 ## Clarifications
@@ -87,7 +87,7 @@ As an authenticated user, I want to submit my answers and immediately see my sco
 - **Contest**: Represents a contest with attributes like slug, title, description, and associated questions.
 - **Question**: Represents a question within a contest, with text, type (single or multiple correct answers), and possible answers.
 - **Answer**: Represents possible answer options for a question, with text and correctness indicator.
-- **UserAnswer**: Represents a user's selected answers for a question, linking user, question, and selected answers.
+- **Submission**: Represents a user's selected answers for a question, linking user, question, and selected answers.
 
 ## Success Criteria _(mandatory)_
 

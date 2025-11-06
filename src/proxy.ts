@@ -10,8 +10,8 @@ export async function proxy(request: NextRequest) {
   // Redirect authenticated users away from login/signup pages
   if (!session && !['/login'].includes(pathname)) {
     return NextResponse.redirect(new URL(`/login?redirect=${encodeURIComponent(request.url)}`, request.url));
-  } else if (session?.user.role === 'user' && !pathname.startsWith('/admin')) {
-    return NextResponse.next();
+  } else if (pathname.startsWith('/admin') && session?.user.role !== 'admin') {
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   return NextResponse.next();

@@ -1,8 +1,8 @@
 # Implementation Tasks: Contest Questions Page
 
-**Feature**: 001-contest-questions-page  
-**Branch**: `001-contest-questions-page`  
-**Date**: 4 novembre 2025  
+**Feature**: 001-contest-questions-page
+**Branch**: `001-contest-questions-page`
+**Date**: 4 novembre 2025
 **Execution Model**: Phase-based with sequential dependencies
 
 ## Task Summary
@@ -13,12 +13,12 @@ Total Tasks: 18 | Phases: 5 (Setup, Tests, Core, Integration, Polish)
 
 ### Task 001: Verify Database Schema [SETUP]
 
-- **Description**: Ensure Prisma schema includes Contest, Question, Answer, UserAnswer, User models with proper relationships and RLS policies
+- **Description**: Ensure Prisma schema includes Contest, Question, Answer, Submission, User models with proper relationships and RLS policies
 - **Acceptance**:
   - [x] Contest model exists with slug, title, description fields
   - [x] Question model linked to Contest with text, type enum
   - [x] Answer model linked to Question with score field for correctness
-  - [x] UserAnswer model with userId, questionId, answerId, unique constraint
+  - [x] Submission model with userId, questionId, answerId, unique constraint
   - [x] RLS policies applied to all tables
 - **Files**: `prisma/schema.prisma`
 - **Dependencies**: None
@@ -66,7 +66,7 @@ Total Tasks: 18 | Phases: 5 (Setup, Tests, Core, Integration, Polish)
 
 - **Description**: Test answer submission endpoint POST /api/contests/[slug]/submit
 - **Acceptance**:
-  - [ ] Test successful submission stores UserAnswers
+  - [ ] Test successful submission stores Submissions
   - [ ] Test score calculation is correct
   - [ ] Test correct answers returned in response
   - [ ] Test 409 error on duplicate submission
@@ -110,7 +110,7 @@ Total Tasks: 18 | Phases: 5 (Setup, Tests, Core, Integration, Polish)
 - **Acceptance**:
   - [ ] Validates request using Zod schema
   - [ ] Checks for duplicate submission (409 error)
-  - [ ] Saves UserAnswer records to database
+  - [ ] Saves Submission records to database
   - [ ] Calculates score based on correct answers
   - [ ] Returns score, results, and correct answers
   - [ ] Uses RLS for security

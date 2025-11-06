@@ -33,11 +33,11 @@ export default async function Page({ params }: Params) {
     throw new Error('Contest not found');
   }
 
-  const userAnswers = await prisma.userAnswer.findMany({
+  const submissions = await prisma.submission.findMany({
     where: { userId: session.user.id, contestId: contest.id },
   });
 
-  const answersByQuestion = userAnswers.reduce<Record<string, string[]>>((acc, ua) => {
+  const answersByQuestion = submissions.reduce<Record<string, string[]>>((acc, ua) => {
     if (!acc[ua.questionId]) acc[ua.questionId] = [];
     acc[ua.questionId].push(ua.answerId);
     return acc;
@@ -69,7 +69,7 @@ export default async function Page({ params }: Params) {
       questionId: question.id,
       questionContent: question.content,
       // Render the answer text instead of raw IDs so the UI shows readable content
-      userAnswerIds: selectedAnswers.map(a => a.content),
+      submissionIds: selectedAnswers.map(a => a.content),
       correctAnswerIds: correctAnswers.map(a => a.content),
       isCorrect,
     };
@@ -148,10 +148,10 @@ export default async function Page({ params }: Params) {
                 <div>
                   <p className="mb-2 text-sm font-medium text-slate-700">Your Answer:</p>
                   <div className="space-y-1">
-                    {result.userAnswerIds.length === 0 ? (
+                    {result.submissionIds.length === 0 ? (
                       <p className="text-sm italic text-red-600">No answer selected</p>
                     ) : (
-                      result.userAnswerIds.map(id => (
+                      result.submissionIds.map(id => (
                         <p key={id} className="text-sm text-red-600">
                           • {id}
                         </p>

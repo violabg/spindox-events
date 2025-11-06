@@ -1,7 +1,7 @@
 # API Contract: Submit Answers
 
-**Endpoint**: POST /api/contests/{slug}/submit  
-**Purpose**: Submit user answers for a contest and receive score and correct answers  
+**Endpoint**: POST /api/contests/{slug}/submit
+**Purpose**: Submit user answers for a contest and receive score and correct answers
 **Authentication**: Required (user session)
 
 ## Request
@@ -41,7 +41,7 @@
     {
       "questionId": "string",
       "questionText": "string",
-      "userAnswers": ["string"],
+      "submissions": ["string"],
       "correctAnswers": ["string"],
       "isCorrect": true
     }

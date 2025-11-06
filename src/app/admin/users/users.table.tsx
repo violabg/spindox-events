@@ -5,7 +5,7 @@ import { Eye } from 'lucide-react';
 import Link from 'next/link';
 
 type UsersTableProps = {
-  users: Awaited<ReturnType<typeof getUsers<{ userAnswers: true; sessions: true }>>>;
+  users: Awaited<ReturnType<typeof getUsers<{ submissions: true; sessions: true }>>>;
 };
 
 export default function UsersTable({ users }: UsersTableProps) {
@@ -25,7 +25,7 @@ export default function UsersTable({ users }: UsersTableProps) {
           <TableRow key={user.id}>
             <TableCell className="font-medium">{user.name}</TableCell>
             <TableCell className="text-muted-foreground">{user.email}</TableCell>
-            <TableCell className="text-center">{new Set(user.userAnswers.map(ua => ua.contestId)).size}</TableCell>
+            <TableCell className="text-center">{new Set(user.submissions.map(ua => ua.contestId)).size}</TableCell>
             <TableCell className="text-center">{user.sessions.length}</TableCell>
             <TableCell className="text-right">
               <Button variant="outline" size="sm" asChild>

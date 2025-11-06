@@ -1,6 +1,6 @@
 # Data Model: Contest Questions Page
 
-**Date**: 4 novembre 2025  
+**Date**: 4 novembre 2025
 **Feature**: 001-contest-questions-page
 
 ## Overview
@@ -40,7 +40,7 @@ The data model supports contest participation with questions, answers, and user 
 
 - N:1 with Contest
 - 1:N with Answer
-- 1:N with UserAnswer
+- 1:N with Submission
 
 **Validation Rules**:
 
@@ -60,7 +60,7 @@ The data model supports contest participation with questions, answers, and user 
 **Relationships**:
 
 - N:1 with Question
-- N:N with User via UserAnswer
+- N:N with User via Submission
 
 **Validation Rules**:
 
@@ -68,7 +68,7 @@ The data model supports contest participation with questions, answers, and user 
 - isCorrect: required
 - points: >= 0
 
-### UserAnswer
+### Submission
 
 - **id**: String/UUID (primary key)
 - **userId**: Foreign Key to User
@@ -86,13 +86,13 @@ The data model supports contest participation with questions, answers, and user 
 
 - Unique: userId + questionId + answerId (to prevent duplicates)
 
-**Note**: For multiple selections, multiple UserAnswer records per user per question.
+**Note**: For multiple selections, multiple Submission records per user per question.
 
 ## Business Rules
 
 - Single correct questions: Exactly one Answer with isCorrect=true, points=100 (or as per AI generation)
 - Multiple correct questions: Multiple Answers with isCorrect=true, points divided among correct ones
-- Submission: Once per user per contest, enforced by checking existing UserAnswers for any question in contest
+- Submission: Once per user per contest, enforced by checking existing Submissions for any question in contest
 - Score calculation: Sum of points for correctly selected answers, minus penalties for wrong selections if any
 
 ## State Transitions
@@ -100,4 +100,4 @@ The data model supports contest participation with questions, answers, and user 
 - Contest: Created → Active (default) → Inactive (if needed)
 - Question: Created → Active
 - Answer: Created → Active
-- UserAnswer: None (immutable after submission)
+- Submission: None (immutable after submission)

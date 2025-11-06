@@ -41,7 +41,7 @@ model User {
 
   sessions    Session[]
   accounts    Account[]
-  userAnswers UserAnswer[]
+  submissions Submission[]
 
   @@unique([email])
   @@map("user")
@@ -113,7 +113,7 @@ model Contest {
   updatedAt DateTime @default(now()) @updatedAt
 
   questions   Question[]
-  userAnswers UserAnswer[]
+  submissions Submission[]
 
   @@map("contest")
 }
@@ -131,7 +131,7 @@ model Question {
   contest   Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
 
   answers     Answer[]
-  userAnswers UserAnswer[]
+  submissions Submission[]
 
   @@map("question")
 }
@@ -147,12 +147,12 @@ model Answer {
   questionId String
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
-  userAnswers UserAnswer[]
+  submissions Submission[]
 
   @@map("answer")
 }
 
-model UserAnswer {
+model Submission {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -169,6 +169,8 @@ model UserAnswer {
   answerId String
   answer   Answer @relation(fields: [answerId], references: [id], onDelete: Cascade)
 
+  score Int @default(0)
+
   @@unique([userId, contestId, questionId, answerId])
-  @@map("user_answer")
+  @@map("submission")
 }

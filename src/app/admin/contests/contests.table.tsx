@@ -8,7 +8,7 @@ import { Edit, MessageSquare, Users } from 'lucide-react';
 import Link from 'next/link';
 
 type ContestsTableProps = {
-  contests: Awaited<ReturnType<typeof getContests<{ userAnswers: true; questions: true }>>>;
+  contests: Awaited<ReturnType<typeof getContests<{ submissions: true; questions: true }>>>;
 };
 
 export default function ContestsTable({ contests }: ContestsTableProps) {
@@ -33,7 +33,7 @@ export default function ContestsTable({ contests }: ContestsTableProps) {
               <Badge variant={contest.status === 'active' ? 'default' : 'secondary'}>{contest.status === 'active' ? 'Active' : 'Inactive'}</Badge>
             </TableCell>
             <TableCell>{contest.questions.length}</TableCell>
-            <TableCell>{new Set(contest.userAnswers.map(ua => ua.userId)).size}</TableCell>
+            <TableCell>{new Set(contest.submissions.map(ua => ua.userId)).size}</TableCell>
             <TableCell className="text-right">
               <div className="flex justify-end items-center gap-2">
                 <QRCodeButton contestSlug={contest.slug} contestName={contest.name} />

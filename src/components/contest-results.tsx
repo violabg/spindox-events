@@ -6,7 +6,7 @@ import { CheckCircle, XCircle } from 'lucide-react';
 interface ResultItem {
   questionId: string;
   questionContent: string;
-  userAnswerIds: string[];
+  submissionIds: string[];
   correctAnswerIds: string[];
   isCorrect: boolean;
 }
@@ -90,10 +90,10 @@ export function ContestResults({ score, totalQuestions, correctCount, results }:
                 <div>
                   <p className="mb-2 text-sm font-medium text-slate-700">Your Answer:</p>
                   <div className="space-y-1">
-                    {result.userAnswerIds.length === 0 ? (
+                    {result.submissionIds.length === 0 ? (
                       <p className="text-sm italic text-red-600">No answer selected</p>
                     ) : (
-                      result.userAnswerIds.map(id => (
+                      result.submissionIds.map(id => (
                         <p key={id} className="text-sm text-red-600">
                           • {id}
                         </p>

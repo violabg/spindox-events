@@ -40,7 +40,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     // Check for duplicate submission
-    const existingSubmission = await prisma.userAnswer.findFirst({
+    const existingSubmission = await prisma.submission.findFirst({
       where: {
         userId: session.user.id,
         contestId: contest.id,
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
       // Save user answers
       for (const selectedAnswer of selectedAnswers) {
-        await prisma.userAnswer.create({
+        await prisma.submission.create({
           data: {
             userId: session.user.id,
             contestId: contest.id,
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       results.push({
         questionId: question.id,
         questionContent: question.content,
-        userAnswerIds: selectedAnswers.map(a => a.id),
+        submissionIds: selectedAnswers.map(a => a.id),
         correctAnswerIds: correctAnswers.map(a => a.id),
         isCorrect,
       });
