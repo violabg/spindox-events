@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma';
 
-export async function getScoresByContest(contestId: string) {
+export async function getSubmissionsByContest(contestId: string) {
   const submissions = await prisma.submission.findMany({
     where: { contestId },
     include: { user: true },

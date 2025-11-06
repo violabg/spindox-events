@@ -38,7 +38,7 @@ export default function ContestsTable({ contests }: ContestsTableProps) {
               <div className="flex justify-end items-center gap-2">
                 <QRCodeButton contestSlug={contest.slug} contestName={contest.name} />
                 <Button variant="outline" size="sm" asChild>
-                  <Link href={`/admin/contests/${contest.id}/scores`}>
+                  <Link href={`/admin/contests/${contest.id}/submissions`}>
                     <Users className="w-4 h-4" />
                   </Link>
                 </Button>
