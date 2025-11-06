@@ -18,7 +18,15 @@ export default async function EditContestPage({ params }: EditContestPageProps) 
   }
 
   return (
-    <AdminLayout title="Edit Contest" subtitle="Update the contest information" backHref={`/admin/contests/${id}`}>
+    <AdminLayout
+      title="Edit Contest"
+      subtitle="Update the contest information"
+      backHref={`/admin/contests/${id}`}
+      breadcrumbs={[
+        { label: 'Contests', href: '/admin/contests' },
+        { label: contest.name, href: `/admin/contests/${id}` },
+      ]}
+    >
       <Card>
         <CardHeader>
           <CardTitle>Contest Details</CardTitle>

@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { AdminLayout } from '@/components/admin';
 import Link from 'next/link';
 import { getContestById } from '@/queries/contests';
-import QuestionForm from '../../question.form';
+import QuestionForm from '../question.form';
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -27,7 +27,16 @@ export default async function NewQuestionPage({ params }: PageProps) {
   }
 
   return (
-    <AdminLayout title="Create New Question" subtitle={`Add a new question to "${contest.name}"`} backHref={`/admin/contests/${id}/questions`}>
+    <AdminLayout
+      title="Create New Question"
+      subtitle={`Add a new question to "${contest.name}"`}
+      backHref={`/admin/contests/${id}/questions`}
+      breadcrumbs={[
+        { label: 'Contests', href: '/admin/contests' },
+        { label: contest.name, href: `/admin/contests/${id}` },
+        { label: 'Questions', href: `/admin/contests/${id}/questions` },
+      ]}
+    >
       <Card>
         <CardHeader>
           <CardTitle>Question Details</CardTitle>

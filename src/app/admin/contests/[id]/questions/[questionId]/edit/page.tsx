@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Link from 'next/link';
 import { AdminLayout } from '@/components/admin';
 import { getQuestionWithAnswersAction } from '@/actions/questions/get.action';
-import QuestionForm from '../../../question.form';
+import { getContestById } from '@/queries/contests';
+import QuestionForm from '../../question.form';
 
 type PageProps = {
   params: Promise<{ id: string; questionId: string }>;
@@ -12,7 +13,7 @@ type PageProps = {
 export default async function EditQuestionPage({ params }: PageProps) {
   const { id, questionId } = await params;
 
-  const questionResult = await getQuestionWithAnswersAction(questionId);
+  const [questionResult, contest] = await Promise.all([getQuestionWithAnswersAction(questionId), getContestById(id)]);
 
   if (!questionResult.success || !questionResult.data) {
     return (
@@ -29,7 +30,17 @@ export default async function EditQuestionPage({ params }: PageProps) {
   const question = questionResult.data;
 
   return (
-    <AdminLayout title="Edit Question" subtitle={`Update "${question.title}"`} backHref={`/admin/contests/${id}/questions`}>
+    <AdminLayout
+      title="Edit Question"
+      subtitle={`Update "${question.title}"`}
+      backHref={`/admin/contests/${id}/questions`}
+      breadcrumbs={[
+        { label: 'Contests', href: '/admin/contests' },
+        { label: contest?.name || 'Contest', href: `/admin/contests/${id}` },
+        { label: 'Questions', href: `/admin/contests/${id}/questions` },
+        { label: question.title },
+      ]}
+    >
       <Card>
         <CardHeader>
           <CardTitle>Question Details</CardTitle>

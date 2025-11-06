@@ -8,7 +8,7 @@ export default async function ContestsPage() {
   const contests = await getContests({ include: { submissions: true, questions: true }, orderBy: { createdAt: 'desc' } });
 
   return (
-    <AdminLayout title="Admin Dashboard" subtitle="Manage your contests and events">
+    <AdminLayout title="Admin Dashboard" subtitle="Manage your contests and events" breadcrumbs={[{ label: 'Contests' }]}>
       <Card>
         <CardContent className="p-4 sm:p-6">
           {contests.length === 0 ? (

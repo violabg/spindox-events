@@ -4,7 +4,12 @@ import ContestForm from '../contest.form';
 
 export default function NewContestPage() {
   return (
-    <AdminLayout title="Create New Contest" subtitle="Add a new event contest to the system" backHref="/admin">
+    <AdminLayout
+      title="Create New Contest"
+      subtitle="Add a new event contest to the system"
+      backHref="/admin"
+      breadcrumbs={[{ label: 'Contests', href: '/admin/contests' }]}
+    >
       <Card>
         <CardHeader>
           <CardTitle>Contest Details</CardTitle>

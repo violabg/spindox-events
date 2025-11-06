@@ -10,7 +10,7 @@ export default async function UsersPage() {
   });
 
   return (
-    <AdminLayout title="Users" subtitle="Manage users and participants">
+    <AdminLayout title="Users" subtitle="Manage users and participants" breadcrumbs={[{ label: 'Users' }]}>
       <Card>
         <CardContent className="p-4 sm:p-6">
           {users.length === 0 ? (
