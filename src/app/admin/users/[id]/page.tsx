@@ -43,7 +43,12 @@ export default async function UserDetailPage({ params }: PageProps) {
   });
 
   return (
-    <AdminLayout title="User Details" subtitle={user.name} backHref="/admin/users">
+    <AdminLayout
+      title="User Details"
+      subtitle={user.name}
+      backHref="/admin/users"
+      breadcrumbs={[{ label: 'Users', href: '/admin/users' }, { label: user.name }]}
+    >
       <div className="space-y-6">
         {/* User Information */}
         <Card>

@@ -1,6 +1,6 @@
 import { getContestById } from '@/queries/contests';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AdminLayout, EmptyTable, ContestInformationCard } from '@/components/admin';
+import { AdminLayout, EmptyTable } from '@/components/admin';
 import SubmissionsTable from './submissions.table';
 import { notFound } from 'next/navigation';
 import { getSubmissionsByContest } from '@/queries/submissions';
@@ -19,9 +19,12 @@ export default async function SubmissionsPage({ params }: PageProps) {
   }
 
   return (
-    <AdminLayout title="Submissions" subtitle="Participants & Results" backHref="/admin">
-      <ContestInformationCard contest={contest} />
-
+    <AdminLayout
+      title="Submissions"
+      subtitle="Participants & Results"
+      backHref="/admin"
+      breadcrumbs={[{ label: 'Contests', href: '/admin/contests' }, { label: contest.name, href: `/admin/contests/${id}` }, { label: 'Submissions' }]}
+    >
       <Card>
         <CardHeader>
           <CardTitle>Participants ({submissions.length})</CardTitle>

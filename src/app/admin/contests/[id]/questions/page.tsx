@@ -1,6 +1,6 @@
 import { getContestById } from '@/queries/contests';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AdminLayout, EmptyTable, ContestInformationCard } from '@/components/admin';
+import { AdminLayout, EmptyTable } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
@@ -30,9 +30,12 @@ export default async function QuestionsPage({ params }: PageProps) {
   }
 
   return (
-    <AdminLayout title="Questions" subtitle="Manage Contest Questions" backHref="/admin">
-      <ContestInformationCard contest={contest} />
-
+    <AdminLayout
+      title="Questions"
+      subtitle="Manage Contest Questions"
+      backHref="/admin"
+      breadcrumbs={[{ label: 'Contests', href: '/admin/contests' }, { label: contest.name, href: `/admin/contests/${id}` }, { label: 'Questions' }]}
+    >
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
