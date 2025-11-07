@@ -237,10 +237,7 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
         {/* Display server-side errors */}
         {error && <div className="bg-destructive/10 p-3 rounded-md text-destructive text-sm">{error}</div>}
 
-        <div className="flex sm:flex-row flex-col gap-3 sm:gap-4">
-          <Button type="submit" disabled={form.formState.isSubmitting} className="w-full sm:w-auto">
-            {form.formState.isSubmitting ? `${isEditMode ? 'Updating' : 'Creating'}...` : `${isEditMode ? 'Update' : 'Create'} Question`}
-          </Button>
+        <div className="flex sm:flex-row flex-col gap-3 sm:gap-4 sm:justify-end">
           <Button
             type="button"
             variant="outline"
@@ -249,6 +246,9 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
             className="w-full sm:w-auto"
           >
             Cancel
+          </Button>
+          <Button type="submit" disabled={form.formState.isSubmitting} className="w-full sm:w-auto">
+            {form.formState.isSubmitting ? `${isEditMode ? 'Updating' : 'Creating'}...` : `${isEditMode ? 'Update' : 'Create'} Question`}
           </Button>
         </div>
       </form>

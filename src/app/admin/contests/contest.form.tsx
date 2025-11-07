@@ -140,12 +140,12 @@ export default function ContestForm({ contestId, initialData }: ContestFormProps
 
       {error && <div className="bg-destructive/10 p-3 rounded-md text-destructive text-sm">{error}</div>}
 
-      <div className="flex gap-4">
-        <Button type="submit" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting ? `${isEditMode ? 'Updating' : 'Creating'}...` : `${isEditMode ? 'Update' : 'Create'} Contest`}
-        </Button>
+      <div className="flex gap-4 justify-end">
         <Button type="button" variant="outline" asChild>
           <Link href={isEditMode && contestId ? `/admin/contests/${contestId}` : '/admin'}>Cancel</Link>
+        </Button>
+        <Button type="submit" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? `${isEditMode ? 'Updating' : 'Creating'}...` : `${isEditMode ? 'Update' : 'Create'} Contest`}
         </Button>
       </div>
     </form>
