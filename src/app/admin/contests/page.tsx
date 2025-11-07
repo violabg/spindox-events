@@ -7,8 +7,26 @@ import Link from 'next/link';
 import ContestsTable from './contests.table';
 
 export default async function ContestsPage() {
-  // Get contests with user answer counts and questions in a single optimized query
-  const contests = await getContests({ include: { submissions: true, questions: true }, orderBy: { createdAt: 'desc' } });
+  // Get contests with questions and their answers to calculate max possible score
+  const contests = await getContests({
+    include: {
+      questions: {
+        include: {
+          answers: {
+            select: {
+              score: true,
+            },
+          },
+        },
+      },
+      attempts: {
+        select: {
+          score: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
 
   return (
     <AdminLayout title="Admin Dashboard" subtitle="Manage your contests and events" breadcrumbs={[{ label: 'Contests' }]}>

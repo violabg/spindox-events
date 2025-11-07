@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ContestStatus } from '@/prisma/enums';
+import { ContestStatus, ContestMode } from '@/prisma/enums';
 
 // Base contest schema (without ID) for creation and updates
 export const contestSchema = z.object({
@@ -12,6 +12,7 @@ export const contestSchema = z.object({
   theme: z.string().max(50, 'Theme must be less than 50 characters').optional(),
   description: z.string().max(500, 'Description must be less than 500 characters').optional(),
   status: z.enum(ContestStatus),
+  mode: z.enum(ContestMode),
 });
 
 // Schema for creation (same as base, but can be extended later if needed)

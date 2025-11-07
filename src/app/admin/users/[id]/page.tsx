@@ -16,10 +16,9 @@ export default async function UserDetailPage({ params }: PageProps) {
 
   const user = await getUserById(userId, {
     include: {
-      submissions: {
+      attempts: {
         include: {
           contest: true,
-          question: true,
         },
       },
       sessions: true,
@@ -32,11 +31,11 @@ export default async function UserDetailPage({ params }: PageProps) {
   }
 
   const contestsParticipated = new Map<string, { name: string; count: number }>();
-  user.submissions.forEach(ua => {
-    if (!contestsParticipated.has(ua.contestId)) {
-      contestsParticipated.set(ua.contestId, { name: ua.contest.name, count: 0 });
+  user.attempts.forEach(attempt => {
+    if (!contestsParticipated.has(attempt.contestId)) {
+      contestsParticipated.set(attempt.contestId, { name: attempt.contest.name, count: 0 });
     }
-    const contest = contestsParticipated.get(ua.contestId);
+    const contest = contestsParticipated.get(attempt.contestId);
     if (contest) {
       contest.count++;
     }

@@ -70,7 +70,7 @@ export default async function QuestionDetailPage({ params }: PageProps) {
           <div className="grid gap-4 md:grid-cols-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total Submissions</CardTitle>
+                <CardTitle className="text-sm font-medium">Total Responses</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-bold">{analytics.totalSubmissions}</p>
@@ -160,10 +160,10 @@ export default async function QuestionDetailPage({ params }: PageProps) {
               <CardDescription>All users who answered this question</CardDescription>
             </CardHeader>
             <CardContent>
-              {analyticsData.question.submissions.length === 0 ? (
+              {analyticsData.question.userAnswers.length === 0 ? (
                 <EmptyTable title="No responses" description="No users have answered this question yet." />
               ) : (
-                <AnswerAnalyticsTable submissions={analyticsData.question.submissions} />
+                <AnswerAnalyticsTable userAnswers={analyticsData.question.userAnswers} />
               )}
             </CardContent>
           </Card>

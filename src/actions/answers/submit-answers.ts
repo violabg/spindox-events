@@ -3,8 +3,9 @@ import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { submitAnswersSchema } from '@/lib/schemas/contest.schema';
 import { headers } from 'next/headers';
+import { ContestMode, QuestionType } from '@/prisma/enums';
 
-export async function submitAnswersAction(data: { answers: { questionId: string; answerIds: string[] }[] }, slug: string) {
+export async function submitAnswersAction(data: { answers: { questionId: string; answerIds: string[] }[]; startedAt: string }, slug: string) {
   // Authenticate
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) {
@@ -35,20 +36,29 @@ export async function submitAnswersAction(data: { answers: { questionId: string;
 
   if (!contest) throw new Error('Contest not found');
 
-  // Check duplicate submission
-  const existingSubmission = await prisma.submission.findFirst({
-    where: { userId: session.user.id, contestId: contest.id },
-  });
-  if (existingSubmission) throw new Error('Already submitted');
+  // Check for existing attempt (for SINGLE mode contests)
+  if (contest.mode === ContestMode.SINGLE) {
+    const existingAttempt = await prisma.userAttempts.findFirst({
+      where: {
+        userId: session.user.id,
+        contestId: contest.id,
+      },
+    });
 
-  // Calculate results and persist
+    // If contest mode is SINGLE and user already attempted, reject
+    if (existingAttempt) {
+      throw new Error('You can only submit once for this contest');
+    }
+  }
+
+  // Calculate results
   let totalScore = 0;
   let correctCount = 0;
   const results: {
     questionId: string;
     questionContent: string;
-    submissionIds: string[];
-    correctAnswerIds: string[];
+    selectedAnswers: string[];
+    correctAnswers: string[];
     isCorrect: boolean;
   }[] = [];
 
@@ -62,12 +72,12 @@ export async function submitAnswersAction(data: { answers: { questionId: string;
     const correctAnswers = question.answers.filter(a => a.score > 0);
 
     let isCorrect = false;
-    if (question.type === 'SINGLE_CHOICE') {
+    if (question.type === QuestionType.SINGLE_CHOICE) {
       isCorrect = selectedAnswers.length === 1 && selectedAnswers[0].score > 0;
-    } else if (question.type === 'MULTIPLE_CHOICES') {
-      const selectedIds = new Set(selectedAnswers.map(a => a.id));
-      const correctIds = new Set(correctAnswers.map(a => a.id));
-      isCorrect = selectedIds.size === correctIds.size && [...selectedIds].every(id => correctIds.has(id));
+    } else if (question.type === QuestionType.MULTIPLE_CHOICES) {
+      const selSet = new Set(selectedAnswers.map(a => a.id));
+      const corSet = new Set(correctAnswers.map(a => a.id));
+      isCorrect = selSet.size === corSet.size && [...selSet].every(id => corSet.has(id));
     }
 
     if (isCorrect) {
@@ -75,26 +85,41 @@ export async function submitAnswersAction(data: { answers: { questionId: string;
       totalScore += selectedAnswers.reduce((sum, a) => sum + a.score, 0);
     }
 
-    for (const selectedAnswer of selectedAnswers) {
-      await prisma.submission.create({
-        data: {
-          userId: session.user.id,
-          contestId: contest.id,
-          questionId: question.id,
-          answerId: selectedAnswer.id,
-          score: selectedAnswer.score,
-        },
-      });
-    }
-
     results.push({
       questionId: question.id,
       questionContent: question.content,
-      submissionIds: selectedAnswers.map(a => a.id),
-      correctAnswerIds: correctAnswers.map(a => a.id),
+      selectedAnswers: selectedAnswers.map(a => a.id),
+      correctAnswers: correctAnswers.map(a => a.id),
       isCorrect,
     });
   }
+
+  // Create UserAttempt and UserAnswers
+  // Always create new attempt (SINGLE mode already threw error if one exists)
+  const startDate = new Date(data.startedAt);
+  const finishDate = new Date(); // Server time when submission is received
+
+  await prisma.userAttempts.create({
+    data: {
+      userId: session.user.id,
+      contestId: contest.id,
+      startedAt: startDate,
+      finishedAt: finishDate,
+      score: totalScore,
+      userAnswers: {
+        create: answerEntries.flatMap(answer => {
+          const question = contest.questions.find(q => q.id === answer.questionId);
+          if (!question) return [];
+          const selectedAnswers = question.answers.filter(a => answer.answerIds.includes(a.id));
+          return selectedAnswers.map(selectedAnswer => ({
+            questionId: question.id,
+            answerId: selectedAnswer.id,
+            score: selectedAnswer.score,
+          }));
+        }),
+      },
+    },
+  });
 
   return {
     score: totalScore,

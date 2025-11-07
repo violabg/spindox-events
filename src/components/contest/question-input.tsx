@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Controller, useFormContext } from 'react-hook-form';
 import { QuestionDisplay } from './question-display';
+import { QuestionType } from '@/prisma/enums';
 
 interface Answer {
   id: string;
@@ -34,7 +35,7 @@ export function QuestionInput({
 }: QuestionInputProps) {
   const { control } = useFormContext();
 
-  if (type === 'SINGLE_CHOICE') {
+  if (type === QuestionType.SINGLE_CHOICE) {
     return (
       <QuestionDisplay title={title} content={content}>
         <Controller

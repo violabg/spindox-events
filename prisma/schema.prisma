@@ -19,6 +19,11 @@ enum ContestStatus {
   inactive
 }
 
+enum ContestMode {
+  SINGLE
+  MULTIPLE
+}
+
 enum QuestionType {
   SINGLE_CHOICE
   MULTIPLE_CHOICES
@@ -39,12 +44,12 @@ model User {
   banReason  String?
   banExpires DateTime?
 
-  sessions    Session[]
-  accounts    Account[]
-  submissions Submission[]
+  sessions Session[]
+  accounts Account[]
+  attempts UserAttempts[]
 
   @@unique([email])
-  @@map("user")
+  @@map("users")
 }
 
 model Session {
@@ -63,7 +68,7 @@ model Session {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([token])
-  @@map("session")
+  @@map("sessions")
 }
 
 model Account {
@@ -71,8 +76,6 @@ model Account {
 
   accountId             String
   providerId            String
-  userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -84,7 +87,10 @@ model Account {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("account")
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("accounts")
 }
 
 model Verification {
@@ -108,52 +114,62 @@ model Contest {
   theme       String?
   description String?
   status      ContestStatus @default(active)
+  mode        ContestMode   @default(SINGLE)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  questions   Question[]
-  submissions Submission[]
+  questions Question[]
+  attempts  UserAttempts[]
 
-  @@map("contest")
+  @@map("contests")
 }
 
 model Question {
-  id        String       @id @default(cuid())
-  title     String
-  content   String
-  type      QuestionType @default(SINGLE_CHOICE)
-  order     Int          @default(0)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @default(now()) @updatedAt
+  id String @id @default(cuid())
+
+  title   String
+  content String
+  type    QuestionType @default(SINGLE_CHOICE)
+  order   Int          @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   contestId String
   contest   Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
 
   answers     Answer[]
-  submissions Submission[]
+  userAnswers UserAnswer[]
 
-  @@map("question")
+  @@map("questions")
 }
 
 model Answer {
-  id        String   @id @default(cuid())
-  content   String
-  score     Int      @default(0)
-  order     Int      @default(0)
+  id String @id @default(cuid())
+
+  content String
+  score   Int    @default(0)
+  order   Int    @default(0)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
   questionId String
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
-  submissions Submission[]
+  userAnswers UserAnswer[]
 
-  @@map("answer")
+  @@map("answers")
 }
 
-model Submission {
-  id        String   @id @default(cuid())
+model UserAttempts {
+  id String @id @default(cuid())
+
+  score      Int      @default(0)
+  startedAt  DateTime
+  finishedAt DateTime
+
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
@@ -163,14 +179,28 @@ model Submission {
   contestId String
   contest   Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
 
+  userAnswers UserAnswer[]
+
+  @@map("user_attempts")
+}
+
+model UserAnswer {
+  id String @id @default(cuid())
+
+  score Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  userAttemptId String
+  userAttempt   UserAttempts @relation(fields: [userAttemptId], references: [id], onDelete: Cascade)
+
   questionId String
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   answerId String
   answer   Answer @relation(fields: [answerId], references: [id], onDelete: Cascade)
 
-  score Int @default(0)
-
-  @@unique([userId, contestId, questionId, answerId])
-  @@map("submission")
+  @@unique([userAttemptId, questionId, answerId])
+  @@map("user_answers")
 }

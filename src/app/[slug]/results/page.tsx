@@ -1,9 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { headers } from 'next/headers';
 import { Suspense } from 'react';
+import Link from 'next/link';
+import { ContestMode, QuestionType } from '@/prisma/enums';
 
 type Params = {
   params: {
@@ -45,11 +48,25 @@ async function DynamicContent({ params }: Params) {
     throw new Error('Contest not found');
   }
 
-  const submissions = await prisma.submission.findMany({
-    where: { userId: session.user.id, contestId: contest.id },
+  // Get the latest attempt for this user
+  const attempt = await prisma.userAttempts.findFirst({
+    where: {
+      userId: session.user.id,
+      contestId: contest.id,
+    },
+    include: {
+      userAnswers: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
 
-  const answersByQuestion = submissions.reduce<Record<string, string[]>>((acc, ua) => {
+  if (!attempt) {
+    throw new Error('No attempt found');
+  }
+
+  const answersByQuestion = attempt.userAnswers.reduce<Record<string, string[]>>((acc, ua) => {
     if (!acc[ua.questionId]) acc[ua.questionId] = [];
     acc[ua.questionId].push(ua.answerId);
     return acc;
@@ -64,9 +81,9 @@ async function DynamicContent({ params }: Params) {
     const correctAnswers = question.answers.filter(a => a.score > 0);
 
     let isCorrect = false;
-    if (question.type === 'SINGLE_CHOICE') {
+    if (question.type === QuestionType.SINGLE_CHOICE) {
       isCorrect = selectedAnswers.length === 1 && selectedAnswers[0].score > 0;
-    } else if (question.type === 'MULTIPLE_CHOICES') {
+    } else if (question.type === QuestionType.MULTIPLE_CHOICES) {
       const selSet = new Set(selectedAnswers.map(a => a.id));
       const corSet = new Set(correctAnswers.map(a => a.id));
       isCorrect = selSet.size === corSet.size && [...selSet].every(id => corSet.has(id));
@@ -81,8 +98,8 @@ async function DynamicContent({ params }: Params) {
       questionId: question.id,
       questionContent: question.content,
       // Render the answer text instead of raw IDs so the UI shows readable content
-      submissionIds: selectedAnswers.map(a => a.content),
-      correctAnswerIds: correctAnswers.map(a => a.content),
+      selectedAnswers: selectedAnswers.map(a => a.content),
+      correctAnswers: correctAnswers.map(a => a.content),
       isCorrect,
     };
   });
@@ -102,6 +119,18 @@ async function DynamicContent({ params }: Params) {
           You scored {totalScore} points ({percentage}%) - {correctCount} out of
           {totalQuestions} questions correct.
         </p>
+        {contest.mode === ContestMode.MULTIPLE && (
+          <div className="mt-4">
+            <Button asChild>
+              <Link href={`/${slug}/questions`}>Retake Contest</Link>
+            </Button>
+          </div>
+        )}
+        {contest.mode === ContestMode.SINGLE && (
+          <div className="mt-4">
+            <p className="text-sm text-slate-600">This is a single-attempt contest. You cannot retake it.</p>
+          </div>
+        )}
       </div>
 
       <Card>
@@ -160,12 +189,12 @@ async function DynamicContent({ params }: Params) {
                 <div>
                   <p className="mb-2 font-medium text-slate-700 text-sm">Your Answer:</p>
                   <div className="space-y-1">
-                    {result.submissionIds.length === 0 ? (
+                    {result.selectedAnswers.length === 0 ? (
                       <p className="text-red-600 text-sm italic">No answer selected</p>
                     ) : (
-                      result.submissionIds.map(id => (
-                        <p key={id} className="text-red-600 text-sm">
-                          • {id}
+                      result.selectedAnswers.map((answer: string) => (
+                        <p key={answer} className="text-red-600 text-sm">
+                          • {answer}
                         </p>
                       ))
                     )}
@@ -175,12 +204,12 @@ async function DynamicContent({ params }: Params) {
               <div>
                 <p className="mb-2 font-medium text-slate-700 text-sm">
                   Correct Answer
-                  {result.correctAnswerIds.length > 1 ? 's' : ''}:
+                  {result.correctAnswers.length > 1 ? 's' : ''}:
                 </p>
                 <div className="space-y-1">
-                  {result.correctAnswerIds.map(id => (
-                    <p key={id} className="font-medium text-green-600 text-sm">
-                      ✓ {id}
+                  {result.correctAnswers.map((answer: string) => (
+                    <p key={answer} className="font-medium text-green-600 text-sm">
+                      ✓ {answer}
                     </p>
                   ))}
                 </div>

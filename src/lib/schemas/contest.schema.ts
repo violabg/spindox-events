@@ -45,8 +45,8 @@ export const submitResultSchema = z.object({
     z.object({
       questionId: z.string(),
       questionContent: z.string(),
-      submissionIds: z.array(z.string()),
-      correctAnswerIds: z.array(z.string()),
+      selectedAnswers: z.array(z.string()),
+      correctAnswers: z.array(z.string()),
       isCorrect: z.boolean(),
     })
   ),

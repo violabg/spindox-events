@@ -4,7 +4,7 @@ import { createContestAction } from '@/actions/contests/create.action';
 import { updateContestAction } from '@/actions/contests/update.action';
 import { FieldInput, FieldSelect, FieldTextarea } from '@/components/admin';
 import { Button } from '@/components/ui/button';
-import { ContestStatus } from '@/prisma/enums';
+import { ContestStatus, ContestMode } from '@/prisma/enums';
 import { ContestModel } from '@/prisma/models/Contest';
 import { contestSchema, type ContestData } from '@/schemas/contest.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,6 +34,7 @@ export default function ContestForm({ contestId, initialData }: ContestFormProps
       theme: initialData?.theme || '',
       description: initialData?.description || '',
       status: initialData?.status || ContestStatus.active,
+      mode: initialData?.mode || ContestMode.SINGLE,
     },
   });
 
@@ -125,6 +126,20 @@ export default function ContestForm({ contestId, initialData }: ContestFormProps
           description="Current status of this contest"
           placeholder="Select status"
           options={Object.values(ContestStatus).map(status => ({ value: status, label: status }))}
+        />
+      </div>
+
+      <div className="gap-6 grid grid-cols-1 sm:grid-cols-2">
+        <FieldSelect
+          name="mode"
+          control={form.control}
+          label="Mode"
+          description="SINGLE: Users can submit only once. MULTIPLE: Users can retake the contest multiple times"
+          placeholder="Select mode"
+          options={Object.values(ContestMode).map(mode => ({
+            value: mode,
+            label: mode === ContestMode.SINGLE ? `${mode} (Users can submit only once)` : `${mode} (Users can retake the contest multiple times)`,
+          }))}
         />
       </div>
 

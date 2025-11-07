@@ -20,6 +20,11 @@ export default async function QuestionsPage({ params }: PageProps) {
         orderBy: { order: 'asc' },
         include: {
           answers: { orderBy: { order: 'asc' } },
+          userAnswers: {
+            select: {
+              score: true,
+            },
+          },
         },
       },
     },

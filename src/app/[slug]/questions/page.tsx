@@ -7,6 +7,7 @@ import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import QuestionForm from './question-form';
+import { ContestMode } from '@/prisma/enums';
 
 type ContestPageParams = {
   params: Promise<{ slug: string }>;
@@ -117,9 +118,12 @@ async function DynamicContent({
     headers: headersInstance,
   });
   const result = await checkResultPromise.json();
-  if (result.hasSubmitted) {
+
+  // For SINGLE mode contests, redirect to results if already submitted
+  if (result.hasSubmitted && result.mode === ContestMode.SINGLE) {
     redirect(`/${slug}/results`);
   }
+
   cacheTag(`contest-${contest.id}`);
   return <QuestionForm contest={contest} />;
 }

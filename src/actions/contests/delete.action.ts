@@ -12,7 +12,7 @@ export async function deleteContestAction(contestId: string) {
         _count: {
           select: {
             questions: true,
-            submissions: true,
+            attempts: true,
           },
         },
       },
@@ -26,7 +26,7 @@ export async function deleteContestAction(contestId: string) {
     }
 
     // Check if contest has associated data
-    if (contest._count.questions > 0 || contest._count.submissions > 0) {
+    if (contest._count.questions > 0 || contest._count.attempts > 0) {
       return {
         success: false,
         error: 'Cannot delete contest with existing questions or user answers',

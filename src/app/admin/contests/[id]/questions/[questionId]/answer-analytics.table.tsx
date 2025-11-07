@@ -3,24 +3,25 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 
-type SubmissionWithDetails = {
+type UserAnswerWithDetails = {
   id: string;
-  user: {
-    name: string;
-    email: string;
+  score: number;
+  userAttempt: {
+    user: {
+      name: string;
+      email: string;
+    };
   };
   answer: {
     content: string;
-    score: number;
   };
-  score: number;
 };
 
 type AnswerAnalyticsTableProps = {
-  submissions: SubmissionWithDetails[];
+  userAnswers: UserAnswerWithDetails[];
 };
 
-export default function AnswerAnalyticsTable({ submissions }: AnswerAnalyticsTableProps) {
+export default function AnswerAnalyticsTable({ userAnswers }: AnswerAnalyticsTableProps) {
   return (
     <Table>
       <TableHeader>
@@ -32,13 +33,13 @@ export default function AnswerAnalyticsTable({ submissions }: AnswerAnalyticsTab
         </TableRow>
       </TableHeader>
       <TableBody>
-        {submissions.map(submission => (
-          <TableRow key={submission.id}>
-            <TableCell className="font-medium">{submission.user.name}</TableCell>
-            <TableCell className="text-muted-foreground">{submission.user.email}</TableCell>
-            <TableCell>{submission.answer.content}</TableCell>
+        {userAnswers.map(ua => (
+          <TableRow key={ua.id}>
+            <TableCell className="font-medium">{ua.userAttempt.user.name}</TableCell>
+            <TableCell className="text-muted-foreground">{ua.userAttempt.user.email}</TableCell>
+            <TableCell>{ua.answer.content}</TableCell>
             <TableCell className="text-right">
-              <Badge variant={submission.score > 0 ? 'default' : 'secondary'}>{submission.score}</Badge>
+              <Badge variant={ua.score > 0 ? 'default' : 'secondary'}>{ua.score}</Badge>
             </TableCell>
           </TableRow>
         ))}

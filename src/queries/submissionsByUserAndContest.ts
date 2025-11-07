@@ -1,17 +1,28 @@
 import prisma from '@/lib/prisma';
 
 export async function getSubmissionsByUserAndContest(contestId: string, userId: string) {
-  const submissions = await prisma.submission.findMany({
-    where: { contestId, userId },
+  // Get latest attempt for user and contest
+  const attempt = await prisma.userAttempts.findFirst({
+    where: {
+      userId,
+      contestId,
+    },
     include: {
       user: true,
-      question: true,
-      answer: true,
+      userAnswers: {
+        include: {
+          question: true,
+          answer: true,
+        },
+        orderBy: {
+          question: { order: 'asc' },
+        },
+      },
     },
     orderBy: {
-      question: { order: 'asc' },
+      createdAt: 'desc',
     },
   });
 
-  return submissions;
+  return attempt;
 }

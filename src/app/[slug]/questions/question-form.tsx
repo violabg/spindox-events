@@ -8,7 +8,7 @@ import { submitAnswersSchema } from '@/lib/schemas/contest.schema';
 import { Prisma } from '@/prisma/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { FormProvider, useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -42,8 +42,14 @@ type FormData = z.infer<typeof submitAnswersSchema>;
 export default function QuestionForm({ contest }: Props) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isPending, startTransition] = useTransition();
+  const [startedAt, setStartedAt] = useState<string | null>(null);
   const router = useRouter();
   const steps = Array.from({ length: contest.questions.length }, (_, i) => i + 1);
+
+  // Store start time in frontend when component mounts
+  useEffect(() => {
+    setStartedAt(new Date().toISOString());
+  }, []);
 
   const methods = useForm<FormData>({
     resolver: zodResolver(submitAnswersSchema),
@@ -65,6 +71,7 @@ export default function QuestionForm({ contest }: Props) {
   const onSubmit: SubmitHandler<FormData> = data => {
     const submitData = {
       answers: Object.entries(data.answers).map(([questionId, { answerIds }]) => ({ questionId, answerIds })),
+      startedAt: startedAt || new Date().toISOString(),
     };
 
     startTransition(() => {

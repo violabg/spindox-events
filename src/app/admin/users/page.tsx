@@ -5,7 +5,7 @@ import { getUsers } from '@/queries/users';
 
 export default async function UsersPage() {
   const users = await getUsers({
-    include: { submissions: true, sessions: true },
+    include: { attempts: true, sessions: true },
     orderBy: { createdAt: 'desc' },
   });
 

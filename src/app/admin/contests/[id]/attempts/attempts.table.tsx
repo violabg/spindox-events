@@ -2,20 +2,17 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { getAttemptsByContest } from '@/queries/userAttempts';
+import { getUniqueUserAttemptsByContest } from '@/queries/userAttempts';
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react';
 import { MoreHorizontal, Eye } from 'lucide-react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
 
-type SubmissionsTableProps = {
-  submissions: Awaited<ReturnType<typeof getAttemptsByContest>>;
+type AttemptTableProps = {
+  attempts: Awaited<ReturnType<typeof getUniqueUserAttemptsByContest>>;
+  contestId: string;
 };
 
-function SubmissionActionsMenu({ userId }: { userId: string }) {
-  const params = useParams();
-  const contestId = params.id as string;
-
+function AttemptActionsMenu({ userId, contestId }: { userId: string; contestId: string }) {
   return (
     <Menu>
       <MenuButton as={Button} variant="ghost" size="sm">
@@ -23,7 +20,7 @@ function SubmissionActionsMenu({ userId }: { userId: string }) {
       </MenuButton>
       <MenuItems anchor="bottom end" className="z-50 rounded-md border bg-popover p-1 shadow-md">
         <MenuItem>
-          <Link href={`/admin/contests/${contestId}/submissions/${userId}`} className="flex items-center px-2 py-1.5 text-sm hover:bg-accent rounded">
+          <Link href={`/admin/contests/${contestId}/attempts/${userId}`} className="flex items-center px-2 py-1.5 text-sm hover:bg-accent rounded">
             <Eye className="mr-2 h-4 w-4" />
             View Details
           </Link>
@@ -33,7 +30,7 @@ function SubmissionActionsMenu({ userId }: { userId: string }) {
   );
 }
 
-export default function SubmissionsTable({ submissions }: SubmissionsTableProps) {
+export default function AttemptTable({ attempts, contestId }: AttemptTableProps) {
   return (
     <Table>
       <TableHeader>
@@ -47,7 +44,7 @@ export default function SubmissionsTable({ submissions }: SubmissionsTableProps)
         </TableRow>
       </TableHeader>
       <TableBody>
-        {submissions.map((attempt, index) => {
+        {attempts.map((attempt, index) => {
           const timeSpent = Math.round((attempt.finishedAt.getTime() - attempt.startedAt.getTime()) / 1000);
           const minutes = Math.floor(timeSpent / 60);
           const seconds = timeSpent % 60;
@@ -62,7 +59,7 @@ export default function SubmissionsTable({ submissions }: SubmissionsTableProps)
                 {minutes}m {seconds}s
               </TableCell>
               <TableCell className="text-right">
-                <SubmissionActionsMenu userId={attempt.user.id} />
+                <AttemptActionsMenu userId={attempt.user.id} contestId={contestId} />
               </TableCell>
             </TableRow>
           );

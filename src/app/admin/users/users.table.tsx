@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { formatDate } from '@/lib/date';
 
 type UsersTableProps = {
-  users: Awaited<ReturnType<typeof getUsers<{ submissions: true; sessions: true }>>>;
+  users: Awaited<ReturnType<typeof getUsers<{ attempts: true; sessions: true }>>>;
 };
 
 export default function UsersTable({ users }: UsersTableProps) {

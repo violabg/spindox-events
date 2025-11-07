@@ -1,5 +1,5 @@
 import { getContestById } from '@/queries/contests';
-import { getSubmissionsByUserAndContest } from '@/queries/submissionsByUserAndContest';
+import { getUserAnswersByAttempt } from '@/queries/userAnswersByAttempt';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AdminLayout, EmptyTable } from '@/components/admin';
 import SubmissionDetailTable from './submission-detail.table';
@@ -12,14 +12,14 @@ type PageProps = {
 export default async function SubmissionDetailPage({ params }: PageProps) {
   const { id, userId } = await params;
 
-  const [contest, submissions] = await Promise.all([getContestById(id), getSubmissionsByUserAndContest(id, userId)]);
+  const [contest, attempt] = await Promise.all([getContestById(id), getUserAnswersByAttempt(id, userId)]);
 
-  if (!contest || submissions.length === 0) {
+  if (!contest || !attempt || attempt.userAnswers.length === 0) {
     notFound();
   }
 
-  const user = submissions[0].user;
-  const totalScore = submissions.reduce((sum, submission) => sum + submission.score, 0);
+  const user = attempt.user;
+  const totalScore = attempt.score;
 
   return (
     <AdminLayout
@@ -50,7 +50,7 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">{totalScore}</p>
-              <p className="text-sm text-muted-foreground">{submissions.length} questions</p>
+              <p className="text-sm text-muted-foreground">{attempt.userAnswers.length} questions</p>
             </CardContent>
           </Card>
         </div>
@@ -59,10 +59,10 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
             <CardTitle>Answers</CardTitle>
           </CardHeader>
           <CardContent>
-            {submissions.length === 0 ? (
+            {attempt.userAnswers.length === 0 ? (
               <EmptyTable title="No submissions" description="No answers found for this user." />
             ) : (
-              <SubmissionDetailTable submissions={submissions} />
+              <SubmissionDetailTable submissions={attempt.userAnswers} />
             )}
           </CardContent>
         </Card>

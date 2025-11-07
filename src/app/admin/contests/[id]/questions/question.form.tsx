@@ -19,6 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { GeneratedQuestion } from '@/lib/schemas/ai-question.schema';
 import { questionSchema, type QuestionData } from '@/schemas/question.schema';
 import { toast } from 'sonner';
+import { QuestionType } from '@/prisma/enums';
 
 type QuestionFormData = QuestionData;
 
@@ -220,7 +221,7 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
               );
             })}
             <FieldDescription>
-              {watchedType === 'SINGLE_CHOICE'
+              {watchedType === QuestionType.SINGLE_CHOICE
                 ? 'Assign a score to exactly one answer (the correct one should have a score > 0, others 0).'
                 : 'Assign scores to each answer (0 or higher). Higher scores indicate better answers.'}
               {' Add more answers as needed. Users will see these options in random order.'}

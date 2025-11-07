@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react';
-import { getContests } from '@/queries/contests';
 import { MoreHorizontal, Eye, MessageSquare, Users, Edit, QrCode, Trash2, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 import { QRCodeModal } from '@/components/modals';
@@ -23,7 +22,20 @@ import {
 } from '@/components/ui/alert-dialog';
 
 type ContestsTableProps = {
-  contests: Awaited<ReturnType<typeof getContests<{ submissions: true; questions: true }>>>;
+  contests: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    status: 'active' | 'inactive';
+    questions: Array<{
+      answers: Array<{ score: number }>;
+    }>;
+    attempts: Array<{ score: number }>;
+    createdAt: Date;
+    updatedAt: Date;
+    theme?: string | null;
+    description?: string | null;
+  }>;
 };
 
 function ContestActionsMenu({ contest }: { contest: ContestsTableProps['contests'][number] }) {
@@ -71,9 +83,9 @@ function ContestActionsMenu({ contest }: { contest: ContestsTableProps['contests
             </Link>
           </MenuItem>
           <MenuItem>
-            <Link href={`/admin/contests/${contest.id}/submissions`} className="flex items-center px-2 py-1.5 text-sm hover:bg-accent rounded">
+            <Link href={`/admin/contests/${contest.id}/attempts`} className="flex items-center px-2 py-1.5 text-sm hover:bg-accent rounded">
               <Users className="mr-2 h-4 w-4" />
-              View Submissions
+              View Attempts
             </Link>
           </MenuItem>
           <div className="my-1 h-px bg-border" />
@@ -131,31 +143,47 @@ export default function ContestsTable({ contests }: ContestsTableProps) {
           <TableHead>Status</TableHead>
           <TableHead>Questions</TableHead>
           <TableHead>Participants</TableHead>
+          <TableHead className="text-center">Total Score</TableHead>
+          <TableHead className="text-center">Avg Score</TableHead>
           <TableHead></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {contests.map(contest => (
-          <TableRow key={contest.id}>
-            <TableCell className="font-medium">{contest.name}</TableCell>
-            <TableCell className="font-mono text-sm">{contest.slug}</TableCell>
-            <TableCell>
-              <Badge variant={contest.status === 'active' ? 'default' : 'secondary'}>{contest.status === 'active' ? 'Active' : 'Inactive'}</Badge>
-            </TableCell>
-            <TableCell>{contest.questions.length}</TableCell>
-            <TableCell>{new Set(contest.submissions.map(ua => ua.userId)).size}</TableCell>
-            <TableCell className="text-right">
-              <div className="flex items-center justify-end gap-2">
-                <Button variant="ghost" size="sm" asChild>
-                  <a href={`/${contest.slug}`} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                </Button>
-                <ContestActionsMenu contest={contest} />
-              </div>
-            </TableCell>
-          </TableRow>
-        ))}
+        {contests.map(contest => {
+          // Calculate total score: sum of max scores from all questions
+          const totalScore = contest.questions.reduce((sum, question) => {
+            const maxScore = question.answers.length > 0 ? Math.max(...question.answers.map(a => a.score)) : 0;
+            return sum + maxScore;
+          }, 0);
+
+          // Calculate average score from user attempts
+          const totalAttemptScore = contest.attempts.reduce((sum, a) => sum + a.score, 0);
+          const avgScore = contest.attempts.length > 0 ? (totalAttemptScore / contest.attempts.length).toFixed(2) : '0.00';
+
+          return (
+            <TableRow key={contest.id}>
+              <TableCell className="font-medium">{contest.name}</TableCell>
+              <TableCell className="font-mono text-sm">{contest.slug}</TableCell>
+              <TableCell>
+                <Badge variant={contest.status === 'active' ? 'default' : 'secondary'}>{contest.status === 'active' ? 'Active' : 'Inactive'}</Badge>
+              </TableCell>
+              <TableCell>{contest.questions.length}</TableCell>
+              <TableCell>{contest.attempts.length}</TableCell>
+              <TableCell className="text-center">{totalScore}</TableCell>
+              <TableCell className="text-center">{avgScore}</TableCell>
+              <TableCell className="text-right">
+                <div className="flex items-center justify-end gap-2">
+                  <Button variant="ghost" size="sm" asChild>
+                    <a href={`/${contest.slug}`} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </Button>
+                  <ContestActionsMenu contest={contest} />
+                </div>
+              </TableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );
