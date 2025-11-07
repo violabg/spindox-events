@@ -1,9 +1,10 @@
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
-import ContestPageClient from './page.client';
+import QuestionForm from './questio-form';
 
 type ContestPageParams = {
   params: Promise<{ slug: string }>;
@@ -11,12 +12,17 @@ type ContestPageParams = {
 
 export default async function ContestPage({ params }: ContestPageParams) {
   return (
-    <>
-      <h1>This will be pre-rendered</h1>
-      <Suspense fallback={<div>Loading...</div>}>
-        <DynamicContent params={params} />
-      </Suspense>
-    </>
+    <Card>
+      <CardHeader>
+        <CardTitle>Answer Questions</CardTitle>
+        <CardDescription>Please select your answers below and submit when ready.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Suspense fallback={<div>Loading...</div>}>
+          <DynamicContent params={params} />
+        </Suspense>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -67,5 +73,5 @@ async function DynamicContent({ params }: ContestPageParams) {
     redirect(`/${slug}/results`);
   }
 
-  return <ContestPageClient contest={contest} />;
+  return <QuestionForm contest={contest} />;
 }

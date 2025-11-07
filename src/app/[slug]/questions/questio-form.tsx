@@ -3,12 +3,12 @@
 import { submitAnswersAction } from '@/actions/answers/submit-answers';
 import { QuestionInput } from '@/components/question-input';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Stepper, StepperIndicator, StepperItem, StepperTrigger } from '@/components/ui/stepper';
 import { submitAnswersSchema } from '@/lib/schemas/contest.schema';
 import { Prisma } from '@/prisma/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { FormProvider, useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -41,9 +41,11 @@ type FormData = z.infer<typeof submitAnswersSchema>;
 
 // result types are not needed in this client file anymore
 
-export default function ContestPageClient({ contest }: Props) {
+export default function QuestionForm({ contest }: Props) {
+  const [currentStep, setCurrentStep] = useState(1);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const steps = Array.from({ length: contest.questions.length }, (_, i) => i + 1);
 
   const methods = useForm<FormData>({
     resolver: zodResolver(submitAnswersSchema),
@@ -57,6 +59,9 @@ export default function ContestPageClient({ contest }: Props) {
       ),
     },
   });
+
+  const currentQuestion = contest.questions[currentStep - 1];
+  const selectedAnswers = methods.watch(`answers.${currentQuestion.id}.answerIds`);
 
   const onSubmit: SubmitHandler<FormData> = data => {
     const submitData = {
@@ -74,15 +79,28 @@ export default function ContestPageClient({ contest }: Props) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Answer Questions</CardTitle>
-        <CardDescription>Please select your answers below and submit when ready.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <FormProvider {...methods}>
-          <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
-            {contest.questions.map(question => (
+    <FormProvider {...methods}>
+      <div className="space-y-8 mx-auto text-center">
+        <div className="space-y-3">
+          <Stepper value={currentStep} onValueChange={setCurrentStep}>
+            {steps.map(step => (
+              <StepperItem key={step} step={step} className="flex-1">
+                <StepperTrigger className="flex-col items-start gap-2 w-full" asChild>
+                  <StepperIndicator asChild className="bg-border rounded-none w-full h-2">
+                    <span className="sr-only">{step}</span>
+                  </StepperIndicator>
+                </StepperTrigger>
+              </StepperItem>
+            ))}
+          </Stepper>
+          <div className="font-medium tabular-nums text-muted-foreground text-sm">
+            Step {currentStep} of {steps.length}
+          </div>
+        </div>
+        <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
+          {contest.questions
+            .filter((_, index) => index === currentStep - 1)
+            .map(question => (
               <QuestionInput
                 key={question.id}
                 questionId={question.id}
@@ -93,12 +111,23 @@ export default function ContestPageClient({ contest }: Props) {
                 disabled={isPending}
               />
             ))}
+          {currentStep === steps.length && (
             <Button type="submit" disabled={isPending} className="w-full">
               {isPending ? 'Submitting...' : 'Submit Answers'}
             </Button>
-          </form>
-        </FormProvider>
-      </CardContent>
-    </Card>
+          )}
+        </form>
+        <div className="flex justify-center space-x-4">
+          {/* <Button variant="outline" className="w-32" onClick={() => setCurrentStep(prev => prev - 1)} disabled={currentStep === 1}>
+            Prev step
+          </Button> */}
+          {currentStep < steps.length && (
+            <Button variant="outline" className="w-32" onClick={() => setCurrentStep(prev => prev + 1)} disabled={selectedAnswers.length === 0}>
+              Next step
+            </Button>
+          )}
+        </div>
+      </div>
+    </FormProvider>
   );
 }
