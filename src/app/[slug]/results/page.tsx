@@ -14,12 +14,12 @@ type Params = {
 
 export default async function Page({ params }: Params) {
   return (
-    <section>
+    <>
       <h1>This will be pre-rendered</h1>
       <Suspense fallback={<div>Loading...</div>}>
         <DynamicContent params={params} />
       </Suspense>
-    </section>
+    </>
   );
 }
 

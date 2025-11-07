@@ -11,12 +11,12 @@ type ContestPageParams = {
 
 export default async function ContestPage({ params }: ContestPageParams) {
   return (
-    <section>
+    <>
       <h1>This will be pre-rendered</h1>
       <Suspense fallback={<div>Loading...</div>}>
         <DynamicContent params={params} />
       </Suspense>
-    </section>
+    </>
   );
 }
 
