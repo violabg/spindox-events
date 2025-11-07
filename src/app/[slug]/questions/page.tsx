@@ -1,10 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-import { headers } from 'next/headers';
-import { notFound, redirect } from 'next/navigation';
+import { cacheLife, cacheTag } from 'next/cache';
+import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
-import QuestionForm from './questio-form';
+import QuestionForm from './question-form';
 
 type ContestPageParams = {
   params: Promise<{ slug: string }>;
@@ -27,11 +26,13 @@ export default async function ContestPage({ params }: ContestPageParams) {
 }
 
 async function DynamicContent({ params }: ContestPageParams) {
+  'use cache';
+  cacheLife('hours');
   const { slug } = await params;
   // Check authentication
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  // const session = await auth.api.getSession({
+  //   headers: await headers(),
+  // });
 
   const contest = await prisma.contest.findUnique({
     where: {
@@ -62,16 +63,17 @@ async function DynamicContent({ params }: ContestPageParams) {
 
   if (!contest) return notFound();
   // Check if user already submitted
-  const existingSubmission = await prisma.submission.findFirst({
-    where: {
-      userId: session?.user.id,
-      contestId: contest.id,
-    },
-  });
+  // const existingSubmission = await prisma.submission.findFirst({
+  //   where: {
+  //     userId: session?.user.id,
+  //     contestId: contest.id,
+  //   },
+  // });
 
-  if (existingSubmission) {
-    redirect(`/${slug}/results`);
-  }
+  // if (existingSubmission) {
+  //   redirect(`/${slug}/results`);
+  // }
 
+  cacheTag(`contest-${contest.id}`);
   return <QuestionForm contest={contest} />;
 }

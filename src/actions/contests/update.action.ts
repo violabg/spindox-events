@@ -1,9 +1,9 @@
 'use server';
 
-import { z } from 'zod';
 import prisma from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
 import { contestSchema, type ContestData } from '@/schemas/contest.schema';
+import { revalidatePath, updateTag } from 'next/cache';
+import { z } from 'zod';
 
 export async function updateContestAction(id: string, data: ContestData) {
   try {
@@ -50,6 +50,8 @@ export async function updateContestAction(id: string, data: ContestData) {
       },
     });
 
+    // update cache tag to revalidate the cache
+    updateTag(`contest-${validatedId}`);
     // Revalidate the admin page and contest details page
     revalidatePath('/admin');
     revalidatePath(`/admin/contests/${validatedId}`);

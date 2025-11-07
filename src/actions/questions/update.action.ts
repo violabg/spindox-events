@@ -2,7 +2,7 @@
 
 import prisma from '@/lib/prisma';
 import { updateQuestionSchema, type UpdateQuestionData } from '@/schemas/question.schema';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import { z } from 'zod';
 
 export async function updateQuestionAction(contestId: string, questionId: string, data: UpdateQuestionData) {
@@ -51,6 +51,8 @@ export async function updateQuestionAction(contestId: string, questionId: string
       });
     });
 
+    // update cache tag to revalidate the cache
+    updateTag(`contest-${contestId}`);
     // Revalidate the contest page
     revalidatePath(`/admin/contests/${validatedContestId}`);
 

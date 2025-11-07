@@ -1,17 +1,17 @@
 'use client';
 
-import { useForm, useWatch } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ContestStatus } from '@/prisma/enums';
-import { ContestModel } from '@/prisma/models/Contest';
-import { Button } from '@/components/ui/button';
-import { FieldInput, FieldSelect, FieldTextarea } from '@/components/admin';
-import Link from 'next/link';
 import { createContestAction } from '@/actions/contests/create.action';
 import { updateContestAction } from '@/actions/contests/update.action';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { FieldInput, FieldSelect, FieldTextarea } from '@/components/admin';
+import { Button } from '@/components/ui/button';
+import { ContestStatus } from '@/prisma/enums';
+import { ContestModel } from '@/prisma/models/Contest';
 import { contestSchema, type ContestData } from '@/schemas/contest.schema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 
 type ContestFormData = ContestData;
 
@@ -88,7 +88,7 @@ export default function ContestForm({ contestId, initialData }: ContestFormProps
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <div className="gap-6 grid grid-cols-1 sm:grid-cols-2">
         <FieldInput
           name="name"
           control={form.control}
@@ -108,7 +108,7 @@ export default function ContestForm({ contestId, initialData }: ContestFormProps
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <div className="gap-6 grid grid-cols-1 sm:grid-cols-2">
         <FieldInput
           name="theme"
           control={form.control}
@@ -138,7 +138,7 @@ export default function ContestForm({ contestId, initialData }: ContestFormProps
         maxLength={500}
       />
 
-      {error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>}
+      {error && <div className="bg-destructive/10 p-3 rounded-md text-destructive text-sm">{error}</div>}
 
       <div className="flex gap-4">
         <Button type="submit" disabled={form.formState.isSubmitting}>

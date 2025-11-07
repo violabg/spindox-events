@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import prisma from '@/lib/prisma';
-import { cacheLife } from 'next/cache';
+import { cacheLife, cacheTag } from 'next/cache';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -62,6 +62,7 @@ async function DynamicContent({ params }: ContestPageParams) {
   });
 
   if (!contest) return notFound();
+  cacheTag(`contest-${contest.id}`);
   return (
     <Card>
       <CardHeader>

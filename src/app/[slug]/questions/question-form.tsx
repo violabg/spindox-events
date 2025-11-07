@@ -59,9 +59,10 @@ export default function QuestionForm({ contest }: Props) {
       ),
     },
   });
+  const { watch, handleSubmit } = methods;
 
   const currentQuestion = contest.questions[currentStep - 1];
-  const selectedAnswers = methods.watch(`answers.${currentQuestion.id}.answerIds`);
+  const selectedAnswers = watch(`answers.${currentQuestion.id}.answerIds`);
 
   const onSubmit: SubmitHandler<FormData> = data => {
     const submitData = {
@@ -97,7 +98,7 @@ export default function QuestionForm({ contest }: Props) {
             Step {currentStep} of {steps.length}
           </div>
         </div>
-        <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {contest.questions
             .filter((_, index) => index === currentStep - 1)
             .map(question => (
