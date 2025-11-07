@@ -1,7 +1,7 @@
 'use client';
 
 import { submitAnswersAction } from '@/actions/answers/submit-answers';
-import { QuestionInput } from '@/components/question-input';
+import { QuestionInput } from '@/components/contest/question-input';
 import { Button } from '@/components/ui/button';
 import { Stepper, StepperIndicator, StepperItem, StepperTrigger } from '@/components/ui/stepper';
 import { submitAnswersSchema } from '@/lib/schemas/contest.schema';
@@ -38,8 +38,6 @@ type Props = {
 };
 
 type FormData = z.infer<typeof submitAnswersSchema>;
-
-// result types are not needed in this client file anymore
 
 export default function QuestionForm({ contest }: Props) {
   const [currentStep, setCurrentStep] = useState(1);

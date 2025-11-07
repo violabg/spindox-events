@@ -1,7 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import prisma from '@/lib/prisma';
 import { cacheLife, cacheTag } from 'next/cache';
-import { notFound } from 'next/navigation';
+import { ReadonlyHeaders } from 'next/dist/server/web/spec-extension/adapters/headers';
+import { headers } from 'next/headers';
+import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import QuestionForm from './question-form';
 
@@ -18,21 +20,25 @@ export default async function ContestPage({ params }: ContestPageParams) {
       </CardHeader>
       <CardContent>
         <Suspense fallback={<div>Loading...</div>}>
-          <DynamicContent params={params} />
+          <DynamicContent params={params} reqHeaders={headers()} />
         </Suspense>
       </CardContent>
     </Card>
   );
 }
 
-async function DynamicContent({ params }: ContestPageParams) {
+async function DynamicContent({
+  params,
+  reqHeaders,
+}: {
+  params: Promise<{ slug: string }>;
+
+  reqHeaders: Promise<ReadonlyHeaders>;
+}) {
   'use cache';
   cacheLife('hours');
   const { slug } = await params;
-  // Check authentication
-  // const session = await auth.api.getSession({
-  //   headers: await headers(),
-  // });
+  const headersInstance = await reqHeaders;
 
   const contest = await prisma.contest.findUnique({
     where: {
@@ -62,18 +68,16 @@ async function DynamicContent({ params }: ContestPageParams) {
   });
 
   if (!contest) return notFound();
+
   // Check if user already submitted
-  // const existingSubmission = await prisma.submission.findFirst({
-  //   where: {
-  //     userId: session?.user.id,
-  //     contestId: contest.id,
-  //   },
-  // });
-
-  // if (existingSubmission) {
-  //   redirect(`/${slug}/results`);
-  // }
-
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const checkResultPromise = await fetch(`${baseUrl}/api/contests/${contest.slug}/checkIfUserHasResults`, {
+    headers: headersInstance,
+  });
+  const result = await checkResultPromise.json();
+  if (result.hasSubmitted) {
+    redirect(`/${slug}/results`);
+  }
   cacheTag(`contest-${contest.id}`);
   return <QuestionForm contest={contest} />;
 }
