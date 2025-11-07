@@ -9,7 +9,7 @@ export default async function Layout({ children }: Readonly<{ children: React.Re
       </header>
       <main className="p-6">
         <section className="mx-auto py-8 container">
-          <div className="mx-auto max-w-6xl">{children}</div>
+          <div className="mx-auto max-w-7xl">{children}</div>
         </section>
       </main>
     </>

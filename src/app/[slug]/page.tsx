@@ -14,7 +14,13 @@ type ContestPageParams = {
 export default async function ContestPage({ params }: ContestPageParams) {
   return (
     <>
-      <h1 className="mb-8 font-bold text-3xl text-center">Contest Details</h1>
+      <div className="p-4">
+        <h1 className="mb-8 font-bold text-3xl text-center">Contest Details</h1>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur odio sequi sed quam explicabo, laudantium aut voluptatem vitae fugiat
+          eaque culpa ipsam modi earum laborum est numquam similique itaque saepe.
+        </p>
+      </div>
       <Suspense
         fallback={
           <Card>
