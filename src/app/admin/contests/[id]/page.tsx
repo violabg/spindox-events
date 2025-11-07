@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AdminLayout } from '@/components/admin';
 import { notFound } from 'next/navigation';
@@ -7,6 +7,7 @@ import { getContestById } from '@/queries/contests';
 import { formatDate } from '@/lib/date';
 import Link from 'next/link';
 import { ExternalLink, Edit } from 'lucide-react';
+import { getSubmissionsByContest } from '@/queries/submissions';
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -15,107 +16,128 @@ type PageProps = {
 export default async function ContestDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  const contest = await getContestById(id);
+  const [contest, submissions] = await Promise.all([getContestById(id, { include: { questions: true } }), getSubmissionsByContest(id)]);
 
   if (!contest) {
     notFound();
   }
 
+  // Calculate metrics
+  const uniqueParticipants = new Set(submissions.map(s => s.user.id)).size;
+  const averageScore = submissions.length > 0 ? (submissions.reduce((sum, s) => sum + s.totalScore, 0) / uniqueParticipants).toFixed(2) : 0;
+  const highestScore = submissions.length > 0 ? Math.max(...submissions.map(s => s.totalScore)) : 0;
+  const lowestScore = submissions.length > 0 ? Math.min(...submissions.map(s => s.totalScore)) : 0;
+
   return (
     <AdminLayout
       title={contest.name}
-      subtitle="Contest details and information"
+      subtitle="Contest details and statistics"
       backHref="/admin/contests"
       breadcrumbs={[{ label: 'Contests', href: '/admin/contests' }, { label: contest.name }]}
     >
       <div className="grid gap-6">
-        {/* Header Card with Status */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <CardTitle className="text-2xl">{contest.name}</CardTitle>
-                <CardDescription className="mt-2">{contest.description || 'No description'}</CardDescription>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant={contest.status === 'active' ? 'default' : 'secondary'} className="whitespace-nowrap">
-                  {contest.status === 'active' ? 'Active' : 'Inactive'}
-                </Badge>
-                <Button asChild size="icon" variant="ghost" className="h-8 w-8">
-                  <Link href={`/${contest.slug}`} target="_blank" title="View on site">
-                    <ExternalLink className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-        </Card>
-
-        {/* Details Grid */}
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Basic Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Basic Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase">ID</p>
-                <p className="text-sm font-mono mt-1">{contest.id}</p>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase">Slug</p>
-                <p className="text-sm mt-1">{contest.slug}</p>
-              </div>
+        {/* Header with Status and Actions */}
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold">{contest.name}</h1>
+            {contest.description && <p className="text-muted-foreground mt-2 max-w-2xl">{contest.description}</p>}
+            <div className="flex gap-2 mt-4 text-xs text-muted-foreground">
+              <span>ID: {contest.id}</span>
+              <span>•</span>
+              <span>Slug: {contest.slug}</span>
               {contest.theme && (
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase">Theme</p>
-                  <p className="text-sm mt-1">{contest.theme}</p>
-                </div>
+                <>
+                  <span>•</span>
+                  <span>Theme: {contest.theme}</span>
+                </>
               )}
+              <span>•</span>
+              <span>Created: {formatDate(contest.createdAt)}</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <Badge variant={contest.status === 'active' ? 'default' : 'secondary'} className="whitespace-nowrap">
+              {contest.status === 'active' ? 'Active' : 'Inactive'}
+            </Badge>
+            <Button asChild size="sm" variant="outline">
+              <Link href={`/${contest.slug}`} target="_blank" className="gap-2">
+                <ExternalLink className="h-4 w-4" />
+                Preview
+              </Link>
+            </Button>
+            <Button asChild size="sm">
+              <Link href={`/admin/contests/${id}/edit`} className="gap-2">
+                <Edit className="h-4 w-4" />
+                Edit
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* Key Metrics */}
+        <div className="grid gap-4 md:grid-cols-5">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium">Questions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold">{contest.questions.length}</p>
+              <p className="text-xs text-muted-foreground mt-1">total questions</p>
             </CardContent>
           </Card>
-
-          {/* Timestamps */}
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Timeline</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium">Participants</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase">Created</p>
-                <p className="text-sm mt-1">{formatDate(contest.createdAt)}</p>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase">Last Updated</p>
-                <p className="text-sm mt-1">{formatDate(contest.updatedAt)}</p>
-              </div>
+            <CardContent>
+              <p className="text-3xl font-bold">{uniqueParticipants}</p>
+              <p className="text-xs text-muted-foreground mt-1">unique users</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium">Average Score</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold">{averageScore}</p>
+              <p className="text-xs text-muted-foreground mt-1">across all users</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium">Highest Score</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold">{highestScore}</p>
+              <p className="text-xs text-muted-foreground mt-1">best result</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium">Lowest Score</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold">{lowestScore}</p>
+              <p className="text-xs text-muted-foreground mt-1">minimum result</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Actions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              <Button asChild>
-                <Link href={`/admin/contests/${id}/questions`}>View Questions</Link>
-              </Button>
-              <Button asChild>
-                <Link href={`/admin/contests/${id}/submissions`}>View Submissions</Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href={`/admin/contests/${id}/edit`}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit
-                </Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Navigation Buttons */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <Button asChild size="lg" variant="outline" className="h-auto flex-col items-start gap-2 p-4">
+            <Link href={`/admin/contests/${id}/questions`}>
+              <span className="font-semibold">Manage Questions</span>
+              <span className="text-xs text-muted-foreground">View {contest.questions.length} questions and analytics</span>
+            </Link>
+          </Button>
+          <Button asChild size="lg" variant="outline" className="h-auto flex-col items-start gap-2 p-4">
+            <Link href={`/admin/contests/${id}/submissions`}>
+              <span className="font-semibold">View Submissions</span>
+              <span className="text-xs text-muted-foreground">Review {uniqueParticipants} participant responses</span>
+            </Link>
+          </Button>
+        </div>
       </div>
     </AdminLayout>
   );

@@ -1,11 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import Link from 'next/link';
-import { AdminLayout } from '@/components/admin';
+import { AdminLayout, EmptyTable } from '@/components/admin';
 import { Edit } from 'lucide-react';
 import { getQuestionWithAnswersAction } from '@/actions/questions/get.action';
 import { getContestById } from '@/queries/contests';
+import { getQuestionWithAnalytics } from '@/queries/questionWithAnalytics';
+import AnswerAnalyticsTable from './answer-analytics.table';
 
 type PageProps = {
   params: Promise<{ id: string; questionId: string }>;
@@ -15,7 +18,7 @@ export default async function QuestionDetailPage({ params }: PageProps) {
   const { id, questionId } = await params;
 
   const questionResult = await getQuestionWithAnswersAction(questionId);
-  const contest = await getContestById(id);
+  const [contest, analyticsData] = await Promise.all([getContestById(id), getQuestionWithAnalytics(questionId)]);
 
   if (!questionResult.success || !questionResult.data) {
     return (
@@ -30,15 +33,7 @@ export default async function QuestionDetailPage({ params }: PageProps) {
   }
 
   const question = questionResult.data;
-
-  const actions = (
-    <Button asChild>
-      <Link href={`/admin/contests/${id}/questions/${questionId}/edit`}>
-        <Edit className="mr-2 h-4 w-4" />
-        Edit Question
-      </Link>
-    </Button>
-  );
+  const analytics = analyticsData?.analytics;
 
   return (
     <AdminLayout
@@ -51,17 +46,68 @@ export default async function QuestionDetailPage({ params }: PageProps) {
         { label: 'Questions', href: `/admin/contests/${id}/questions` },
         { label: question.title },
       ]}
-      actions={actions}
     >
       <div className="grid gap-6">
         <Card>
-          <CardHeader>
-            <CardTitle>Question Content</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <div>
+              <CardTitle>Question Content</CardTitle>
+            </div>
+            <Button asChild size="sm">
+              <Link href={`/admin/contests/${id}/questions/${questionId}/edit`}>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </Link>
+            </Button>
           </CardHeader>
           <CardContent>
             <p className="text-lg">{question.content}</p>
           </CardContent>
         </Card>
+
+        {/* Analytics Summary */}
+        {analytics && (
+          <div className="grid gap-4 md:grid-cols-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Total Submissions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold">{analytics.totalSubmissions}</p>
+                <p className="text-xs text-muted-foreground">{analytics.uniqueUsers} unique users</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Average Score</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold">{analytics.averageScore}</p>
+                <p className="text-xs text-muted-foreground">out of {analytics.maxScore}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Correct Answers</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold">{analytics.correctAnswers}</p>
+                <p className="text-xs text-muted-foreground">{analytics.correctPercentage}% accuracy</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Min - Max Score</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold">
+                  {analytics.minScore} - {analytics.maxScore}
+                </p>
+                <p className="text-xs text-muted-foreground">score range</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         <Card>
           <CardHeader>
@@ -70,37 +116,58 @@ export default async function QuestionDetailPage({ params }: PageProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {question.answers.map((answer, index) => {
+              {question.answers.map(answer => {
                 const maxScore = Math.max(...question.answers.map(a => a.score));
                 const isHighestScore = answer.score === maxScore && maxScore > 0;
+                const distribution = analytics?.answerDistribution.get(answer.id);
 
                 return (
-                  <div
-                    key={answer.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg border ${isHighestScore ? 'bg-green-50 border-green-200' : 'bg-gray-50'}`}
-                  >
-                    <div className="shrink-0 w-8 h-8 bg-white border rounded-full flex items-center justify-center font-medium">
-                      {String.fromCharCode(65 + index)}
-                    </div>
-                    <div className="flex-1">
-                      <p className={isHighestScore ? 'font-medium text-green-800' : ''}>{answer.content}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="font-mono">
-                        Score: {answer.score}
-                      </Badge>
-                      {isHighestScore && (
-                        <Badge variant="default" className="bg-green-600">
-                          Highest Score
+                  <div key={answer.id} className="space-y-2">
+                    <div className={`flex items-center gap-3 p-3 rounded-lg border`}>
+                      <div className="flex-1">
+                        <p>{answer.content}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="font-mono">
+                          Score: {answer.score}
                         </Badge>
-                      )}
+                        {isHighestScore && (
+                          <Badge variant="default" className="bg-green-600">
+                            Highest Score
+                          </Badge>
+                        )}
+                      </div>
                     </div>
+                    {distribution && (
+                      <div className="flex items-center gap-2 px-3">
+                        <span className="text-xs text-muted-foreground">{distribution.count} answers</span>
+                        <Progress value={distribution.percentage} className="h-1.5 flex-1" />
+                        <span className="text-xs text-muted-foreground font-medium">{distribution.percentage}%</span>
+                      </div>
+                    )}
                   </div>
                 );
               })}
             </div>
           </CardContent>
         </Card>
+
+        {/* User Responses Table */}
+        {analyticsData && (
+          <Card>
+            <CardHeader>
+              <CardTitle>User Responses</CardTitle>
+              <CardDescription>All users who answered this question</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {analyticsData.question.submissions.length === 0 ? (
+                <EmptyTable title="No responses" description="No users have answered this question yet." />
+              ) : (
+                <AnswerAnalyticsTable submissions={analyticsData.question.submissions} />
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
     </AdminLayout>
   );

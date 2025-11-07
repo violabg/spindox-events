@@ -3,13 +3,23 @@
 import { deleteQuestionAction } from '@/actions/questions/delete.action';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ConfirmationDialog } from '@/components/admin';
 import { AnswerModel } from '@/prisma/models/Answer';
 import { QuestionModel } from '@/prisma/models/Question';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 type QuestionWithAnswers = QuestionModel & {
   answers: AnswerModel[];
@@ -20,15 +30,17 @@ type QuestionsTableProps = {
   questions: QuestionWithAnswers[];
 };
 
-function DeleteQuestionButton({ questionId, questionTitle }: { questionId: string; questionTitle: string }) {
+function QuestionActionsMenu({ question, contestId }: { question: QuestionWithAnswers; contestId: string }) {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      const result = await deleteQuestionAction(questionId);
+      const result = await deleteQuestionAction(question.id);
       if (result.success) {
         toast.success('Question deleted successfully');
+        setIsDeleteDialogOpen(false);
       } else {
         toast.error(result.error || 'Failed to delete question');
       }
@@ -40,18 +52,65 @@ function DeleteQuestionButton({ questionId, questionTitle }: { questionId: strin
   };
 
   return (
-    <ConfirmationDialog
-      title="Delete Question"
-      description={`Are you sure you want to delete "${questionTitle}"? This action cannot be undone and will also delete all associated answers and user responses.`}
-      actionText="Delete"
-      onAction={handleDelete}
-      isLoading={isDeleting}
-      isDangerous
-    >
-      <Button variant="outline" size="sm" disabled={isDeleting}>
-        <Trash2 className="h-4 w-4" />
-      </Button>
-    </ConfirmationDialog>
+    <>
+      <Menu>
+        <MenuButton as={Button} variant="ghost" size="sm">
+          <MoreHorizontal className="h-4 w-4" />
+        </MenuButton>
+        <MenuItems anchor="bottom end" className="z-50 rounded-md border bg-popover p-1 shadow-md">
+          <MenuItem>
+            <Link
+              href={`/admin/contests/${contestId}/questions/${question.id}`}
+              className="flex items-center px-2 py-1.5 text-sm hover:bg-accent rounded"
+            >
+              <Edit className="mr-2 h-4 w-4" />
+              View Analytics
+            </Link>
+          </MenuItem>
+          <MenuItem>
+            <Link
+              href={`/admin/contests/${contestId}/questions/${question.id}/edit`}
+              className="flex items-center px-2 py-1.5 text-sm hover:bg-accent rounded"
+            >
+              <Edit className="mr-2 h-4 w-4" />
+              Edit Question
+            </Link>
+          </MenuItem>
+          <div className="my-1 h-px bg-border" />
+          <MenuItem>
+            <button
+              onClick={() => setIsDeleteDialogOpen(true)}
+              className="w-full flex items-center px-2 py-1.5 text-sm hover:bg-destructive/10 rounded text-destructive text-left"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete Question
+            </button>
+          </MenuItem>
+        </MenuItems>
+      </Menu>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Question</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete &ldquo;{question.title}&rdquo;? This action cannot be undone and will also delete all associated answers
+              and user responses.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 
@@ -77,14 +136,7 @@ export default function QuestionsTable({ contestId, questions }: QuestionsTableP
               <TableCell className="text-center">{answerCount}</TableCell>
               <TableCell className="text-center">{maxScore}</TableCell>
               <TableCell className="text-right">
-                <div className="flex items-center justify-end gap-2">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={`/admin/contests/${contestId}/questions/${question.id}/edit`}>
-                      <Edit className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                  <DeleteQuestionButton questionId={question.id} questionTitle={question.title} />
-                </div>
+                <QuestionActionsMenu question={question} contestId={contestId} />
               </TableCell>
             </TableRow>
           );
