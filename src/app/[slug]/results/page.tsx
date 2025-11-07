@@ -140,9 +140,9 @@ async function DynamicContent({ params }: Params) {
               <div className="flex justify-between items-start">
                 <div className="flex items-start gap-3">
                   {result.isCorrect ? (
-                    <CheckCircle className="flex-shrink-0 mt-1 w-5 h-5 text-green-600" />
+                    <CheckCircle className="mt-1 w-5 h-5 text-green-600 shrink-0" />
                   ) : (
-                    <XCircle className="flex-shrink-0 mt-1 w-5 h-5 text-red-600" />
+                    <XCircle className="mt-1 w-5 h-5 text-red-600 shrink-0" />
                   )}
                   <div>
                     <CardTitle className="text-base">Question {index + 1}</CardTitle>
