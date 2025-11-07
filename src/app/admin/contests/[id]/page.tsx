@@ -16,7 +16,7 @@ type PageProps = {
 export default async function ContestDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  const [contest, attempts] = await Promise.all([getContestById(id, { include: { questions: true } }), getAttemptsByContest(id)]);
+  const [contest, attempts] = await Promise.all([getContestById(id), getAttemptsByContest(id)]);
 
   if (!contest) {
     notFound();

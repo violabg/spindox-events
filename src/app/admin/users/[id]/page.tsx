@@ -1,11 +1,10 @@
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AdminLayout } from '@/components/admin';
 import { notFound } from 'next/navigation';
 import { getUserById } from '@/queries/users';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/date';
 import LinkedAccounts from '../linked-accounts';
-import AdminRoleSelect from './admin-role-select';
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -78,11 +77,6 @@ export default async function UserDetailPage({ params }: PageProps) {
               </div>
             </div>
           </CardContent>
-          <CardFooter>
-            <CardAction>
-              <AdminRoleSelect userId={userId} isAdmin={user.role === 'admin'} />
-            </CardAction>
-          </CardFooter>
         </Card>
 
         {/* Contests Participated */}

@@ -20,22 +20,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { getContests } from '@/queries/contests';
 
 type ContestsTableProps = {
-  contests: Array<{
-    id: string;
-    name: string;
-    slug: string;
-    status: 'active' | 'inactive';
-    questions: Array<{
-      answers: Array<{ score: number }>;
-    }>;
-    attempts: Array<{ score: number }>;
-    createdAt: Date;
-    updatedAt: Date;
-    theme?: string | null;
-    description?: string | null;
-  }>;
+  contests: Awaited<ReturnType<typeof getContests>>;
 };
 
 function ContestActionsMenu({ contest }: { contest: ContestsTableProps['contests'][number] }) {

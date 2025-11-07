@@ -14,21 +14,7 @@ type PageProps = {
 export default async function QuestionsPage({ params }: PageProps) {
   const { id } = await params;
 
-  const contest = await getContestById(id, {
-    include: {
-      questions: {
-        orderBy: { order: 'asc' },
-        include: {
-          answers: { orderBy: { order: 'asc' } },
-          userAnswers: {
-            select: {
-              score: true,
-            },
-          },
-        },
-      },
-    },
-  });
+  const contest = await getContestById(id);
 
   if (!contest) {
     notFound();

@@ -8,14 +8,7 @@ export async function deleteContestAction(contestId: string) {
     // Check if contest exists
     const contest = await prisma.contest.findUnique({
       where: { id: contestId },
-      include: {
-        _count: {
-          select: {
-            questions: true,
-            attempts: true,
-          },
-        },
-      },
+      select: { id: true, name: true },
     });
 
     if (!contest) {
@@ -25,21 +18,14 @@ export async function deleteContestAction(contestId: string) {
       };
     }
 
-    // Check if contest has associated data
-    if (contest._count.questions > 0 || contest._count.attempts > 0) {
-      return {
-        success: false,
-        error: 'Cannot delete contest with existing questions or user answers',
-      };
-    }
-
-    // Delete the contest
+    // Delete the contest (cascade delete will handle all related data)
     await prisma.contest.delete({
       where: { id: contestId },
     });
 
     // Revalidate the admin page to refresh the data
     revalidatePath('/admin');
+    revalidatePath('/admin/contests');
 
     return {
       success: true,
