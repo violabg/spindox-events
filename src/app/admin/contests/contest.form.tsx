@@ -4,7 +4,7 @@ import { createContestAction } from '@/actions/contests/create.action';
 import { updateContestAction } from '@/actions/contests/update.action';
 import { FieldInput, FieldSelect, FieldTextarea } from '@/components/admin';
 import { Button } from '@/components/ui/button';
-import { ContestStatus, ContestMode } from '@/prisma/enums';
+import { ContestMode, ContestStatus } from '@/prisma/enums';
 import { ContestModel } from '@/prisma/models/Contest';
 import { contestSchema, type ContestData } from '@/schemas/contest.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -35,6 +35,7 @@ export default function ContestForm({ contestId, initialData }: ContestFormProps
       description: initialData?.description || '',
       status: initialData?.status || ContestStatus.active,
       mode: initialData?.mode || ContestMode.SINGLE,
+      timeLimit: initialData?.timeLimit || 0,
     },
   });
 
@@ -141,6 +142,16 @@ export default function ContestForm({ contestId, initialData }: ContestFormProps
             label: mode === ContestMode.SINGLE ? `${mode} (Users can submit only once)` : `${mode} (Users can retake the contest multiple times)`,
           }))}
         />
+
+        <FieldInput
+          name="timeLimit"
+          control={form.control}
+          label="Time Limit (minutes)"
+          description="Time limit for the contest in minutes. 0 means no time limit"
+          placeholder="0"
+          type="number"
+          min={0}
+        />
       </div>
 
       <FieldTextarea
@@ -155,7 +166,7 @@ export default function ContestForm({ contestId, initialData }: ContestFormProps
 
       {error && <div className="bg-destructive/10 p-3 rounded-md text-destructive text-sm">{error}</div>}
 
-      <div className="flex gap-4 justify-end">
+      <div className="flex justify-end gap-4">
         <Button type="button" variant="outline" asChild>
           <Link href={isEditMode && contestId ? `/admin/contests/${contestId}` : '/admin'}>Cancel</Link>
         </Button>
