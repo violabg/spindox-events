@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { submitAnswersSchema } from '@/lib/schemas/contest.schema';
 import { NextRequest, NextResponse } from 'next/server';
+import { ContestMode, QuestionType } from '@/prisma/enums';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
@@ -22,6 +23,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     const { answers } = validationResult.data;
+    const startedAt = body.startedAt ? new Date(body.startedAt) : new Date();
 
     // Get contest
     const contest = await prisma.contest.findUnique({
@@ -39,19 +41,23 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'Contest not found' }, { status: 404 });
     }
 
-    // Check for duplicate submission
-    const existingSubmission = await prisma.submission.findFirst({
-      where: {
-        userId: session.user.id,
-        contestId: contest.id,
-      },
-    });
-
-    if (existingSubmission) {
-      return NextResponse.json({ error: 'Already submitted' }, { status: 409 });
+    // Check for existing attempt based on contest mode
+    let existingAttempt = null;
+    if (contest.mode === ContestMode.SINGLE) {
+      existingAttempt = await prisma.userAttempts.findFirst({
+        where: {
+          userId: session.user.id,
+          contestId: contest.id,
+        },
+      });
     }
 
-    // Create user answers and calculate score
+    // If contest mode is SINGLE and user already attempted, reject
+    if (contest.mode === ContestMode.SINGLE && existingAttempt) {
+      return NextResponse.json({ error: 'You can only submit once for this contest' }, { status: 409 });
+    }
+
+    // Calculate score and prepare results
     let totalScore = 0;
     let correctCount = 0;
     const results = [];
@@ -71,9 +77,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
       // Check if user selected correct answers
       let isCorrect = false;
-      if (question.type === 'SINGLE_CHOICE') {
+      if (question.type === QuestionType.SINGLE_CHOICE) {
         isCorrect = selectedAnswers.length === 1 && selectedAnswers[0].score > 0;
-      } else if (question.type === 'MULTIPLE_CHOICES') {
+      } else if (question.type === QuestionType.MULTIPLE_CHOICES) {
         // For multiple choice, user must select all correct answers and no wrong ones
         const selectedIds = new Set(selectedAnswers.map(a => a.id));
         const correctIds = new Set(correctAnswers.map(a => a.id));
@@ -85,25 +91,63 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         totalScore += selectedAnswers.reduce((sum, a) => sum + a.score, 0);
       }
 
-      // Save user answers
-      for (const selectedAnswer of selectedAnswers) {
-        await prisma.submission.create({
-          data: {
-            userId: session.user.id,
-            contestId: contest.id,
-            questionId: question.id,
-            answerId: selectedAnswer.id,
-            score: selectedAnswer.score > 0 ? selectedAnswer.score : 0,
-          },
-        });
-      }
-
       results.push({
         questionId: question.id,
         questionContent: question.content,
-        submissionIds: selectedAnswers.map(a => a.id),
-        correctAnswerIds: correctAnswers.map(a => a.id),
+        selectedAnswers: selectedAnswers.map(a => a.id),
+        correctAnswers: correctAnswers.map(a => a.id),
         isCorrect,
+      });
+    }
+
+    // Create or update UserAttempt with UserAnswers
+    // For SINGLE mode, update existing attempt. For MULTIPLE mode, create new attempt.
+    const finishedAt = new Date(); // Server time when submission is received
+
+    if (contest.mode === ContestMode.SINGLE && existingAttempt) {
+      // Update existing attempt for SINGLE mode
+      await prisma.userAttempts.update({
+        where: { id: existingAttempt.id },
+        data: {
+          score: totalScore,
+          finishedAt: finishedAt,
+          userAnswers: {
+            deleteMany: {}, // Clear old answers
+            create: answerEntries.flatMap(answer => {
+              const question = contest.questions.find(q => q.id === answer.questionId);
+              if (!question) return [];
+              const selectedAnswers = question.answers.filter(a => answer.answerIds.includes(a.id));
+              return selectedAnswers.map(selectedAnswer => ({
+                questionId: question.id,
+                answerId: selectedAnswer.id,
+                score: selectedAnswer.score > 0 ? selectedAnswer.score : 0,
+              }));
+            }),
+          },
+        },
+      });
+    } else {
+      // Create new attempt for MULTIPLE mode or new SINGLE mode attempt
+      await prisma.userAttempts.create({
+        data: {
+          userId: session.user.id,
+          contestId: contest.id,
+          startedAt: startedAt,
+          finishedAt: finishedAt,
+          score: totalScore,
+          userAnswers: {
+            create: answerEntries.flatMap(answer => {
+              const question = contest.questions.find(q => q.id === answer.questionId);
+              if (!question) return [];
+              const selectedAnswers = question.answers.filter(a => answer.answerIds.includes(a.id));
+              return selectedAnswers.map(selectedAnswer => ({
+                questionId: question.id,
+                answerId: selectedAnswer.id,
+                score: selectedAnswer.score > 0 ? selectedAnswer.score : 0,
+              }));
+            }),
+          },
+        },
       });
     }
 

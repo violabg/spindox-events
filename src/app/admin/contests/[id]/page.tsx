@@ -7,7 +7,7 @@ import { getContestById } from '@/queries/contests';
 import { formatDate } from '@/lib/date';
 import Link from 'next/link';
 import { ExternalLink, Edit } from 'lucide-react';
-import { getSubmissionsByContest } from '@/queries/submissions';
+import { getAttemptsByContest } from '@/queries/userAttempts';
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -16,17 +16,17 @@ type PageProps = {
 export default async function ContestDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  const [contest, submissions] = await Promise.all([getContestById(id, { include: { questions: true } }), getSubmissionsByContest(id)]);
+  const [contest, attempts] = await Promise.all([getContestById(id), getAttemptsByContest(id)]);
 
   if (!contest) {
     notFound();
   }
 
   // Calculate metrics
-  const uniqueParticipants = new Set(submissions.map(s => s.user.id)).size;
-  const averageScore = submissions.length > 0 ? (submissions.reduce((sum, s) => sum + s.totalScore, 0) / uniqueParticipants).toFixed(2) : 0;
-  const highestScore = submissions.length > 0 ? Math.max(...submissions.map(s => s.totalScore)) : 0;
-  const lowestScore = submissions.length > 0 ? Math.min(...submissions.map(s => s.totalScore)) : 0;
+  const uniqueParticipants = attempts.length; // Already unique by user from query
+  const averageScore = attempts.length > 0 ? (attempts.reduce((sum: number, a) => sum + a.score, 0) / attempts.length).toFixed(2) : 0;
+  const highestScore = attempts.length > 0 ? Math.max(...attempts.map(a => a.score)) : 0;
+  const lowestScore = attempts.length > 0 ? Math.min(...attempts.map(a => a.score)) : 0;
 
   return (
     <AdminLayout
@@ -132,8 +132,8 @@ export default async function ContestDetailPage({ params }: PageProps) {
             </Link>
           </Button>
           <Button asChild size="lg" variant="outline" className="h-auto flex-col items-start gap-2 p-4">
-            <Link href={`/admin/contests/${id}/submissions`}>
-              <span className="font-semibold">View Submissions</span>
+            <Link href={`/admin/contests/${id}/attempts`}>
+              <span className="font-semibold">View Attempts</span>
               <span className="text-xs text-muted-foreground">Review {uniqueParticipants} participant responses</span>
             </Link>
           </Button>

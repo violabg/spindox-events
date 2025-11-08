@@ -1,5 +1,6 @@
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { ContestMode } from '@/prisma/enums';
 import { NextRequest, NextResponse } from 'next/server';
 
 export type CheckUserHasResultsResponse = {
@@ -33,23 +34,25 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if user has already submitted answers for this contest
-    const existingSubmission = await prisma.submission.findFirst({
+    const existingAttempt = await prisma.userAttempts.findFirst({
       where: {
         userId: userId,
         contestId: contest.id,
       },
     });
 
-    const hasSubmitted = !!existingSubmission;
+    const hasSubmitted = !!existingAttempt;
 
-    // Format response
+    // Format response - include mode so frontend can decide what to do
     const response: CheckUserHasResultsResponse = {
       hasSubmitted,
+      mode: contest.mode,
+      canRetake: contest.mode === ContestMode.MULTIPLE && hasSubmitted,
     };
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Error fetching contest:', error);
+    console.error('Error checking if user has results:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

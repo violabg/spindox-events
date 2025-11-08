@@ -74,7 +74,7 @@ async function DynamicContent({ params }: ContestPageParams) {
       </CardContent>
       <CardFooter>
         <Button asChild>
-          <Link href={`/${slug}/questions`}>Questions</Link>
+          <Link href={`/${slug}/questions`}>Start Contest</Link>
         </Button>
       </CardFooter>
     </Card>

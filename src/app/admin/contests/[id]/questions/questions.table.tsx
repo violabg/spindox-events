@@ -23,6 +23,7 @@ import {
 
 type QuestionWithAnswers = QuestionModel & {
   answers: AnswerModel[];
+  userAnswers: { score: number }[];
 };
 
 type QuestionsTableProps = {
@@ -122,6 +123,7 @@ export default function QuestionsTable({ contestId, questions }: QuestionsTableP
           <TableHead>Title</TableHead>
           <TableHead className="text-center">Answers</TableHead>
           <TableHead className="text-center">Max Score</TableHead>
+          <TableHead className="text-center">Avg Score</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -130,11 +132,18 @@ export default function QuestionsTable({ contestId, questions }: QuestionsTableP
           const answerCount = question.answers.length;
           const maxScore = question.answers.length > 0 ? Math.max(...question.answers.map(answer => answer.score)) : 0;
 
+          // Calculate average score from user answers
+          const avgScore =
+            question.userAnswers.length > 0
+              ? (question.userAnswers.reduce((sum, ua) => sum + ua.score, 0) / question.userAnswers.length).toFixed(2)
+              : '0.00';
+
           return (
             <TableRow key={question.id}>
               <TableCell className="font-medium">{question.title}</TableCell>
               <TableCell className="text-center">{answerCount}</TableCell>
               <TableCell className="text-center">{maxScore}</TableCell>
+              <TableCell className="text-center">{avgScore}</TableCell>
               <TableCell className="text-right">
                 <QuestionActionsMenu question={question} contestId={contestId} />
               </TableCell>

@@ -6,8 +6,8 @@ import { CheckCircle, XCircle } from 'lucide-react';
 interface ResultItem {
   questionId: string;
   questionContent: string;
-  submissionIds: string[];
-  correctAnswerIds: string[];
+  selectedAnswers: string[];
+  correctAnswers: string[];
   isCorrect: boolean;
 }
 
@@ -67,9 +67,9 @@ export function ContestResults({ score, totalQuestions, correctCount, results }:
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
                   {result.isCorrect ? (
-                    <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-green-600" />
+                    <CheckCircle className="mt-1 h-5 w-5 shrink-0 text-green-600" />
                   ) : (
-                    <XCircle className="mt-1 h-5 w-5 flex-shrink-0 text-red-600" />
+                    <XCircle className="mt-1 h-5 w-5 shrink-0 text-red-600" />
                   )}
                   <div>
                     <CardTitle className="text-base">Question {index + 1}</CardTitle>
@@ -90,12 +90,12 @@ export function ContestResults({ score, totalQuestions, correctCount, results }:
                 <div>
                   <p className="mb-2 text-sm font-medium text-slate-700">Your Answer:</p>
                   <div className="space-y-1">
-                    {result.submissionIds.length === 0 ? (
+                    {result.selectedAnswers.length === 0 ? (
                       <p className="text-sm italic text-red-600">No answer selected</p>
                     ) : (
-                      result.submissionIds.map(id => (
-                        <p key={id} className="text-sm text-red-600">
-                          • {id}
+                      result.selectedAnswers.map((answer: string) => (
+                        <p key={answer} className="text-sm text-red-600">
+                          • {answer}
                         </p>
                       ))
                     )}
@@ -105,12 +105,12 @@ export function ContestResults({ score, totalQuestions, correctCount, results }:
               <div>
                 <p className="mb-2 text-sm font-medium text-slate-700">
                   Correct Answer
-                  {result.correctAnswerIds.length > 1 ? 's' : ''}:
+                  {result.correctAnswers.length > 1 ? 's' : ''}:
                 </p>
                 <div className="space-y-1">
-                  {result.correctAnswerIds.map(id => (
-                    <p key={id} className="text-sm font-medium text-green-600">
-                      ✓ {id}
+                  {result.correctAnswers.map((answer: string) => (
+                    <p key={answer} className="text-sm font-medium text-green-600">
+                      ✓ {answer}
                     </p>
                   ))}
                 </div>

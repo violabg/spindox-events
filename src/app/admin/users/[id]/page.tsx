@@ -1,11 +1,10 @@
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AdminLayout } from '@/components/admin';
 import { notFound } from 'next/navigation';
 import { getUserById } from '@/queries/users';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/date';
 import LinkedAccounts from '../linked-accounts';
-import AdminRoleSelect from './admin-role-select';
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -16,10 +15,9 @@ export default async function UserDetailPage({ params }: PageProps) {
 
   const user = await getUserById(userId, {
     include: {
-      submissions: {
+      attempts: {
         include: {
           contest: true,
-          question: true,
         },
       },
       sessions: true,
@@ -32,11 +30,11 @@ export default async function UserDetailPage({ params }: PageProps) {
   }
 
   const contestsParticipated = new Map<string, { name: string; count: number }>();
-  user.submissions.forEach(ua => {
-    if (!contestsParticipated.has(ua.contestId)) {
-      contestsParticipated.set(ua.contestId, { name: ua.contest.name, count: 0 });
+  user.attempts.forEach(attempt => {
+    if (!contestsParticipated.has(attempt.contestId)) {
+      contestsParticipated.set(attempt.contestId, { name: attempt.contest.name, count: 0 });
     }
-    const contest = contestsParticipated.get(ua.contestId);
+    const contest = contestsParticipated.get(attempt.contestId);
     if (contest) {
       contest.count++;
     }
@@ -79,11 +77,6 @@ export default async function UserDetailPage({ params }: PageProps) {
               </div>
             </div>
           </CardContent>
-          <CardFooter>
-            <CardAction>
-              <AdminRoleSelect userId={userId} isAdmin={user.role === 'admin'} />
-            </CardAction>
-          </CardFooter>
         </Card>
 
         {/* Contests Participated */}

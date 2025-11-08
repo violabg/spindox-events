@@ -1,18 +1,18 @@
 import { getContestById } from '@/queries/contests';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AdminLayout, EmptyTable } from '@/components/admin';
-import SubmissionsTable from './submissions.table';
+import AttemptTable from './attempts.table';
 import { notFound } from 'next/navigation';
-import { getSubmissionsByContest } from '@/queries/submissions';
+import { getUniqueUserAttemptsByContest } from '@/queries/userAttempts';
 
 type PageProps = {
   params: Promise<{ id: string }>;
 };
 
-export default async function SubmissionsPage({ params }: PageProps) {
+export default async function AttemptsPage({ params }: PageProps) {
   const { id } = await params;
 
-  const [contest, submissions] = await Promise.all([getContestById(id), getSubmissionsByContest(id)]);
+  const [contest, attempts] = await Promise.all([getContestById(id), getUniqueUserAttemptsByContest(id)]);
 
   if (!contest) {
     notFound();
@@ -20,20 +20,20 @@ export default async function SubmissionsPage({ params }: PageProps) {
 
   return (
     <AdminLayout
-      title="Submissions"
+      title="Contest Attempts"
       subtitle="Participants & Results"
       backHref="/admin"
-      breadcrumbs={[{ label: 'Contests', href: '/admin/contests' }, { label: contest.name, href: `/admin/contests/${id}` }, { label: 'Submissions' }]}
+      breadcrumbs={[{ label: 'Contests', href: '/admin/contests' }, { label: contest.name, href: `/admin/contests/${id}` }, { label: 'Attempts' }]}
     >
       <Card>
         <CardHeader>
-          <CardTitle>Participants ({submissions.length})</CardTitle>
+          <CardTitle>Participants ({attempts.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          {submissions.length === 0 ? (
+          {attempts.length === 0 ? (
             <EmptyTable title="No participants" description="Users will appear here once they start answering questions." />
           ) : (
-            <SubmissionsTable submissions={submissions} />
+            <AttemptTable attempts={attempts} contestId={id} />
           )}
         </CardContent>
       </Card>

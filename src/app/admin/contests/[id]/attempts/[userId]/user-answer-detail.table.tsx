@@ -1,14 +1,18 @@
 'use client';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { getSubmissionsByUserAndContest } from '@/queries/submissionsByUserAndContest';
 import { Badge } from '@/components/ui/badge';
 
-type SubmissionDetailTableProps = {
-  submissions: Awaited<ReturnType<typeof getSubmissionsByUserAndContest>>;
+type UserAnswerDetailTableProps = {
+  userAnswers: {
+    id: string;
+    score: number;
+    question: { id: string; title: string };
+    answer: { id: string; content: string };
+  }[];
 };
 
-export default function SubmissionDetailTable({ submissions }: SubmissionDetailTableProps) {
+export default function UserAnswerDetailTable({ userAnswers }: UserAnswerDetailTableProps) {
   return (
     <Table>
       <TableHeader>
@@ -20,13 +24,13 @@ export default function SubmissionDetailTable({ submissions }: SubmissionDetailT
         </TableRow>
       </TableHeader>
       <TableBody>
-        {submissions.map((submission, index) => (
-          <TableRow key={submission.id}>
+        {userAnswers.map((userAnswer, index) => (
+          <TableRow key={userAnswer.id}>
             <TableCell className="text-center">{index + 1}</TableCell>
-            <TableCell className="font-medium">{submission.question.title}</TableCell>
-            <TableCell>{submission.answer.content}</TableCell>
+            <TableCell className="font-medium">{userAnswer.question.title}</TableCell>
+            <TableCell>{userAnswer.answer.content}</TableCell>
             <TableCell className="text-right">
-              <Badge variant={submission.score > 0 ? 'default' : 'secondary'}>{submission.score}</Badge>
+              <Badge variant={userAnswer.score > 0 ? 'default' : 'secondary'}>{userAnswer.score}</Badge>
             </TableCell>
           </TableRow>
         ))}

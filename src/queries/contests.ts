@@ -1,19 +1,32 @@
-'use server';
-
 import prisma from '@/lib/prisma';
-import type { Prisma } from '@/prisma/client';
+import { cache } from 'react';
 
-export async function getContests<T extends Prisma.ContestInclude | undefined>(
-  args: Omit<Prisma.ContestFindManyArgs, 'include'> & { include?: T } = {}
-) {
+export const getContests = cache(async () => {
   return prisma.contest.findMany({
-    ...args,
-  }) as Promise<Array<Prisma.ContestGetPayload<{ include: T }>>>;
-}
+    include: {
+      questions: {
+        include: { answers: { orderBy: { order: 'asc' } } },
+        orderBy: { order: 'asc' },
+      },
+      attempts: {
+        include: { userAnswers: { orderBy: { createdAt: 'desc' } } },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+});
 
-export async function getContestById<T extends Prisma.ContestInclude | undefined>(contestId: string, args: { include?: T } = {}) {
+export const getContestById = cache(async (id: string) => {
   return prisma.contest.findUnique({
-    where: { id: contestId },
-    include: args.include,
-  }) as Promise<Prisma.ContestGetPayload<{ include: T }> | null>;
-}
+    where: { id: id },
+    include: {
+      questions: {
+        include: { answers: { orderBy: { order: 'asc' } }, userAnswers: { orderBy: { createdAt: 'desc' } } },
+        orderBy: { order: 'asc' },
+      },
+      attempts: {
+        include: { userAnswers: { orderBy: { createdAt: 'desc' } } },
+      },
+    },
+  });
+});
