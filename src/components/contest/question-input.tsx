@@ -3,9 +3,9 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { QuestionType } from '@/prisma/enums';
 import { Controller, useFormContext } from 'react-hook-form';
 import { QuestionDisplay } from './question-display';
-import { QuestionType } from '@/prisma/enums';
 
 interface Answer {
   id: string;
@@ -57,19 +57,16 @@ export function QuestionInput({
                     else if (selected) containerClass = 'bg-red-600 hover:bg-red-700 text-white';
                   }
                   return (
-                    <div
-                      key={answer.id}
-                      role="button"
-                      onClick={() => !disabled && field.onChange([answer.id])}
-                      className={`w-full flex items-center space-x-3 px-2 rounded-md cursor-pointer ${containerClass}`}
-                    >
+                    <div key={answer.id} className={`w-full flex items-center space-x-3 px-2 rounded-md cursor-pointer ${containerClass}`}>
                       <RadioGroupItem value={answer.id} id={answer.id} disabled={disabled} />
-                      <span>{answer.content}</span>
+                      <Label htmlFor={answer.id} className="flex-1 text-sm cursor-pointer">
+                        {answer.content}
+                      </Label>
                     </div>
                   );
                 })}
               </RadioGroup>
-              {fieldState.error?.message && <p className="text-sm text-destructive mt-1">{String(fieldState.error.message)}</p>}
+              {fieldState.error?.message && <p className="mt-1 text-destructive text-sm">{String(fieldState.error.message)}</p>}
             </>
           )}
         />
@@ -81,7 +78,7 @@ export function QuestionInput({
   return (
     <QuestionDisplay title={title} content={content}>
       <div className="mb-2">
-        <div className="text-sm text-muted-foreground">Multiple answers allowed</div>
+        <div className="text-muted-foreground text-sm">Multiple answers allowed</div>
       </div>
       <div className="space-y-2">
         {answers.map(answer => (
@@ -114,7 +111,7 @@ export function QuestionInput({
                       {answer.content}
                     </Label>
                   </div>
-                  {fieldState.error?.message && <p className="text-sm text-destructive mt-1">{String(fieldState.error.message)}</p>}
+                  {fieldState.error?.message && <p className="mt-1 text-destructive text-sm">{String(fieldState.error.message)}</p>}
                 </>
               );
             }}
