@@ -5,6 +5,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export type CheckUserHasResultsResponse = {
   hasSubmitted: boolean;
+  mode: ContestMode;
+  canRetake: boolean;
 };
 
 export async function GET(request: NextRequest) {
