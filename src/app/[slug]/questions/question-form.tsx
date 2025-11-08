@@ -2,6 +2,7 @@
 
 import { submitAnswersAction } from '@/actions/answers/submit-answers';
 import { QuestionInput } from '@/components/contest/question-input';
+import Timer from '@/components/contest/timer';
 import { Button } from '@/components/ui/button';
 import { Stepper, StepperIndicator, StepperItem, StepperTrigger } from '@/components/ui/stepper';
 import { submitAnswersSchema } from '@/lib/schemas/contest.schema';
@@ -66,6 +67,7 @@ export default function QuestionForm({ contest }: Props) {
   return (
     <FormProvider {...methods}>
       <div className="space-y-8 mx-auto text-center">
+        <Timer timeLimit={contest.timeLimit} />
         <div className="space-y-3">
           <Stepper value={currentStep} onValueChange={setCurrentStep}>
             {steps.map(step => (

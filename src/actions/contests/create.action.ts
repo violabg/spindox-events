@@ -28,6 +28,8 @@ export async function createContestAction(data: CreateContestData) {
         theme: validatedData.theme || null,
         description: validatedData.description || null,
         status: validatedData.status,
+        mode: validatedData.mode,
+        timeLimit: validatedData.timeLimit,
       },
     });
 

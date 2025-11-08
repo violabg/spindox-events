@@ -25,6 +25,7 @@ Last Amended Date: 2025-11-08
 Auto-generated from all feature plans. Last updated: 2025-11-08
 
 ## Active Technologies
+
 - Prisma with PostgreSQL and Row Level Security (RLS) (001-contest-questions-page)
 
 - TypeScript/JavaScript with Next.js 16 (App Router) + @ai-sdk/groq, zod, react-hook-form, shadcn/ui components (001-ai-question-generation)
@@ -45,6 +46,7 @@ npm test && npm run lint
 TypeScript/JavaScript with Next.js 16 (App Router): Follow standard conventions
 
 ## Recent Changes
+
 - 001-contest-questions-page: Added TypeScript/JavaScript with Next.js 16 (App Router) + @ai-sdk/groq, zod, react-hook-form, shadcn/ui components
 
 - 001-ai-question-generation: Added TypeScript/JavaScript with Next.js 16 (App Router) + @ai-sdk/groq, zod, react-hook-form, shadcn/ui components

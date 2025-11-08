@@ -47,6 +47,8 @@ export async function updateContestAction(id: string, data: ContestData) {
         theme: validatedData.theme || null,
         description: validatedData.description || null,
         status: validatedData.status,
+        mode: validatedData.mode,
+        timeLimit: validatedData.timeLimit,
       },
     });
 
