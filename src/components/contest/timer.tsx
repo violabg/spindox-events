@@ -1,13 +1,15 @@
 'use client';
 
+import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 
 interface TimerProps {
   timeLimit: number; // in minutes
   onTimeUp?: () => void;
+  className?: string;
 }
 
-export default function Timer({ timeLimit, onTimeUp }: TimerProps) {
+export default function Timer({ timeLimit, onTimeUp, className }: TimerProps) {
   const [timeLeft, setTimeLeft] = useState(timeLimit * 60); // convert to seconds
 
   useEffect(() => {
@@ -35,11 +37,17 @@ export default function Timer({ timeLimit, onTimeUp }: TimerProps) {
   const isWarning = timeLeft < 300; // 5 minutes
 
   return (
-    <div className={`text-center p-4 rounded-lg text-white ${isWarning ? 'bg-red-900 border-red-700' : 'bg-gray-800 border-gray-600'} border`}>
+    <div
+      className={cn(
+        'shadow-black/30 shadow-inner p-5 border rounded-2xl font-medium text-center transition-colors',
+        isWarning ? 'border-rose-500/50 bg-rose-500/20 text-rose-50' : 'border-slate-500/40 bg-slate-900/80 text-slate-100',
+        className
+      )}
+    >
       <div className="font-mono font-bold tabular-nums text-2xl">
         {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
       </div>
-      <div className="text-gray-300 text-sm">Time remaining</div>
+      <div className="mt-1 text-slate-300/80 text-xs uppercase tracking-wider">Time remaining</div>
     </div>
   );
 }

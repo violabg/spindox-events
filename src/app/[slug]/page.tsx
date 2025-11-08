@@ -1,7 +1,8 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import prisma from '@/lib/prisma';
+import { Sparkles, Timer, Trophy } from 'lucide-react';
 import { cacheLife, cacheTag } from 'next/cache';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -13,38 +14,13 @@ type ContestPageParams = {
 
 export default async function ContestPage({ params }: ContestPageParams) {
   return (
-    <>
-      <div className="p-4">
-        <h1 className="mb-8 font-bold text-3xl text-center">Contest Details</h1>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur odio sequi sed quam explicabo, laudantium aut voluptatem vitae fugiat
-          eaque culpa ipsam modi earum laborum est numquam similique itaque saepe.
-        </p>
-      </div>
-      <Suspense
-        fallback={
-          <Card>
-            <CardHeader>
-              <Skeleton className="w-3/4 h-6" />
-              <Skeleton className="w-1/2 h-4" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="mb-2 w-full h-4" />
-              <Skeleton className="w-5/6 h-4" />
-            </CardContent>
-            <CardFooter>
-              <Skeleton className="w-24 h-10" />
-            </CardFooter>
-          </Card>
-        }
-      >
-        <DynamicContent params={params} />
-      </Suspense>
-    </>
+    <Suspense fallback={<ContestSkeleton />}>
+      <ContestContent params={params} />
+    </Suspense>
   );
 }
 
-async function DynamicContent({ params }: ContestPageParams) {
+async function ContestContent({ params }: ContestPageParams) {
   'use cache';
   cacheLife('hours');
   const { slug } = await params;
@@ -58,25 +34,114 @@ async function DynamicContent({ params }: ContestPageParams) {
       id: true,
       name: true,
       description: true,
+      mode: true,
+      timeLimit: true,
+      _count: {
+        select: {
+          questions: true,
+        },
+      },
     },
   });
 
   if (!contest) return notFound();
   cacheTag(`contest-${contest.id}`);
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{contest.name}</CardTitle>
-        <CardDescription>ID: {contest.id}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p>{contest.description}</p>
-      </CardContent>
-      <CardFooter>
-        <Button asChild>
-          <Link href={`/${slug}/questions`}>Start Contest</Link>
-        </Button>
-      </CardFooter>
-    </Card>
+    <div className="space-y-8">
+      <div className="bg-linear-to-br from-slate-900/60 via-slate-900/40 to-slate-900/60 shadow-black/30 shadow-inner p-8 border border-white/5 rounded-3xl">
+        <p className="font-semibold text-slate-400 text-sm uppercase tracking-[0.4em]">Featured Challenge</p>
+        <h2 className="mt-4 font-semibold text-white text-3xl sm:text-4xl">{contest.name}</h2>
+        <p className="mt-4 max-w-2xl text-slate-300 text-base">
+          {contest.description || 'Get ready to test your knowledge and climb the leaderboard.'}
+        </p>
+        <div className="flex flex-wrap gap-3 mt-6 text-slate-200 text-sm">
+          <span className="inline-flex items-center gap-2 bg-emerald-500/10 px-4 py-1.5 border border-emerald-400/40 rounded-full">
+            <span className="bg-emerald-400 rounded-full w-2 h-2" aria-hidden />
+            Active now
+          </span>
+          <span className="inline-flex items-center gap-2 bg-slate-800/60 px-4 py-1.5 border border-slate-500/40 rounded-full">
+            Mode: <strong className="font-semibold text-white">{contest.mode.toLowerCase()}</strong>
+          </span>
+          <span className="inline-flex items-center gap-2 bg-slate-800/60 px-4 py-1.5 border border-slate-500/40 rounded-full">
+            Questions: <strong className="font-semibold text-white">{contest._count.questions}</strong>
+          </span>
+          <span className="inline-flex items-center gap-2 bg-slate-800/60 px-4 py-1.5 border border-slate-500/40 rounded-full">
+            Time limit: <strong className="font-semibold text-white">{contest.timeLimit ? `${contest.timeLimit} min` : 'No limit'}</strong>
+          </span>
+        </div>
+        <div className="flex flex-wrap items-center gap-4 mt-8">
+          <Button size="lg" className="bg-emerald-500 hover:bg-emerald-500/90" asChild>
+            <Link href={`/${slug}/questions`}>Enter Contest</Link>
+          </Button>
+          <p className="text-slate-400 text-sm">You&apos;ll have immediate access to all questions once you start.</p>
+        </div>
+      </div>
+
+      <Card className="bg-slate-900/80 border border-white/5 text-slate-200">
+        <CardHeader>
+          <CardTitle className="text-white">Contest insights</CardTitle>
+          <CardDescription className="text-slate-400">Know the rules before you begin</CardDescription>
+        </CardHeader>
+        <CardContent className="gap-6 grid sm:grid-cols-3">
+          <div className="bg-linear-to-br from-emerald-500/10 via-emerald-500/5 to-slate-950/70 shadow-emerald-500/10 shadow-inner p-5 border border-white/10 rounded-2xl">
+            <div className="flex items-center gap-3 text-emerald-200">
+              <Sparkles className="w-5 h-5" />
+              <p className="text-xs uppercase tracking-wide">Your mission</p>
+            </div>
+            <p className="mt-3 text-slate-200 text-sm">Answer every question and submit when you feel confident with your choices.</p>
+          </div>
+          <div className="bg-linear-to-br from-amber-500/10 via-amber-500/5 to-slate-950/70 shadow-amber-500/10 shadow-inner p-5 border border-white/10 rounded-2xl">
+            <div className="flex items-center gap-3 text-amber-200">
+              <Trophy className="w-5 h-5" />
+              <p className="text-xs uppercase tracking-wide">Scoring</p>
+            </div>
+            <p className="mt-3 text-slate-200 text-sm">Each correct answer boosts your score. Chase multipliers hidden in multi-choice rounds.</p>
+          </div>
+          <div className="bg-linear-to-br from-sky-500/10 via-sky-500/5 to-slate-950/70 shadow-inner shadow-sky-500/10 p-5 border border-white/10 rounded-2xl">
+            <div className="flex items-center gap-3 text-sky-200">
+              <Timer className="w-5 h-5" />
+              <p className="text-xs uppercase tracking-wide">Timing</p>
+            </div>
+            <p className="mt-3 text-slate-200 text-sm">
+              {contest.timeLimit
+                ? 'The clock starts as soon as you begin. Stay sharp and watch the countdown.'
+                : 'No ticking clock today—take a deep breath and plan each answer.'}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function ContestSkeleton() {
+  return (
+    <div className="space-y-8">
+      <div className="bg-slate-900/60 p-8 border border-white/5 rounded-3xl">
+        <Skeleton className="mb-4 w-40 h-3" />
+        <Skeleton className="mb-4 w-3/4 h-10" />
+        <Skeleton className="mb-6 w-2/3 h-4" />
+        <div className="flex flex-wrap gap-3">
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <Skeleton key={idx} className="w-32 h-9" />
+          ))}
+        </div>
+        <Skeleton className="mt-6 w-40 h-11" />
+      </div>
+      <Card className="bg-slate-900/60 border border-white/5">
+        <CardHeader>
+          <Skeleton className="mb-2 w-40 h-5" />
+          <Skeleton className="w-56 h-4" />
+        </CardHeader>
+        <CardContent className="gap-4 grid sm:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, idx) => (
+            <div key={idx} className="space-y-2">
+              <Skeleton className="w-24 h-3" />
+              <Skeleton className="w-32 h-4" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

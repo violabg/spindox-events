@@ -1,15 +1,17 @@
 'use client';
 
 import { submitAnswersAction } from '@/actions/answers/submit-answers';
+import ContestInfo from '@/components/contest/contest-info';
 import { QuestionInput } from '@/components/contest/question-input';
 import Timer from '@/components/contest/timer';
 import { Button } from '@/components/ui/button';
 import { Stepper, StepperIndicator, StepperItem, StepperTrigger } from '@/components/ui/stepper';
 import { submitAnswersSchema } from '@/lib/schemas/contest.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { CheckCircle2, Compass } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, useTransition } from 'react';
-import { FormProvider, useForm, type SubmitHandler } from 'react-hook-form';
+import { useState, useTransition } from 'react';
+import { FormProvider, useForm, useWatch, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { Contest } from './question-pre-form';
 
@@ -19,17 +21,26 @@ type Props = {
 
 type FormData = z.infer<typeof submitAnswersSchema>;
 
+const formatIsoToTime = (value?: string | null) => {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${hours}:${minutes}:${seconds}`;
+};
+
 export default function QuestionForm({ contest }: Props) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isPending, startTransition] = useTransition();
-  const [startedAt, setStartedAt] = useState<string | null>(null);
+  const [startedAt] = useState(() => new Date().toISOString());
+  const [hasTimeExpired, setHasTimeExpired] = useState(false);
   const router = useRouter();
   const steps = Array.from({ length: contest.questions.length }, (_, i) => i + 1);
-
-  // Store start time in frontend when component mounts
-  useEffect(() => {
-    setStartedAt(new Date().toISOString());
-  }, []);
+  const totalQuestions = contest.questions.length;
 
   const methods = useForm<FormData>({
     resolver: zodResolver(submitAnswersSchema),
@@ -43,10 +54,33 @@ export default function QuestionForm({ contest }: Props) {
       ),
     },
   });
-  const { watch, handleSubmit } = methods;
+  const { handleSubmit, control } = methods;
 
+  const answersMap = useWatch({
+    control,
+    name: 'answers',
+  }) as Record<string, { answerIds?: string[] }> | undefined;
   const currentQuestion = contest.questions[currentStep - 1];
-  const selectedAnswers = watch(`answers.${currentQuestion.id}.answerIds`);
+  const selectedAnswers: string[] = Array.isArray(answersMap?.[currentQuestion?.id]?.answerIds)
+    ? (answersMap[currentQuestion.id].answerIds ?? [])
+    : [];
+  const answeredCount = Object.values(answersMap || {}).filter(value => Array.isArray(value.answerIds) && value.answerIds.length > 0).length;
+  const progressPercentage = totalQuestions ? Math.round((answeredCount / totalQuestions) * 100) : 0;
+
+  const handleNext = () => {
+    setCurrentStep(prev => Math.min(prev + 1, totalQuestions));
+  };
+
+  const handlePrev = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1));
+  };
+
+  if (!currentQuestion) {
+    return null;
+  }
+
+  const formattedStartTime = formatIsoToTime(startedAt);
+  const startLabel = formattedStartTime ? `Started ${formattedStartTime}` : 'Started just now';
 
   const onSubmit: SubmitHandler<FormData> = data => {
     const submitData = {
@@ -66,53 +100,123 @@ export default function QuestionForm({ contest }: Props) {
 
   return (
     <FormProvider {...methods}>
-      <div className="space-y-8 mx-auto text-center">
-        <Timer timeLimit={contest.timeLimit} />
-        <div className="space-y-3">
-          <Stepper value={currentStep} onValueChange={setCurrentStep}>
-            {steps.map(step => (
-              <StepperItem key={step} step={step} className="flex-1">
-                <StepperTrigger className="flex-col items-start gap-2 w-full" asChild>
-                  <StepperIndicator asChild className="bg-border rounded-none w-full h-2">
-                    <span className="sr-only">{step}</span>
-                  </StepperIndicator>
-                </StepperTrigger>
-              </StepperItem>
-            ))}
-          </Stepper>
-          <div className="font-medium tabular-nums text-muted-foreground text-sm">
-            Step {currentStep} of {steps.length}
-          </div>
+      <div className="gap-4 md:gap-8 grid grid-cols-1 md:grid-cols-[2fr_1fr] grid-rows-[auto_1fr_auto] md:grid-rows-1 grid-template-areas-['timer'_'questions'_'info'] md:grid-template-areas-['questions side']">
+        {/* Timer for mobile */}
+        <div className="md:hidden top-4 z-20 sticky grid-area-[timer] backdrop-blur-sm">
+          {contest.timeLimit > 0 ? (
+            <div className="w-full">
+              <Timer timeLimit={contest.timeLimit} onTimeUp={() => setHasTimeExpired(true)} className="w-full" />
+              {hasTimeExpired && (
+                <div className="bg-rose-500/10 mt-2 md:mt-4 p-3 md:p-4 border border-rose-500/40 rounded-2xl text-rose-100 text-sm">
+                  Time is up! You can still review your answers and submit when ready.
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="bg-slate-900/60 p-4 md:p-6 border border-white/10 rounded-3xl text-slate-200">
+              <h4 className="font-semibold text-white text-lg">No timer on this contest</h4>
+              <p className="mt-2 text-slate-300 text-sm">Take the time you need—focus on accuracy over speed.</p>
+            </div>
+          )}
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {contest.questions
-            .filter((_, index) => index === currentStep - 1)
-            .map(question => (
+
+        {/* Questions */}
+        <section className="space-y-6 grid-area-[questions]">
+          <div className="bg-slate-900/80 shadow-black/20 shadow-xl p-4 md:p-6 border border-white/10 rounded-3xl text-left">
+            <div className="flex flex-wrap justify-between items-center gap-4">
+              <div>
+                <p className="text-slate-400 text-xs uppercase tracking-[0.4em]">Question {currentStep}</p>
+                <h3 className="mt-1 md:mt-2 font-semibold text-white text-2xl">Stay focused and make your choice</h3>
+              </div>
+              <div className="inline-flex items-center gap-2 bg-emerald-500/10 px-4 py-2 border border-emerald-400/30 rounded-full font-medium text-emerald-100 text-sm">
+                <CheckCircle2 className="w-4 h-4" /> {progressPercentage}% complete
+              </div>
+            </div>
+
+            <div className="mt-4 md:mt-6">
+              <Stepper value={currentStep} onValueChange={setCurrentStep} className="hidden sm:flex">
+                {steps.map(step => (
+                  <StepperItem key={step} step={step} className="flex-1">
+                    <StepperTrigger className="flex-col items-start gap-2 w-full" asChild>
+                      <StepperIndicator asChild className={`h-2 w-full rounded-full ${step <= currentStep ? 'bg-emerald-400' : 'bg-white/10'}`}>
+                        <span className="sr-only">{step}</span>
+                      </StepperIndicator>
+                    </StepperTrigger>
+                  </StepperItem>
+                ))}
+              </Stepper>
+              <div className="mt-2 text-slate-400 text-sm">
+                Step {currentStep} of {steps.length}
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 md:space-y-8 mt-6 md:mt-8">
               <QuestionInput
-                key={question.id}
-                questionId={question.id}
-                title={question.title}
-                content={question.content}
-                type={question.type as 'SINGLE_CHOICE' | 'MULTIPLE_CHOICES'}
-                answers={question.answers}
+                key={currentQuestion.id}
+                questionId={currentQuestion.id}
+                title={currentQuestion.title}
+                content={currentQuestion.content}
+                type={currentQuestion.type as 'SINGLE_CHOICE' | 'MULTIPLE_CHOICES'}
+                answers={currentQuestion.answers}
                 disabled={isPending}
               />
-            ))}
-          {currentStep === steps.length && (
-            <Button type="submit" disabled={isPending} className="w-full">
-              {isPending ? 'Submitting...' : 'Submit Answers'}
-            </Button>
-          )}
-        </form>
-        <div className="flex justify-center space-x-4">
-          {/* <Button variant="outline" className="w-32" onClick={() => setCurrentStep(prev => prev - 1)} disabled={currentStep === 1}>
-            Prev step
-          </Button> */}
-          {currentStep < steps.length && (
-            <Button variant="outline" className="w-32" onClick={() => setCurrentStep(prev => prev + 1)} disabled={selectedAnswers.length === 0}>
-              Next step
-            </Button>
-          )}
+
+              <div className="flex flex-wrap justify-between items-center gap-4 pt-4 md:pt-6 border-white/10 border-t">
+                <div className="flex items-center gap-2 text-slate-400 text-sm">
+                  <Compass className="w-4 h-4" /> {answeredCount} of {totalQuestions} questions answered
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <Button type="button" variant="outline" className="min-w-[120px]" onClick={handlePrev} disabled={currentStep === 1 || isPending}>
+                    Previous
+                  </Button>
+                  {currentStep < steps.length ? (
+                    <Button
+                      type="button"
+                      className="bg-emerald-500 hover:bg-emerald-500/90 min-w-[150px]"
+                      onClick={handleNext}
+                      disabled={selectedAnswers.length === 0 || isPending}
+                    >
+                      Next question
+                    </Button>
+                  ) : (
+                    <Button type="submit" className="bg-emerald-500 hover:bg-emerald-500/90 min-w-[150px]" disabled={isPending}>
+                      {isPending ? 'Submitting...' : hasTimeExpired ? 'Submit (time elapsed)' : 'Submit answers'}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        {/* Info for mobile */}
+        <div className="md:hidden space-y-4 grid-area-[info]">
+          <ContestInfo startLabel={startLabel} totalQuestions={totalQuestions} answeredCount={answeredCount} mode={contest.mode} />
+        </div>
+
+        {/* Side for desktop */}
+        <div className="hidden gap-4 md:gap-8 md:grid grid-cols-1 grid-rows-[auto_1fr] grid-area-[side] grid-template-areas-['timer'_'info']">
+          <div className="top-4 z-20 sticky grid-area-[timer] backdrop-blur-sm">
+            {contest.timeLimit > 0 ? (
+              <div className="w-full">
+                <Timer timeLimit={contest.timeLimit} onTimeUp={() => setHasTimeExpired(true)} className="w-full" />
+                {hasTimeExpired && (
+                  <div className="bg-rose-500/10 mt-2 md:mt-4 p-3 md:p-4 border border-rose-500/40 rounded-2xl text-rose-100 text-sm">
+                    Time is up! You can still review your answers and submit when ready.
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="bg-slate-900/60 p-4 md:p-6 border border-white/10 rounded-3xl text-slate-200">
+                <h4 className="font-semibold text-white text-lg">No timer on this contest</h4>
+                <p className="mt-2 text-slate-300 text-sm">Take the time you need—focus on accuracy over speed.</p>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4 grid-area-[info]">
+            <ContestInfo startLabel={startLabel} totalQuestions={totalQuestions} answeredCount={answeredCount} mode={contest.mode} />
+          </div>
         </div>
       </div>
     </FormProvider>

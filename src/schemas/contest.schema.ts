@@ -13,7 +13,7 @@ export const contestSchema = z.object({
   description: z.string().max(500, 'Description must be less than 500 characters').optional(),
   status: z.enum(ContestStatus),
   mode: z.enum(ContestMode),
-  timeLimit: z.coerce.number().int().min(0, 'Time limit must be 0 or greater').default(0),
+  timeLimit: z.number().int().min(0, 'Time limit must be 0 or greater'),
 });
 
 // Schema for creation (same as base, but can be extended later if needed)
