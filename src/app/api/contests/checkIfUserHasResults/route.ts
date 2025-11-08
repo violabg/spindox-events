@@ -2,16 +2,26 @@ import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
+export type CheckUserHasResultsResponse = {
+  hasSubmitted: boolean;
+};
+
+export async function GET(request: NextRequest) {
   try {
+    // Extract query parameters
+    const slug = request.nextUrl.searchParams.get('slug');
+    const userId = request.nextUrl.searchParams.get('userId');
+
+    if (!slug || !userId) {
+      return NextResponse.json({ error: 'Missing required parameters: slug and userId' }, { status: 400 });
+    }
+
     // Check authentication
     const session = await auth.api.getSession({ headers: request.headers });
 
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const { slug } = await params;
 
     // Retrieve contest by slug
     const contest = await prisma.contest.findUnique({
@@ -25,7 +35,7 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
     // Check if user has already submitted answers for this contest
     const existingSubmission = await prisma.submission.findFirst({
       where: {
-        userId: session.user.id,
+        userId: userId,
         contestId: contest.id,
       },
     });
@@ -33,7 +43,7 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
     const hasSubmitted = !!existingSubmission;
 
     // Format response
-    const response = {
+    const response: CheckUserHasResultsResponse = {
       hasSubmitted,
     };
 

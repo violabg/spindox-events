@@ -2,11 +2,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton';
 import prisma from '@/lib/prisma';
 import { cacheLife, cacheTag } from 'next/cache';
-import { ReadonlyHeaders } from 'next/dist/server/web/spec-extension/adapters/headers';
-import { headers } from 'next/headers';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
-import QuestionForm from './question-form';
+import QuestionPreForm from './question-pre-form';
 
 type ContestPageParams = {
   params: Promise<{ slug: string }>;
@@ -21,7 +19,7 @@ export default async function ContestPage({ params }: ContestPageParams) {
       </CardHeader>
       <CardContent>
         <Suspense fallback={<QuestionFormSkeleton />}>
-          <DynamicContent params={params} reqHeaders={headers()} />
+          <DynamicContent params={params} />
         </Suspense>
       </CardContent>
     </Card>
@@ -69,18 +67,10 @@ function QuestionFormSkeleton() {
   );
 }
 
-async function DynamicContent({
-  params,
-  reqHeaders,
-}: {
-  params: Promise<{ slug: string }>;
-
-  reqHeaders: Promise<ReadonlyHeaders>;
-}) {
+async function DynamicContent({ params }: { params: Promise<{ slug: string }> }) {
   'use cache';
   cacheLife('hours');
   const { slug } = await params;
-  const headersInstance = await reqHeaders;
 
   const contest = await prisma.contest.findUnique({
     where: {
@@ -112,14 +102,14 @@ async function DynamicContent({
   if (!contest) return notFound();
 
   // Check if user already submitted
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  const checkResultPromise = await fetch(`${baseUrl}/api/contests/${contest.slug}/checkIfUserHasResults`, {
-    headers: headersInstance,
-  });
-  const result = await checkResultPromise.json();
-  if (result.hasSubmitted) {
-    redirect(`/${slug}/results`);
-  }
+  // const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  // const checkResultPromise = await fetch(`${baseUrl}/api/contests/${contest.slug}/checkIfUserHasResults`, {
+  //   headers: headersInstance,
+  // });
+  // const result = await checkResultPromise.json();
+  // if (result.hasSubmitted) {
+  //   redirect(`/${slug}/results`);
+  // }
   cacheTag(`contest-${contest.id}`);
-  return <QuestionForm contest={contest} />;
+  return <QuestionPreForm contest={contest} />;
 }

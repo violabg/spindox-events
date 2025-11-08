@@ -5,33 +5,12 @@ import { QuestionInput } from '@/components/contest/question-input';
 import { Button } from '@/components/ui/button';
 import { Stepper, StepperIndicator, StepperItem, StepperTrigger } from '@/components/ui/stepper';
 import { submitAnswersSchema } from '@/lib/schemas/contest.schema';
-import { Prisma } from '@/prisma/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { FormProvider, useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
-
-type Contest = Prisma.ContestGetPayload<{
-  include: {
-    questions: {
-      select: {
-        id: true;
-        title: true;
-        content: true;
-        type: true;
-        order: true;
-        answers: {
-          select: {
-            id: true;
-            content: true;
-            score: true;
-          };
-        };
-      };
-    };
-  };
-}>;
+import { Contest } from './question-pre-form';
 
 type Props = {
   contest: Contest;
