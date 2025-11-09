@@ -25,7 +25,7 @@ export default async function Layout({ children }: Readonly<{ children: React.Re
       <main className="relative overflow-visible">
         <div className="absolute inset-0 bg-linear-to-br from-sky-500/5 via-fuchsia-500/5 to-emerald-500/5" aria-hidden />
         <section className="relative px-3 sm:px-6 py-6 sm:py-14">
-          <div className="mx-auto max-w-5xl">
+          <div className="mx-auto max-w-7xl">
             <div className="space-y-8 sm:space-y-10">{children}</div>
           </div>
         </section>
