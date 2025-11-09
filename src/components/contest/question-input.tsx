@@ -21,7 +21,7 @@ interface AnswerDisplayProps {
 
 function AnswerDisplay({ content }: AnswerDisplayProps) {
   return (
-    <div className="max-w-none text-sm prose prose-sm">
+    <div className="w-full max-w-none text-sm prose prose-sm">
       <ReactMarkdown
         components={{
           // use `any` here because react-markdown's types for components differ
@@ -90,7 +90,6 @@ export function QuestionInput({
   showCorrectAnswers = false,
   correctAnswerIds = [],
 }: QuestionInputProps) {
-  console.log('🚀 ~ QuestionInput ~ answers:', answers);
   const { control } = useFormContext();
 
   if (type === QuestionType.SINGLE_CHOICE) {
@@ -115,7 +114,7 @@ export function QuestionInput({
                     else if (selected) containerClass = 'bg-red-600 hover:bg-red-700 text-white';
                   }
                   return (
-                    <div key={answer.id} className={`w-full flex items-start space-x-3 px-2 py-2 rounded-md cursor-pointer ${containerClass}`}>
+                    <div key={answer.id} className={`w-full flex items-center space-x-3 px-2 py-2 rounded-md cursor-pointer ${containerClass}`}>
                       <RadioGroupItem value={answer.id} id={answer.id} disabled={disabled} className="mt-1" />
                       <Label htmlFor={answer.id} className="flex-1 text-sm cursor-pointer">
                         <AnswerDisplay content={answer.content} />
@@ -154,7 +153,7 @@ export function QuestionInput({
               }
               return (
                 <>
-                  <div className={`w-full flex items-start space-x-3 p-2 rounded-md cursor-pointer ${containerClass}`}>
+                  <div className={`w-full flex items-center space-x-3 p-2 rounded-md cursor-pointer ${containerClass}`}>
                     <Checkbox
                       id={answer.id}
                       checked={isChecked}
