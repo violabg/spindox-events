@@ -11,7 +11,8 @@ export async function generateQuestionWithAI(
   numAnswers: number,
   isMultipleCorrect: boolean,
   difficulty: Difficulty,
-  language: Language
+  language: Language,
+  generateCode: boolean = false
 ): Promise<AIResponse> {
   const languageInstructions = language === 'italian' ? 'Italian' : 'English';
 
@@ -21,7 +22,7 @@ Generate a ${isMultipleCorrect ? 'multiple choice question with multiple correct
 The question should be appropriate for difficulty level: ${difficulty}.
 Generate exactly ${numAnswers} answer options.
 ${isMultipleCorrect ? 'Mark 2 or more answers as correct.' : 'Mark exactly 1 answer as correct.'}
-For multiple correct answers, assign weight values (0-1) indicating relative importance of each correct answer.`;
+For multiple correct answers, assign weight values (0-1) indicating relative importance of each correct answer.${generateCode ? ' Additionally, generate a relevant code snippet in markdown format with proper language annotation (e.g., ```javascript\ncode\n```).' : ''}`;
 
   const userPrompt = `Create a quiz question based on: ${prompt}
 
@@ -30,7 +31,7 @@ Requirements:
 - All answers should be plausible
 - No typos or grammar errors
 - Appropriate difficulty level: ${difficulty}
-- All generated text MUST be in ${languageInstructions}.`;
+- All generated text MUST be in ${languageInstructions}.${generateCode ? ' Include a code snippet related to the question.' : ''}`;
 
   try {
     const result = await generateObject({

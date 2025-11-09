@@ -17,9 +17,9 @@ import { FieldBase, FieldInput, FieldSelect, FieldTextarea } from '@/components/
 import { AIQuestionModal } from '@/components/modals';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { GeneratedQuestion } from '@/lib/schemas/ai-question.schema';
+import { QuestionType } from '@/prisma/enums';
 import { questionSchema, type QuestionData } from '@/schemas/question.schema';
 import { toast } from 'sonner';
-import { QuestionType } from '@/prisma/enums';
 
 type QuestionFormData = QuestionData;
 
@@ -74,7 +74,7 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
   const handleAIGenerated = (generatedQuestion: GeneratedQuestion) => {
     // Update form with generated data
     form.setValue('title', generatedQuestion.title);
-    form.setValue('content', generatedQuestion.content);
+    form.setValue('content', generatedQuestion.content + (generatedQuestion.codeSnippet ? '\n\n' + generatedQuestion.codeSnippet : ''));
     // If the generated question includes a `type`, use it to set the form's question type
     if (generatedQuestion.type) {
       form.setValue('type', generatedQuestion.type as 'SINGLE_CHOICE' | 'MULTIPLE_CHOICES');
@@ -176,7 +176,7 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
                       name={`answers.${index}.content`}
                       label={`Answer ${String.fromCharCode(65 + index)}`}
                       placeholder={`Enter answer ${String.fromCharCode(65 + index)}...`}
-                      maxLength={200}
+                      maxLength={300}
                       disableFieldError={true}
                     />
 
@@ -238,7 +238,7 @@ export default function QuestionForm({ contestId, question }: QuestionFormProps)
         {/* Display server-side errors */}
         {error && <div className="bg-destructive/10 p-3 rounded-md text-destructive text-sm">{error}</div>}
 
-        <div className="flex sm:flex-row flex-col gap-3 sm:gap-4 sm:justify-end">
+        <div className="flex sm:flex-row flex-col sm:justify-end gap-3 sm:gap-4">
           <Button
             type="button"
             variant="outline"

@@ -24,7 +24,8 @@ export async function generateQuestion(input: unknown): Promise<GenerateQuestion
       validated.numAnswers,
       validated.isMultipleCorrect,
       validated.difficulty,
-      validated.language
+      validated.language,
+      validated.generateCode
     );
 
     // Calculate scores based on type and difficulty
@@ -37,6 +38,7 @@ export async function generateQuestion(input: unknown): Promise<GenerateQuestion
       data: {
         title: aiResponse.question.title,
         content: aiResponse.question.content,
+        codeSnippet: aiResponse.question.codeSnippet,
         answers: aiResponse.answers.map((answer, index) => ({
           content: answer.content,
           score: scores[index],

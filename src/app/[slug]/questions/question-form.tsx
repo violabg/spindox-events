@@ -6,7 +6,7 @@ import { QuestionInput } from '@/components/contest/question-input';
 import Timer from '@/components/contest/timer';
 import { Button } from '@/components/ui/button';
 import { Stepper, StepperIndicator, StepperItem, StepperTrigger } from '@/components/ui/stepper';
-import { submitAnswersSchema } from '@/lib/schemas/contest.schema';
+import { submitAnswersClientSchema } from '@/lib/schemas/contest.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CheckCircle2, Compass } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -19,7 +19,7 @@ type Props = {
   contest: Contest;
 };
 
-type FormData = z.infer<typeof submitAnswersSchema>;
+type FormData = z.infer<typeof submitAnswersClientSchema>;
 
 const formatIsoToTime = (value?: string | null) => {
   if (!value) return null;
@@ -43,7 +43,7 @@ export default function QuestionForm({ contest }: Props) {
   const totalQuestions = contest.questions.length;
 
   const methods = useForm<FormData>({
-    resolver: zodResolver(submitAnswersSchema),
+    resolver: zodResolver(submitAnswersClientSchema),
     defaultValues: {
       answers: contest.questions.reduce(
         (acc, q) => {
@@ -52,6 +52,7 @@ export default function QuestionForm({ contest }: Props) {
         },
         {} as Record<string, { answerIds: string[] }>
       ),
+      hasTimeExpired: false,
     },
   });
   const { handleSubmit, control } = methods;
@@ -83,8 +84,10 @@ export default function QuestionForm({ contest }: Props) {
   const startLabel = formattedStartTime ? `Started ${formattedStartTime}` : 'Started just now';
 
   const onSubmit: SubmitHandler<FormData> = data => {
+    // Only include answered questions so server-side Zod validation passes
+    const answeredEntries = Object.entries(data.answers).filter(([, { answerIds }]) => Array.isArray(answerIds) && answerIds.length > 0);
     const submitData = {
-      answers: Object.entries(data.answers).map(([questionId, { answerIds }]) => ({ questionId, answerIds })),
+      answers: answeredEntries.map(([questionId, { answerIds }]) => ({ questionId, answerIds })),
       startedAt: startedAt || new Date().toISOString(),
     };
 
@@ -105,7 +108,15 @@ export default function QuestionForm({ contest }: Props) {
         <div className="md:hidden top-4 z-20 sticky grid-area-[timer] backdrop-blur-sm">
           {contest.timeLimit > 0 ? (
             <div className="w-full">
-              <Timer timeLimit={contest.timeLimit} onTimeUp={() => setHasTimeExpired(true)} className="w-full" />
+              <Timer
+                timeLimit={contest.timeLimit}
+                onTimeUp={() => {
+                  setHasTimeExpired(true);
+                  // reflect in the form value so client validation knows time expired
+                  methods.setValue('hasTimeExpired', true);
+                }}
+                className="w-full"
+              />
               {hasTimeExpired && (
                 <div className="bg-rose-500/10 mt-2 md:mt-4 p-3 md:p-4 border border-rose-500/40 rounded-2xl text-rose-100 text-sm">
                   Time is up! You can still review your answers and submit when ready.
@@ -134,7 +145,13 @@ export default function QuestionForm({ contest }: Props) {
             </div>
 
             <div className="mt-4 md:mt-6">
-              <Stepper value={currentStep} onValueChange={setCurrentStep} className="hidden sm:flex">
+              <Stepper
+                value={currentStep}
+                onValueChange={val => {
+                  if (!hasTimeExpired) setCurrentStep(val);
+                }}
+                className="flex"
+              >
                 {steps.map(step => (
                   <StepperItem key={step} step={step} className="flex-1">
                     <StepperTrigger className="flex-col items-start gap-2 w-full" asChild>
@@ -158,7 +175,7 @@ export default function QuestionForm({ contest }: Props) {
                 content={currentQuestion.content}
                 type={currentQuestion.type as 'SINGLE_CHOICE' | 'MULTIPLE_CHOICES'}
                 answers={currentQuestion.answers}
-                disabled={isPending}
+                disabled={isPending || hasTimeExpired}
               />
 
               <div className="flex flex-wrap justify-between items-center gap-4 pt-4 md:pt-6 border-white/10 border-t">
@@ -166,23 +183,32 @@ export default function QuestionForm({ contest }: Props) {
                   <Compass className="w-4 h-4" /> {answeredCount} of {totalQuestions} questions answered
                 </div>
                 <div className="flex flex-wrap gap-3">
-                  <Button type="button" variant="outline" className="min-w-[120px]" onClick={handlePrev} disabled={currentStep === 1 || isPending}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={`min-w-[120px] ${hasTimeExpired ? 'hidden' : ''}`}
+                    onClick={handlePrev}
+                    disabled={currentStep === 1 || isPending || hasTimeExpired}
+                  >
                     Previous
                   </Button>
-                  {currentStep < steps.length ? (
-                    <Button
-                      type="button"
-                      className="bg-emerald-500 hover:bg-emerald-500/90 min-w-[150px]"
-                      onClick={handleNext}
-                      disabled={selectedAnswers.length === 0 || isPending}
-                    >
-                      Next question
-                    </Button>
-                  ) : (
-                    <Button type="submit" className="bg-emerald-500 hover:bg-emerald-500/90 min-w-[150px]" disabled={isPending}>
-                      {isPending ? 'Submitting...' : hasTimeExpired ? 'Submit (time elapsed)' : 'Submit answers'}
-                    </Button>
-                  )}
+
+                  <Button
+                    type="button"
+                    className={`bg-emerald-500 hover:bg-emerald-500/90 min-w-[150px] ${hasTimeExpired || currentStep === steps.length ? 'hidden' : ''}`}
+                    onClick={handleNext}
+                    disabled={selectedAnswers.length === 0 || isPending || hasTimeExpired || currentStep === steps.length}
+                  >
+                    Next question
+                  </Button>
+
+                  <Button
+                    type="submit"
+                    className={`bg-emerald-500 hover:bg-emerald-500/90 min-w-[150px] ${hasTimeExpired || currentStep === steps.length ? '' : 'hidden'}`}
+                    disabled={isPending}
+                  >
+                    {isPending ? 'Submitting...' : hasTimeExpired ? 'Submit answers (time elapsed)' : 'Submit answers'}
+                  </Button>
                 </div>
               </div>
             </form>

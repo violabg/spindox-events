@@ -11,6 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import type { Resolver } from 'react-hook-form';
 import { useForm, useWatch } from 'react-hook-form';
 
 type ContestFormData = ContestData;
@@ -27,7 +28,7 @@ export default function ContestForm({ contestId, initialData }: ContestFormProps
   const isEditMode = !!contestId;
 
   const form = useForm<ContestFormData>({
-    resolver: zodResolver(contestSchema),
+    resolver: zodResolver(contestSchema) as Resolver<ContestFormData>,
     defaultValues: {
       name: initialData?.name || '',
       slug: initialData?.slug || '',

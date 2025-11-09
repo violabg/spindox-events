@@ -19,7 +19,6 @@ export default function Timer({ timeLimit, onTimeUp, className }: TimerProps) {
       setTimeLeft(prev => {
         if (prev <= 1) {
           clearInterval(interval);
-          onTimeUp?.();
           return 0;
         }
         return prev - 1;
@@ -28,6 +27,17 @@ export default function Timer({ timeLimit, onTimeUp, className }: TimerProps) {
 
     return () => clearInterval(interval);
   }, [timeLimit, onTimeUp]);
+
+  // Call onTimeUp from an effect when timeLeft reaches 0. Calling parent's setState
+  // directly during the child's state update can trigger the React warning about
+  // updating a component while rendering another. Using an effect ensures the
+  // callback runs after render.
+  useEffect(() => {
+    if (timeLeft === 0) {
+      // call asynchronously to be extra-safe
+      Promise.resolve().then(() => onTimeUp?.());
+    }
+  }, [timeLeft, onTimeUp]);
 
   if (timeLimit === 0) return null;
 

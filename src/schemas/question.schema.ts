@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Answer schema for nested use in questions
 export const answerSchema = z.object({
   id: z.cuid().optional(),
-  content: z.string().min(1, 'Answer content is required').max(200, 'Answer must be less than 200 characters'),
+  content: z.string().min(1, 'Answer content is required').max(300, 'Answer must be less than 300 characters'),
   score: z.number().int().min(0, 'Score must be 0 or greater'),
 });
 

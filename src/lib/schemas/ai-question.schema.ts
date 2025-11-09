@@ -23,6 +23,7 @@ export const GenerateQuestionInputSchema = z.object({
   isMultipleCorrect: z.boolean(),
   difficulty: DifficultyEnum,
   language: LanguageEnum,
+  generateCode: z.boolean().default(false),
   contestId: z.string().cuid('Invalid contest ID'),
 });
 
@@ -39,6 +40,7 @@ export const AIResponseSchema = z.object({
   question: z.object({
     title: z.string().min(5, 'Title too short').max(200, 'Title too long'),
     content: z.string().min(10, 'Content too short').max(2000, 'Content too long'),
+    codeSnippet: z.string().optional(),
   }),
   answers: z.array(AIAnswerSchema).min(2, 'Must have at least 2 answers').max(6, 'Cannot exceed 6 answers'),
 });
@@ -49,6 +51,7 @@ export type AIResponse = z.infer<typeof AIResponseSchema>;
 export const GeneratedQuestionSchema = z.object({
   title: z.string(),
   content: z.string(),
+  codeSnippet: z.string().optional(),
   answers: z.array(
     z.object({
       content: z.string(),

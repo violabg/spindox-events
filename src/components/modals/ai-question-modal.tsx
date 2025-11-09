@@ -32,6 +32,7 @@ export function AIQuestionModal({ open, onOpenChange, contestId, onGenerated }: 
       isMultipleCorrect: false,
       difficulty: 'medium' as const,
       language: 'english' as const,
+      generateCode: false,
       contestId,
     },
   });
@@ -172,12 +173,28 @@ export function AIQuestionModal({ open, onOpenChange, contestId, onGenerated }: 
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="generateCode"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                  <FormControl>
+                    <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled={isGenerating} />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Generate Code Snippet</FormLabel>
+                    <FormDescription>Include a relevant code example in the question</FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
+
             <div className="flex gap-2 pt-4">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isGenerating} className="flex-1">
                 Cancel
               </Button>
               <Button type="submit" disabled={isGenerating} className="flex-1">
-                {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isGenerating && <Loader2 className="mr-2 w-4 h-4 animate-spin" />}
                 {isGenerating ? 'Generating...' : 'Generate'}
               </Button>
             </div>

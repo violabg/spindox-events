@@ -11,6 +11,37 @@ export const submitAnswersSchema = z.object({
 
 export type SubmitAnswersRequest = z.infer<typeof submitAnswersSchema>;
 
+// Client-side schema used by the form. It includes a `hasTimeExpired` flag and
+// conditionally requires at least one answer per question only when
+// `hasTimeExpired` is false. This prevents client-side validation blocking
+// submission when the timer expires and the user wants to submit partial answers.
+export const submitAnswersClientSchema = z
+  .object({
+    answers: z.record(
+      z.string(),
+      z.object({
+        answerIds: z.array(z.string()),
+      })
+    ),
+    hasTimeExpired: z.boolean(),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.hasTimeExpired) {
+      // ensure every question has at least one answer selected
+      for (const [questionId, { answerIds }] of Object.entries(data.answers || {})) {
+        if (!Array.isArray(answerIds) || answerIds.length === 0) {
+          ctx.addIssue({
+            path: ['answers', questionId, 'answerIds'],
+            code: 'custom',
+            message: 'At least one answer must be selected',
+          });
+        }
+      }
+    }
+  });
+
+export type SubmitAnswersClient = z.infer<typeof submitAnswersClientSchema>;
+
 export const contestResponseSchema = z.object({
   contest: z.object({
     id: z.string(),
