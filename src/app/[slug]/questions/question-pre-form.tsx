@@ -76,7 +76,7 @@ export default function QuestionPreForm({ contest }: Props) {
     <div className="space-y-8">
       <Card className="hidden sm:block bg-slate-900/70 border border-white/10 text-slate-200">
         <CardHeader className="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-3">
-          <div>
+          <div className="flex flex-col gap-2 mb-4">
             <CardTitle className="font-semibold text-white text-2xl">{contest.name}</CardTitle>
             <CardDescription className="text-slate-400">{contest.description || 'Select the best answers to climb the leaderboard.'}</CardDescription>
           </div>
