@@ -18,11 +18,29 @@ export async function generateQuestionWithAI(
 
   // Build structured prompt for the LLM
   const systemPrompt = `You are an educational content expert creating high-quality quiz questions in ${languageInstructions}.
-Generate a ${isMultipleCorrect ? 'multiple choice question with multiple correct answers' : 'multiple choice question with one correct answer'}.
-The question should be appropriate for difficulty level: ${difficulty}.
-Generate exactly ${numAnswers} answer options.
-${isMultipleCorrect ? 'Mark 2 or more answers as correct.' : 'Mark exactly 1 answer as correct.'}
-For multiple correct answers, assign weight values (0-1) indicating relative importance of each correct answer.${generateCode ? ' Additionally, generate a relevant code snippet in markdown format with proper language annotation (e.g., ```javascript\ncode\n```).' : ''}`;
+
+QUESTION REQUIREMENTS:
+- Generate a ${isMultipleCorrect ? 'multiple choice question with multiple correct answers' : 'multiple choice question with one correct answer'}
+- Difficulty level: ${difficulty}
+- Generate exactly ${numAnswers} answer options
+- ${isMultipleCorrect ? 'Mark 2 or more answers as correct with weight values (0-1) indicating relative importance' : 'Mark exactly 1 answer as correct'}
+
+${
+  generateCode
+    ? `CODE REQUIREMENTS:
+- Include a relevant code snippet in the question content
+- Format code blocks with proper markdown: \`\`\`language\\ncode\\n\`\`\`
+- If answers contain code, wrap each code snippet with language annotation
+- Infer programming language from context if not specified (e.g., React → typescript, Node.js → javascript)
+- Always include newline after language annotation in code fences`
+    : ''
+}
+
+QUALITY STANDARDS:
+- Clear, unambiguous question wording
+- Plausible but distinct answer options
+- No typos or grammatical errors
+- Appropriate difficulty for target audience`;
 
   const userPrompt = `Create a quiz question based on: ${prompt}
 

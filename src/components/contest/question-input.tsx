@@ -5,11 +5,68 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { QuestionType } from '@/prisma/enums';
 import { Controller, useFormContext } from 'react-hook-form';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { QuestionDisplay } from './question-display';
 
 interface Answer {
   id: string;
   content: string;
+}
+
+interface AnswerDisplayProps {
+  content: string;
+}
+
+function AnswerDisplay({ content }: AnswerDisplayProps) {
+  return (
+    <div className="max-w-none text-sm prose prose-sm">
+      <ReactMarkdown
+        components={{
+          // use `any` here because react-markdown's types for components differ
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          code: (props: any) => {
+            const { inline, className, children: codeChildren } = props;
+            const classAttr = className || '';
+            const match = /language-(\w+)/.exec(classAttr);
+            const code = String(codeChildren || '');
+
+            if (!inline && match) {
+              return (
+                <SyntaxHighlighter
+                  style={oneDark}
+                  language={match[1]}
+                  PreTag="div"
+                  wrapLongLines={true}
+                  wrapLines={true}
+                  // ensure code blocks wrap on small screens
+                  codeTagProps={{
+                    style: {
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-word',
+                      overflowWrap: 'anywhere',
+                    },
+                  }}
+                  {...props}
+                >
+                  {code.replace(/\n$/, '')}
+                </SyntaxHighlighter>
+              );
+            }
+
+            return (
+              <code className={className} {...props}>
+                {codeChildren}
+              </code>
+            );
+          },
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
 }
 
 interface QuestionInputProps {
@@ -33,6 +90,7 @@ export function QuestionInput({
   showCorrectAnswers = false,
   correctAnswerIds = [],
 }: QuestionInputProps) {
+  console.log('🚀 ~ QuestionInput ~ answers:', answers);
   const { control } = useFormContext();
 
   if (type === QuestionType.SINGLE_CHOICE) {
@@ -57,10 +115,10 @@ export function QuestionInput({
                     else if (selected) containerClass = 'bg-red-600 hover:bg-red-700 text-white';
                   }
                   return (
-                    <div key={answer.id} className={`w-full flex items-center space-x-3 px-2 rounded-md cursor-pointer ${containerClass}`}>
-                      <RadioGroupItem value={answer.id} id={answer.id} disabled={disabled} />
+                    <div key={answer.id} className={`w-full flex items-start space-x-3 px-2 py-2 rounded-md cursor-pointer ${containerClass}`}>
+                      <RadioGroupItem value={answer.id} id={answer.id} disabled={disabled} className="mt-1" />
                       <Label htmlFor={answer.id} className="flex-1 text-sm cursor-pointer">
-                        {answer.content}
+                        <AnswerDisplay content={answer.content} />
                       </Label>
                     </div>
                   );
@@ -96,7 +154,7 @@ export function QuestionInput({
               }
               return (
                 <>
-                  <div className={`w-full flex items-center space-x-3 p-2 rounded-md cursor-pointer ${containerClass}`}>
+                  <div className={`w-full flex items-start space-x-3 p-2 rounded-md cursor-pointer ${containerClass}`}>
                     <Checkbox
                       id={answer.id}
                       checked={isChecked}
@@ -106,9 +164,10 @@ export function QuestionInput({
                         field.onChange(newAnswers);
                       }}
                       disabled={disabled}
+                      className="mt-1"
                     />
                     <Label htmlFor={answer.id} className="flex-1 text-sm cursor-pointer">
-                      {answer.content}
+                      <AnswerDisplay content={answer.content} />
                     </Label>
                   </div>
                   {fieldState.error?.message && <p className="mt-1 text-destructive text-sm">{String(fieldState.error.message)}</p>}

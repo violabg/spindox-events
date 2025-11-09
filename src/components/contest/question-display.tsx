@@ -13,12 +13,12 @@ interface QuestionDisplayProps {
 
 export function QuestionDisplay({ title, content, children }: QuestionDisplayProps) {
   return (
-    <div className="bg-background/5 border border-border rounded-md p-4">
+    <div className="bg-background/5 p-4 border border-border rounded-md">
       <div className="mb-4">
-        <h3 className="text-lg font-semibold">{title}</h3>
+        <h3 className="font-semibold text-lg">{title}</h3>
       </div>
 
-      <div className="prose max-w-none mb-4 text-sm text-muted-foreground">
+      <div className="mb-4 max-w-none text-muted-foreground text-sm prose">
         <ReactMarkdown
           components={{
             // use `any` here because react-markdown's types for components differ
@@ -31,7 +31,22 @@ export function QuestionDisplay({ title, content, children }: QuestionDisplayPro
 
               if (!inline && match) {
                 return (
-                  <SyntaxHighlighter style={oneDark} language={match[1]} PreTag="div" {...props}>
+                  <SyntaxHighlighter
+                    style={oneDark}
+                    language={match[1]}
+                    PreTag="div"
+                    wrapLongLines={true}
+                    wrapLines={true}
+                    // ensure code blocks wrap on small screens
+                    codeTagProps={{
+                      style: {
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        overflowWrap: 'anywhere',
+                      },
+                    }}
+                    {...props}
+                  >
                     {code.replace(/\n$/, '')}
                   </SyntaxHighlighter>
                 );
@@ -49,7 +64,7 @@ export function QuestionDisplay({ title, content, children }: QuestionDisplayPro
         </ReactMarkdown>
       </div>
 
-      <div className="pt-4 border-t border-border">{children}</div>
+      <div className="pt-4 border-border border-t">{children}</div>
     </div>
   );
 }
