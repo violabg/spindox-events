@@ -127,7 +127,6 @@ export default function ContestsTable({ contests }: ContestsTableProps) {
       <TableHeader>
         <TableRow>
           <TableHead>Name</TableHead>
-          <TableHead>Slug</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Questions</TableHead>
           <TableHead>Participants</TableHead>
@@ -151,7 +150,6 @@ export default function ContestsTable({ contests }: ContestsTableProps) {
           return (
             <TableRow key={contest.id}>
               <TableCell className="font-medium">{contest.name}</TableCell>
-              <TableCell className="font-mono text-sm">{contest.slug}</TableCell>
               <TableCell>
                 <Badge variant={contest.status === 'active' ? 'default' : 'secondary'}>{contest.status === 'active' ? 'Active' : 'Inactive'}</Badge>
               </TableCell>

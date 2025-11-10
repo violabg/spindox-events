@@ -55,6 +55,9 @@ export async function updateQuestionAction(contestId: string, questionId: string
     updateTag(`contest-${contestId}`);
     // Revalidate the contest page
     revalidatePath(`/admin/contests/${validatedContestId}`);
+    revalidatePath(`/admin/contests/${validatedContestId}/questions`);
+    revalidatePath(`/admin/contests/${validatedContestId}/questions/${validatedQuestionId}`);
+    revalidatePath(`/admin/contests/${validatedContestId}/questions/${validatedQuestionId}/edit`);
 
     return {
       success: true,

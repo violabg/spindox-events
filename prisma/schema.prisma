@@ -29,6 +29,24 @@ enum QuestionType {
   MULTIPLE_CHOICES
 }
 
+enum AgeRange {
+  UNDER_18
+  BETWEEN_18_30
+  BETWEEN_31_50
+  OVER_50
+}
+
+enum JobTitle {
+  Developer
+  Designer
+  Tester
+  Manager
+  Director
+  Analyst
+  ProductManager
+  Other
+}
+
 model User {
   id String @id @default(cuid())
 
@@ -43,6 +61,10 @@ model User {
   banned     Boolean?  @default(false)
   banReason  String?
   banExpires DateTime?
+
+  ageRange    AgeRange?
+  companyName String?
+  jobTitle    JobTitle?
 
   sessions Session[]
   accounts Account[]
@@ -109,13 +131,16 @@ model Verification {
 model Contest {
   id String @id @default(cuid())
 
-  name        String
-  slug        String        @unique
-  theme       String?
-  description String?
-  status      ContestStatus @default(active)
-  mode        ContestMode   @default(SINGLE)
-  timeLimit  Int          @default(0)
+  name                    String
+  slug                    String        @unique
+  theme                   String?
+  description             String?
+  status                  ContestStatus @default(active)
+  mode                    ContestMode   @default(SINGLE)
+  timeLimit               Int           @default(0)
+  requireCompletedProfile Boolean       @default(false)
+  showFinalResults        Boolean       @default(false)
+  showLeaderboard         Boolean       @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt

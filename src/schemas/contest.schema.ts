@@ -14,6 +14,9 @@ export const contestSchema = z.object({
   status: z.enum(ContestStatus),
   mode: z.enum(ContestMode),
   timeLimit: z.coerce.number().int().min(0, 'Time limit must be 0 or greater'),
+  requireCompletedProfile: z.boolean().default(false),
+  showFinalResults: z.boolean().default(false),
+  showLeaderboard: z.boolean().default(true),
 });
 
 // Schema for creation (same as base, but can be extended later if needed)
