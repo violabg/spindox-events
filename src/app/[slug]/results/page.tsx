@@ -6,6 +6,7 @@ import { ContestMode, QuestionType } from '@/prisma/enums';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { headers } from 'next/headers';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
 type Params = {
@@ -60,7 +61,8 @@ async function DynamicContent({ params }: Params) {
   });
 
   if (!attempt) {
-    throw new Error('No attempt found');
+    // If the user has no attempt, redirect them back to the contest page
+    return redirect(`/${slug}`);
   }
 
   const answersByQuestion = attempt.userAnswers.reduce<Record<string, string[]>>((acc, ua) => {
