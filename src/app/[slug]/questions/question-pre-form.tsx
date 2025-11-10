@@ -89,7 +89,7 @@ export default function QuestionPreForm({ contest }: Props) {
         <CardContent className="gap-6 grid sm:grid-cols-3 text-slate-700 dark:text-slate-300 text-sm">
           <div className="bg-slate-100/60 dark:bg-slate-900/60 p-4 border border-slate-300/10 dark:border-white/10 rounded-2xl">
             <p className="mb-1 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wide">Contest mode</p>
-            <p className="font-semibold text-slate-900 dark:text-white">{contest.mode}</p>
+            <p className="font-semibold text-slate-900 dark:text-white">{contest.allowMultipleAttempts ? 'Multiple attempts' : 'Single attempt'}</p>
           </div>
           <div className="bg-slate-100/60 dark:bg-slate-900/60 p-4 border border-slate-300/10 dark:border-white/10 rounded-2xl">
             <p className="mb-1 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wide">Time limit</p>

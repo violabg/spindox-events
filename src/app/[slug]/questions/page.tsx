@@ -149,7 +149,7 @@ async function DynamicContent({ params }: { params: Promise<{ slug: string }> })
   const contest = await prisma.contest.findUnique({
     where: {
       slug,
-      status: 'active',
+      active: true,
     },
     include: {
       questions: {

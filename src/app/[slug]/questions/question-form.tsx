@@ -223,7 +223,12 @@ export default function QuestionForm({ contest }: Props) {
 
         {/* Info for mobile */}
         <div className="md:hidden space-y-4 grid-area-[info]">
-          <ContestInfo startLabel={startLabel} totalQuestions={totalQuestions} answeredCount={answeredCount} mode={contest.mode} />
+          <ContestInfo
+            startLabel={startLabel}
+            totalQuestions={totalQuestions}
+            answeredCount={answeredCount}
+            mode={contest.allowMultipleAttempts ? 'Multiple attempts' : 'Single attempt'}
+          />
         </div>
 
         {/* Side for desktop */}
@@ -247,7 +252,12 @@ export default function QuestionForm({ contest }: Props) {
           </div>
 
           <div className="space-y-4 grid-area-[info]">
-            <ContestInfo startLabel={startLabel} totalQuestions={totalQuestions} answeredCount={answeredCount} mode={contest.mode} />
+            <ContestInfo
+              startLabel={startLabel}
+              totalQuestions={totalQuestions}
+              answeredCount={answeredCount}
+              mode={contest.allowMultipleAttempts ? 'Multiple attempts' : 'Single attempt'}
+            />
           </div>
         </div>
       </div>

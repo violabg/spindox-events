@@ -1,7 +1,6 @@
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
-import { ContestMode } from '@/prisma/enums';
 
 export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
   try {
@@ -45,9 +44,9 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
       },
     });
 
-    // For SINGLE mode contests, user can't submit again if they have an attempt
-    // For MULTIPLE mode contests, user can submit multiple times
-    const hasSubmitted = contest.mode === ContestMode.SINGLE ? !!existingAttempt : false;
+    // For contests that don't allow multiple attempts, user can't submit again if they have an attempt
+    // For contests that allow multiple attempts, user can submit multiple times
+    const hasSubmitted = !contest.allowMultipleAttempts ? !!existingAttempt : false;
 
     // Format response
     const response = {
@@ -56,7 +55,7 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
         slug: contest.slug,
         name: contest.name,
         description: contest.description,
-        mode: contest.mode,
+        allowMultipleAttempts: contest.allowMultipleAttempts,
       },
       questions: contest.questions.map((question: (typeof contest.questions)[number]) => ({
         id: question.id,

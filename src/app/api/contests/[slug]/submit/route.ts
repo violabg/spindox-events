@@ -2,7 +2,7 @@ import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { submitAnswersSchema } from '@/lib/schemas/contest.schema';
 import { NextRequest, NextResponse } from 'next/server';
-import { ContestMode, QuestionType } from '@/prisma/enums';
+import { QuestionType } from '@/prisma/enums';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
@@ -41,9 +41,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'Contest not found' }, { status: 404 });
     }
 
-    // Check for existing attempt based on contest mode
+    // Check for existing attempt based on contest's allowMultipleAttempts setting
     let existingAttempt = null;
-    if (contest.mode === ContestMode.SINGLE) {
+    if (!contest.allowMultipleAttempts) {
       existingAttempt = await prisma.userAttempts.findFirst({
         where: {
           userId: session.user.id,
@@ -52,8 +52,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       });
     }
 
-    // If contest mode is SINGLE and user already attempted, reject
-    if (contest.mode === ContestMode.SINGLE && existingAttempt) {
+    // If contest doesn't allow multiple attempts and user already attempted, reject
+    if (!contest.allowMultipleAttempts && existingAttempt) {
       return NextResponse.json({ error: 'You can only submit once for this contest' }, { status: 409 });
     }
 
@@ -101,33 +101,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     // Create or update UserAttempt with UserAnswers
-    // For SINGLE mode, update existing attempt. For MULTIPLE mode, create new attempt.
+    // For contests that don't allow multiple attempts, we should never update. For contests that allow multiple attempts, create new attempt.
     const finishedAt = new Date(); // Server time when submission is received
 
-    if (contest.mode === ContestMode.SINGLE && existingAttempt) {
-      // Update existing attempt for SINGLE mode
-      await prisma.userAttempts.update({
-        where: { id: existingAttempt.id },
-        data: {
-          score: totalScore,
-          finishedAt: finishedAt,
-          userAnswers: {
-            deleteMany: {}, // Clear old answers
-            create: answerEntries.flatMap(answer => {
-              const question = contest.questions.find(q => q.id === answer.questionId);
-              if (!question) return [];
-              const selectedAnswers = question.answers.filter(a => answer.answerIds.includes(a.id));
-              return selectedAnswers.map(selectedAnswer => ({
-                questionId: question.id,
-                answerId: selectedAnswer.id,
-                score: selectedAnswer.score > 0 ? selectedAnswer.score : 0,
-              }));
-            }),
-          },
-        },
-      });
+    if (!contest.allowMultipleAttempts && existingAttempt) {
+      // This shouldn't happen as we rejected earlier, but just in case
+      return NextResponse.json({ error: 'You can only submit once for this contest' }, { status: 409 });
     } else {
-      // Create new attempt for MULTIPLE mode or new SINGLE mode attempt
+      // Create new attempt
       await prisma.userAttempts.create({
         data: {
           userId: session.user.id,

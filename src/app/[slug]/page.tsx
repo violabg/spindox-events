@@ -28,13 +28,13 @@ async function ContestContent({ params }: ContestPageParams) {
   const contest = await prisma.contest.findUnique({
     where: {
       slug,
-      status: 'active',
+      active: true,
     },
     select: {
       id: true,
       name: true,
       description: true,
-      mode: true,
+      allowMultipleAttempts: true,
       timeLimit: true,
       _count: {
         select: {
@@ -60,7 +60,10 @@ async function ContestContent({ params }: ContestPageParams) {
             Active now
           </span>
           <span className="inline-flex items-center gap-2 bg-slate-200/60 dark:bg-slate-800/60 px-4 py-1.5 border border-slate-500/40 dark:border-slate-500/40 rounded-full">
-            Mode: <strong className="font-semibold text-slate-900 dark:text-white">{contest.mode.toLowerCase()}</strong>
+            Mode:{' '}
+            <strong className="font-semibold text-slate-900 dark:text-white">
+              {contest.allowMultipleAttempts ? 'Multiple attempts' : 'Single attempt'}
+            </strong>
           </span>
           <span className="inline-flex items-center gap-2 bg-slate-200/60 dark:bg-slate-800/60 px-4 py-1.5 border border-slate-500/40 dark:border-slate-500/40 rounded-full">
             Questions: <strong className="font-semibold text-slate-900 dark:text-white">{contest._count.questions}</strong>

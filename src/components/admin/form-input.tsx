@@ -16,6 +16,8 @@ import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
 interface ControllerRenderParams<T extends FieldValues> {
   field: ControllerRenderProps<T, FieldPath<T>>;
@@ -167,5 +169,35 @@ export function FieldSelect<T extends FieldValues>({
         </Select>
       )}
     </FieldBase>
+  );
+}
+
+interface FieldCheckboxProps<T extends FieldValues> {
+  control: Control<T>;
+  name: FieldPath<T>;
+  label: string;
+}
+
+export function FieldCheckbox<T extends FieldValues>({ control, name, label }: FieldCheckboxProps<T>) {
+  const fieldWatcher = useWatch({
+    control: control,
+    name: name,
+  });
+
+  return (
+    <div className="flex items-center space-x-2">
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <>
+            <Checkbox id={field.name} checked={fieldWatcher} onCheckedChange={field.onChange} />
+            <Label htmlFor={field.name} className="cursor-pointer font-normal">
+              {label}
+            </Label>
+          </>
+        )}
+      />
+    </div>
   );
 }

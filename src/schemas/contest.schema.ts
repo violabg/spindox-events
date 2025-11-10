@@ -1,4 +1,3 @@
-import { ContestMode, ContestStatus } from '@/prisma/enums';
 import { z } from 'zod';
 
 // Base contest schema (without ID) for creation and updates
@@ -11,8 +10,8 @@ export const contestSchema = z.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must contain only lowercase letters, numbers, and hyphens'),
   theme: z.string().max(50, 'Theme must be less than 50 characters').optional(),
   description: z.string().max(500, 'Description must be less than 500 characters').optional(),
-  status: z.enum(ContestStatus),
-  mode: z.enum(ContestMode),
+  active: z.boolean().default(true),
+  allowMultipleAttempts: z.boolean().default(true),
   timeLimit: z.coerce.number().int().min(0, 'Time limit must be 0 or greater'),
   requireCompletedProfile: z.boolean().default(false),
   showFinalResults: z.boolean().default(false),

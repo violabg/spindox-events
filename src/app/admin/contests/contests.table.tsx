@@ -151,7 +151,7 @@ export default function ContestsTable({ contests }: ContestsTableProps) {
             <TableRow key={contest.id}>
               <TableCell className="font-medium">{contest.name}</TableCell>
               <TableCell>
-                <Badge variant={contest.status === 'active' ? 'default' : 'secondary'}>{contest.status === 'active' ? 'Active' : 'Inactive'}</Badge>
+                <Badge variant={contest.active ? 'default' : 'secondary'}>{contest.active ? 'Active' : 'Inactive'}</Badge>
               </TableCell>
               <TableCell>{contest.questions.length}</TableCell>
               <TableCell>{contest.attempts.length}</TableCell>

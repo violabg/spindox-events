@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FieldSelect, FieldInput } from '@/components/admin';
+import { FieldSelect, FieldInput, FieldCheckbox } from '@/components/admin';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,8 +11,6 @@ import { updateUserProfileAction } from '@/actions/users/update.action';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import type { Prisma } from '@/prisma/client';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 
 const userEditSchema = z.object({
   isAdmin: z.boolean(),
@@ -82,18 +80,7 @@ export default function UserForm({ user }: UserFormProps) {
               <p className="font-medium">{user.email}</p>
             </div>
             <div className="flex items-end pb-1">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="admin-checkbox"
-                  checked={form.watch('isAdmin')}
-                  onCheckedChange={checked => {
-                    form.setValue('isAdmin', Boolean(checked));
-                  }}
-                />
-                <Label htmlFor="admin-checkbox" className="cursor-pointer text-sm font-medium">
-                  Admin
-                </Label>
-              </div>
+              <FieldCheckbox control={form.control} name="isAdmin" label="Admin" />
             </div>
           </div>
           <div className="grid grid-cols-3 gap-4">

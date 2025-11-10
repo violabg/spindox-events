@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-import { ContestMode, QuestionType } from '@/prisma/enums';
+import { QuestionType } from '@/prisma/enums';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { headers } from 'next/headers';
 import Link from 'next/link';
@@ -116,7 +116,7 @@ async function DynamicContent({ params }: Params) {
   const formattedDuration = `${String(durationMinutes).padStart(2, '0')}:${String(durationSeconds).padStart(2, '0')}`;
 
   const passed = percentage >= passScore;
-  const modeLabel = contest.mode === ContestMode.MULTIPLE ? 'Multiple attempts' : 'Single attempt';
+  const modeLabel = contest.allowMultipleAttempts ? 'Multiple attempts' : 'Single attempt';
 
   return (
     <div className="space-y-10 text-slate-900 dark:text-slate-100">
@@ -147,7 +147,7 @@ async function DynamicContent({ params }: Params) {
               </span>
             </div>
           </div>
-          {contest.mode === ContestMode.MULTIPLE ? (
+          {contest.allowMultipleAttempts ? (
             <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-slate-950">
               <Link href={`/${slug}/questions`}>Retake contest</Link>
             </Button>

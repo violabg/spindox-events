@@ -2,11 +2,8 @@
 
 import { createContestAction } from '@/actions/contests/create.action';
 import { updateContestAction } from '@/actions/contests/update.action';
-import { FieldInput, FieldSelect, FieldTextarea } from '@/components/admin';
+import { FieldInput, FieldTextarea, FieldCheckbox } from '@/components/admin';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { ContestMode, ContestStatus } from '@/prisma/enums';
 import { ContestModel } from '@/prisma/models/Contest';
 import { contestSchema, type ContestData } from '@/schemas/contest.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -36,8 +33,8 @@ export default function ContestForm({ contestId, initialData }: ContestFormProps
       slug: initialData?.slug || '',
       theme: initialData?.theme || '',
       description: initialData?.description || '',
-      status: initialData?.status || ContestStatus.active,
-      mode: initialData?.mode || ContestMode.SINGLE,
+      active: initialData?.active ?? true,
+      allowMultipleAttempts: initialData?.allowMultipleAttempts ?? false,
       timeLimit: initialData?.timeLimit || 0,
       requireCompletedProfile: initialData?.requireCompletedProfile || false,
       showFinalResults: initialData?.showFinalResults || false,
@@ -126,29 +123,6 @@ export default function ContestForm({ contestId, initialData }: ContestFormProps
           maxLength={50}
         />
 
-        <FieldSelect
-          name="status"
-          control={form.control}
-          label="Status"
-          description="Current status of this contest"
-          placeholder="Select status"
-          options={Object.values(ContestStatus).map(status => ({ value: status, label: status }))}
-        />
-      </div>
-
-      <div className="gap-6 grid grid-cols-1 sm:grid-cols-2">
-        <FieldSelect
-          name="mode"
-          control={form.control}
-          label="Mode"
-          description="SINGLE: Users can submit only once. MULTIPLE: Users can retake the contest multiple times"
-          placeholder="Select mode"
-          options={Object.values(ContestMode).map(mode => ({
-            value: mode,
-            label: mode === ContestMode.SINGLE ? `${mode} (Users can submit only once)` : `${mode} (Users can retake the contest multiple times)`,
-          }))}
-        />
-
         <FieldInput
           name="timeLimit"
           control={form.control}
@@ -172,37 +146,12 @@ export default function ContestForm({ contestId, initialData }: ContestFormProps
 
       <div className="space-y-4 border rounded-lg p-4 bg-muted/50">
         <h3 className="font-semibold text-sm">Contest Settings</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="requireCompletedProfile"
-              checked={form.getValues('requireCompletedProfile')}
-              onCheckedChange={checked => form.setValue('requireCompletedProfile', Boolean(checked))}
-            />
-            <Label htmlFor="requireCompletedProfile" className="cursor-pointer font-normal">
-              Require Completed Profile
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="showFinalResults"
-              checked={form.getValues('showFinalResults')}
-              onCheckedChange={checked => form.setValue('showFinalResults', Boolean(checked))}
-            />
-            <Label htmlFor="showFinalResults" className="cursor-pointer font-normal">
-              Show Final Results
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="showLeaderboard"
-              checked={form.getValues('showLeaderboard')}
-              onCheckedChange={checked => form.setValue('showLeaderboard', Boolean(checked))}
-            />
-            <Label htmlFor="showLeaderboard" className="cursor-pointer font-normal">
-              Show Leaderboard
-            </Label>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <FieldCheckbox control={form.control} name="active" label="Active" />
+          <FieldCheckbox control={form.control} name="allowMultipleAttempts" label="Allow Multiple Attempts" />
+          <FieldCheckbox control={form.control} name="requireCompletedProfile" label="Require Completed Profile" />
+          <FieldCheckbox control={form.control} name="showFinalResults" label="Show Final Results" />
+          <FieldCheckbox control={form.control} name="showLeaderboard" label="Show Leaderboard" />
         </div>
       </div>
 

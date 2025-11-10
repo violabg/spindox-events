@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { submitAnswersSchema } from '@/lib/schemas/contest.schema';
 import { headers } from 'next/headers';
-import { ContestMode, QuestionType } from '@/prisma/enums';
+import { QuestionType } from '@/prisma/enums';
 
 export async function submitAnswersAction(data: { answers: { questionId: string; answerIds: string[] }[]; startedAt: string }, slug: string) {
   // Authenticate
@@ -36,8 +36,8 @@ export async function submitAnswersAction(data: { answers: { questionId: string;
 
   if (!contest) throw new Error('Contest not found');
 
-  // Check for existing attempt (for SINGLE mode contests)
-  if (contest.mode === ContestMode.SINGLE) {
+  // Check for existing attempt (for contests that don't allow multiple attempts)
+  if (!contest.allowMultipleAttempts) {
     const existingAttempt = await prisma.userAttempts.findFirst({
       where: {
         userId: session.user.id,
@@ -45,7 +45,7 @@ export async function submitAnswersAction(data: { answers: { questionId: string;
       },
     });
 
-    // If contest mode is SINGLE and user already attempted, reject
+    // If contest doesn't allow multiple attempts and user already attempted, reject
     if (existingAttempt) {
       throw new Error('You can only submit once for this contest');
     }

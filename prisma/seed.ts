@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import { PrismaClient } from '../src/prisma/client';
-import { ContestStatus } from '../src/prisma/enums';
 
 const prisma = new PrismaClient();
 
@@ -14,7 +13,7 @@ async function main() {
       slug: 'javascript-fundamentals',
       theme: 'Programming',
       description: 'Test your knowledge of JavaScript fundamentals including variables, functions, and control structures.',
-      status: ContestStatus.active,
+      active: true,
     },
   });
 

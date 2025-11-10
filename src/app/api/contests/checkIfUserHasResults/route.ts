@@ -1,11 +1,10 @@
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-import { ContestMode } from '@/prisma/enums';
 import { NextRequest, NextResponse } from 'next/server';
 
 export type CheckUserHasResultsResponse = {
   hasSubmitted: boolean;
-  mode: ContestMode;
+  allowMultipleAttempts: boolean;
   canRetake: boolean;
 };
 
@@ -45,11 +44,11 @@ export async function GET(request: NextRequest) {
 
     const hasSubmitted = !!existingAttempt;
 
-    // Format response - include mode so frontend can decide what to do
+    // Format response - include allowMultipleAttempts so frontend can decide what to do
     const response: CheckUserHasResultsResponse = {
       hasSubmitted,
-      mode: contest.mode,
-      canRetake: contest.mode === ContestMode.MULTIPLE && hasSubmitted,
+      allowMultipleAttempts: contest.allowMultipleAttempts,
+      canRetake: contest.allowMultipleAttempts && hasSubmitted,
     };
 
     return NextResponse.json(response);

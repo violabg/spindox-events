@@ -56,8 +56,8 @@ export default async function ContestDetailPage({ params }: PageProps) {
             </div>
           </div>
           <div className="flex items-center gap-3 shrink-0">
-            <Badge variant={contest.status === 'active' ? 'default' : 'secondary'} className="whitespace-nowrap">
-              {contest.status === 'active' ? 'Active' : 'Inactive'}
+            <Badge variant={contest.active ? 'default' : 'secondary'} className="whitespace-nowrap">
+              {contest.active ? 'Active' : 'Inactive'}
             </Badge>
             <Button asChild size="sm" variant="outline">
               <Link href={`/${contest.slug}`} target="_blank" className="gap-2">

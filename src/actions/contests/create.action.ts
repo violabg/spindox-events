@@ -27,9 +27,12 @@ export async function createContestAction(data: CreateContestData) {
         slug: validatedData.slug,
         theme: validatedData.theme || null,
         description: validatedData.description || null,
-        status: validatedData.status,
-        mode: validatedData.mode,
+        active: validatedData.active,
+        allowMultipleAttempts: validatedData.allowMultipleAttempts,
         timeLimit: validatedData.timeLimit,
+        requireCompletedProfile: validatedData.requireCompletedProfile,
+        showFinalResults: validatedData.showFinalResults,
+        showLeaderboard: validatedData.showLeaderboard,
       },
     });
 

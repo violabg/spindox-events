@@ -19,11 +19,6 @@ enum ContestStatus {
   inactive
 }
 
-enum ContestMode {
-  SINGLE
-  MULTIPLE
-}
-
 enum QuestionType {
   SINGLE_CHOICE
   MULTIPLE_CHOICES
@@ -135,9 +130,9 @@ model Contest {
   slug                    String        @unique
   theme                   String?
   description             String?
-  status                  ContestStatus @default(active)
-  mode                    ContestMode   @default(SINGLE)
+  active                  Boolean       @default(true)
   timeLimit               Int           @default(0)
+  allowMultipleAttempts   Boolean       @default(false)
   requireCompletedProfile Boolean       @default(false)
   showFinalResults        Boolean       @default(false)
   showLeaderboard         Boolean       @default(true)
