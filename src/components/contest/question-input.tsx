@@ -103,7 +103,7 @@ export function QuestionInput({
               <RadioGroup
                 value={Array.isArray(field.value) && field.value.length ? field.value[0] : undefined}
                 onValueChange={val => field.onChange(val ? [val] : [])}
-                className="space-y-2"
+                className="space-y-1"
               >
                 {answers.map(answer => {
                   const selected = Array.isArray(field.value) && field.value[0] === answer.id;
@@ -114,7 +114,10 @@ export function QuestionInput({
                     else if (selected) containerClass = 'bg-red-600 hover:bg-red-700 text-white';
                   }
                   return (
-                    <div key={answer.id} className={`w-full flex items-center space-x-3 px-2 py-2 rounded-md cursor-pointer ${containerClass}`}>
+                    <div
+                      key={answer.id}
+                      className={`w-full flex items-center space-x-3 px-2 py-3 rounded-md cursor-pointer ${containerClass} border border-input p-3 shadow-xs outline-none has-data-[state=checked]:border-primary/50`}
+                    >
                       <RadioGroupItem value={answer.id} id={answer.id} disabled={disabled} className="mt-1" />
                       <Label htmlFor={answer.id} className="flex-1 text-sm cursor-pointer">
                         <AnswerDisplay content={answer.content} />
@@ -137,7 +140,7 @@ export function QuestionInput({
       <div className="mb-2">
         <div className="text-muted-foreground text-sm">Multiple answers allowed</div>
       </div>
-      <div className="space-y-2">
+      <div className="space-y-3">
         {answers.map(answer => (
           <Controller
             key={answer.id}
@@ -153,7 +156,9 @@ export function QuestionInput({
               }
               return (
                 <>
-                  <div className={`w-full flex items-center space-x-3 p-2 rounded-md cursor-pointer ${containerClass}`}>
+                  <div
+                    className={`w-full flex items-center space-x-3 rounded-md cursor-pointer ${containerClass} border border-input p-3 shadow-xs outline-none has-data-[state=checked]:border-primary/50`}
+                  >
                     <Checkbox
                       id={answer.id}
                       checked={isChecked}
