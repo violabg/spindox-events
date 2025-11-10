@@ -55,7 +55,6 @@ export default function QuestionPreForm({ contest }: Props) {
         }
 
         const result: CheckUserHasResultsResponse = await response.json();
-        console.log('🚀 ~ checkUserResults ~ result:', result);
 
         if (result.hasSubmitted) {
           setQuestionSubmitted(true);
