@@ -5,10 +5,11 @@ import ContestInfo from '@/components/contest/contest-info';
 import { QuestionInput } from '@/components/contest/question-input';
 import Timer from '@/components/contest/timer';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { Stepper, StepperIndicator, StepperItem, StepperTrigger } from '@/components/ui/stepper';
 import { submitAnswersClientSchema } from '@/lib/schemas/contest.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CheckCircle2, Compass } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUpToLine, CheckCircle2, Compass } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { FormProvider, useForm, useWatch, type SubmitHandler } from 'react-hook-form';
@@ -190,6 +191,7 @@ export default function QuestionForm({ contest }: Props) {
                     onClick={handlePrev}
                     disabled={currentStep === 1 || isPending || hasTimeExpired}
                   >
+                    <ArrowLeft />
                     Previous
                   </Button>
 
@@ -199,7 +201,7 @@ export default function QuestionForm({ contest }: Props) {
                     onClick={handleNext}
                     disabled={selectedAnswers.length === 0 || isPending || hasTimeExpired || currentStep === steps.length}
                   >
-                    Next question
+                    Next question <ArrowRight />
                   </Button>
 
                   <Button
@@ -208,6 +210,7 @@ export default function QuestionForm({ contest }: Props) {
                     disabled={isPending}
                   >
                     {isPending ? 'Submitting...' : hasTimeExpired ? 'Submit answers (time elapsed)' : 'Submit answers'}
+                    {isPending ? <Spinner /> : <ArrowUpToLine />}
                   </Button>
                 </div>
               </div>

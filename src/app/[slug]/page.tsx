@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import prisma from '@/lib/prisma';
-import { Sparkles, Timer, Trophy } from 'lucide-react';
+import { LogInIcon, Sparkles, Timer, Trophy } from 'lucide-react';
 import { cacheLife, cacheTag } from 'next/cache';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -71,7 +71,9 @@ async function ContestContent({ params }: ContestPageParams) {
         </div>
         <div className="flex flex-wrap items-center gap-4 mt-8">
           <Button size="lg" className="bg-primary hover:bg-primary/90" asChild>
-            <Link href={`/${slug}/questions`}>Enter Contest</Link>
+            <Link href={`/${slug}/questions`}>
+              Enter Contest <LogInIcon />
+            </Link>
           </Button>
           <p className="text-slate-400 text-sm">You&apos;ll have immediate access to all questions once you start.</p>
         </div>
