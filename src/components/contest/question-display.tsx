@@ -1,9 +1,12 @@
 'use client';
 
+import { useTheme } from 'next-themes';
+import dynamic from 'next/dynamic';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+const DynamicSyntaxHighlighter = dynamic(() => import('react-syntax-highlighter').then(mod => mod.Prism), { ssr: false });
 
 interface QuestionDisplayProps {
   title: string;
@@ -12,6 +15,9 @@ interface QuestionDisplayProps {
 }
 
 export function QuestionDisplay({ title, content, children }: QuestionDisplayProps) {
+  const { theme } = useTheme();
+  const syntaxTheme = theme === 'dark' ? oneDark : oneLight;
+
   return (
     <div className="bg-background/5 p-4 border border-border rounded-md">
       <div className="mb-4">
@@ -31,8 +37,8 @@ export function QuestionDisplay({ title, content, children }: QuestionDisplayPro
 
               if (!inline && match) {
                 return (
-                  <SyntaxHighlighter
-                    style={oneDark}
+                  <DynamicSyntaxHighlighter
+                    style={syntaxTheme}
                     language={match[1]}
                     PreTag="div"
                     wrapLongLines={true}
@@ -48,7 +54,7 @@ export function QuestionDisplay({ title, content, children }: QuestionDisplayPro
                     {...props}
                   >
                     {code.replace(/\n$/, '')}
-                  </SyntaxHighlighter>
+                  </DynamicSyntaxHighlighter>
                 );
               }
 

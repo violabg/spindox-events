@@ -4,11 +4,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { QuestionType } from '@/prisma/enums';
+import { useTheme } from 'next-themes';
+import dynamic from 'next/dynamic';
 import { Controller, useFormContext } from 'react-hook-form';
 import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { QuestionDisplay } from './question-display';
+
+const DynamicSyntaxHighlighter = dynamic(() => import('react-syntax-highlighter').then(mod => mod.Prism), { ssr: false });
 
 interface Answer {
   id: string;
@@ -20,6 +23,9 @@ interface AnswerDisplayProps {
 }
 
 function AnswerDisplay({ content }: AnswerDisplayProps) {
+  const { theme } = useTheme();
+  const syntaxTheme = theme === 'dark' ? oneDark : oneLight;
+
   return (
     <div className="w-full max-w-none text-sm prose prose-sm">
       <ReactMarkdown
@@ -34,8 +40,8 @@ function AnswerDisplay({ content }: AnswerDisplayProps) {
 
             if (!inline && match) {
               return (
-                <SyntaxHighlighter
-                  style={oneDark}
+                <DynamicSyntaxHighlighter
+                  style={syntaxTheme}
                   language={match[1]}
                   PreTag="div"
                   wrapLongLines={true}
@@ -51,7 +57,7 @@ function AnswerDisplay({ content }: AnswerDisplayProps) {
                   {...props}
                 >
                   {code.replace(/\n$/, '')}
-                </SyntaxHighlighter>
+                </DynamicSyntaxHighlighter>
               );
             }
 

@@ -125,22 +125,22 @@ export default function QuestionForm({ contest }: Props) {
               )}
             </div>
           ) : (
-            <div className="bg-slate-900/60 p-4 md:p-6 border border-white/10 rounded-3xl text-slate-200">
-              <h4 className="font-semibold text-white text-lg">No timer on this contest</h4>
-              <p className="mt-2 text-slate-300 text-sm">Take the time you need—focus on accuracy over speed.</p>
+            <div className="bg-slate-100/60 dark:bg-slate-900/60 p-4 md:p-6 border border-slate-300/10 dark:border-white/10 rounded-3xl text-slate-900 dark:text-slate-200">
+              <h4 className="font-semibold text-slate-900 dark:text-white text-lg">No timer on this contest</h4>
+              <p className="mt-2 text-slate-600 dark:text-slate-300 text-sm">Take the time you need—focus on accuracy over speed.</p>
             </div>
           )}
         </div>
 
         {/* Questions */}
         <section className="space-y-6 grid-area-[questions]">
-          <div className="bg-slate-900/80 shadow-black/20 shadow-xl p-4 md:p-6 border border-white/10 rounded-3xl text-left">
+          <div className="bg-slate-100/80 dark:bg-slate-900/80 shadow-black/20 shadow-xl dark:shadow-black/20 p-4 md:p-6 border border-slate-300/10 dark:border-white/10 rounded-3xl text-left">
             <div className="flex flex-wrap justify-between items-center gap-4">
               <div>
-                <p className="text-slate-400 text-xs uppercase tracking-[0.4em]">Question {currentStep}</p>
-                <h3 className="mt-1 md:mt-2 font-semibold text-white text-2xl">Stay focused and make your choice</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-[0.4em]">Question {currentStep}</p>
+                <h3 className="mt-1 md:mt-2 font-semibold text-slate-900 dark:text-white text-2xl">Stay focused and make your choice</h3>
               </div>
-              <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 border border-emerald-400/30 rounded-full font-medium text-emerald-100 text-sm">
+              <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 border border-emerald-600/30 dark:border-emerald-400/30 rounded-full font-medium text-emerald-700 dark:text-emerald-100 text-sm">
                 <CheckCircle2 className="w-4 h-4" /> {progressPercentage}% complete
               </div>
             </div>
@@ -156,14 +156,17 @@ export default function QuestionForm({ contest }: Props) {
                 {steps.map(step => (
                   <StepperItem key={step} step={step} className="flex-1">
                     <StepperTrigger className="flex-col items-start gap-2 w-full" asChild>
-                      <StepperIndicator asChild className={`h-2 w-full rounded-full ${step <= currentStep ? 'bg-emerald-400' : 'bg-white/10'}`}>
+                      <StepperIndicator
+                        asChild
+                        className={`h-2 w-full rounded-full ${step <= currentStep ? 'bg-emerald-400' : 'bg-slate-300/10 dark:bg-white/10'}`}
+                      >
                         <span className="sr-only">{step}</span>
                       </StepperIndicator>
                     </StepperTrigger>
                   </StepperItem>
                 ))}
               </Stepper>
-              <div className="mt-2 text-slate-400 text-sm">
+              <div className="mt-2 text-slate-500 dark:text-slate-400 text-sm">
                 Step {currentStep} of {steps.length}
               </div>
             </div>
@@ -179,8 +182,8 @@ export default function QuestionForm({ contest }: Props) {
                 disabled={isPending || hasTimeExpired}
               />
 
-              <div className="flex flex-wrap justify-between items-center gap-4 pt-4 md:pt-6 border-white/10 border-t">
-                <div className="flex items-center gap-2 text-slate-400 text-sm">
+              <div className="flex flex-wrap justify-between items-center gap-4 pt-4 md:pt-6 border-slate-300/10 dark:border-white/10 border-t">
+                <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
                   <Compass className="w-4 h-4" /> {answeredCount} of {totalQuestions} questions answered
                 </div>
                 <div className="flex flex-wrap gap-3">
@@ -236,9 +239,9 @@ export default function QuestionForm({ contest }: Props) {
                 )}
               </div>
             ) : (
-              <div className="bg-slate-900/60 p-4 md:p-6 border border-white/10 rounded-3xl text-slate-200">
-                <h4 className="font-semibold text-white text-lg">No timer on this contest</h4>
-                <p className="mt-2 text-slate-300 text-sm">Take the time you need—focus on accuracy over speed.</p>
+              <div className="bg-slate-100/60 dark:bg-slate-900/60 p-4 md:p-6 border border-slate-300/10 dark:border-white/10 rounded-3xl text-slate-900 dark:text-slate-200">
+                <h4 className="font-semibold text-slate-900 dark:text-white text-lg">No timer on this contest</h4>
+                <p className="mt-2 text-slate-600 dark:text-slate-300 text-sm">Take the time you need—focus on accuracy over speed.</p>
               </div>
             )}
           </div>

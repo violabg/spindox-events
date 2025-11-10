@@ -49,15 +49,17 @@ export default function Timer({ timeLimit, onTimeUp, className }: TimerProps) {
   return (
     <div
       className={cn(
-        'shadow-black/30 shadow-inner p-5 border rounded-2xl font-medium text-center transition-colors',
-        isWarning ? 'border-rose-500/50 bg-rose-500/20 text-rose-50' : 'border-slate-500/40 bg-slate-900/80 text-slate-100',
+        'shadow-black/30 shadow-inner dark:shadow-black/30 p-5 border rounded-2xl font-medium text-center transition-colors',
+        isWarning
+          ? 'border-rose-500/50 bg-rose-500/20 text-rose-50 dark:border-rose-500/50 dark:bg-rose-500/20 dark:text-rose-50'
+          : 'border-slate-500/40 dark:border-slate-500/40 bg-slate-100/80 dark:bg-slate-900/80 text-slate-900 dark:text-slate-100',
         className
       )}
     >
       <div className="font-mono font-bold tabular-nums text-2xl">
         {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
       </div>
-      <div className="mt-1 text-slate-300/80 text-xs uppercase tracking-wider">Time remaining</div>
+      <div className="mt-1 text-slate-600/80 dark:text-slate-300/80 text-xs uppercase tracking-wider">Time remaining</div>
     </div>
   );
 }

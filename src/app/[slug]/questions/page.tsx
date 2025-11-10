@@ -21,7 +21,7 @@ function QuestionFormSkeleton() {
   return (
     <div className="space-y-8">
       {/* Contest info card skeleton - hidden on mobile */}
-      <div className="hidden sm:block bg-slate-900/70 p-6 border border-white/10 rounded-lg text-slate-200">
+      <div className="hidden sm:block bg-slate-100/70 dark:bg-slate-900/70 p-6 border border-slate-300/10 dark:border-white/10 rounded-lg text-slate-900 dark:text-slate-200">
         <div className="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-3 mb-6">
           <div className="flex-1">
             <Skeleton className="mb-2 w-64 h-8" />
@@ -29,16 +29,16 @@ function QuestionFormSkeleton() {
           </div>
           <Skeleton className="rounded-full w-40 h-8" />
         </div>
-        <div className="gap-6 grid sm:grid-cols-3 text-slate-300 text-sm">
-          <div className="bg-slate-900/60 p-4 border border-white/10 rounded-2xl">
+        <div className="gap-6 grid sm:grid-cols-3 text-slate-700 dark:text-slate-300 text-sm">
+          <div className="bg-slate-100/60 dark:bg-slate-900/60 p-4 border border-slate-300/10 dark:border-white/10 rounded-2xl">
             <Skeleton className="mb-2 w-20 h-3" />
             <Skeleton className="w-16 h-5" />
           </div>
-          <div className="bg-slate-900/60 p-4 border border-white/10 rounded-2xl">
+          <div className="bg-slate-100/60 dark:bg-slate-900/60 p-4 border border-slate-300/10 dark:border-white/10 rounded-2xl">
             <Skeleton className="mb-2 w-16 h-3" />
             <Skeleton className="w-24 h-5" />
           </div>
-          <div className="bg-slate-900/60 p-4 border border-white/10 rounded-2xl">
+          <div className="bg-slate-100/60 dark:bg-slate-900/60 p-4 border border-slate-300/10 dark:border-white/10 rounded-2xl">
             <Skeleton className="mb-2 w-16 h-3" />
             <Skeleton className="w-8 h-5" />
           </div>
@@ -53,7 +53,7 @@ function QuestionFormSkeleton() {
 
         {/* Questions skeleton */}
         <section className="space-y-6 grid-area-[questions]">
-          <div className="bg-slate-900/80 shadow-black/20 shadow-xl p-4 md:p-6 border border-white/10 rounded-3xl text-left">
+          <div className="bg-slate-100/80 dark:bg-slate-900/80 shadow-black/20 shadow-xl dark:shadow-black/20 p-4 md:p-6 border border-slate-300/10 dark:border-white/10 rounded-3xl text-left">
             <div className="flex flex-wrap justify-between items-center gap-4">
               <div>
                 <Skeleton className="mb-2 w-24 h-3" />
@@ -87,7 +87,7 @@ function QuestionFormSkeleton() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap justify-between items-center gap-4 pt-4 md:pt-6 border-white/10 border-t">
+              <div className="flex flex-wrap justify-between items-center gap-4 pt-4 md:pt-6 border-slate-300/10 dark:border-white/10 border-t">
                 <Skeleton className="w-48 h-4" />
                 <div className="flex flex-wrap gap-3">
                   <Skeleton className="rounded-md w-32 h-10" />
@@ -119,7 +119,7 @@ function QuestionFormSkeleton() {
 
 function ContestInfoSkeleton() {
   return (
-    <div className="space-y-4 bg-slate-900/60 p-4 md:p-6 border border-white/10 rounded-3xl text-slate-200">
+    <div className="space-y-4 bg-slate-100/60 dark:bg-slate-900/60 p-4 md:p-6 border border-slate-300/10 dark:border-white/10 rounded-3xl text-slate-900 dark:text-slate-200">
       <div className="flex items-center gap-3">
         <Skeleton className="rounded w-5 h-5" />
         <div className="flex-1">
@@ -128,11 +128,11 @@ function ContestInfoSkeleton() {
         </div>
       </div>
       <div className="gap-4 grid text-sm">
-        <div className="bg-slate-950/60 p-4 border border-white/10 rounded-2xl">
+        <div className="bg-slate-50/60 dark:bg-slate-950/60 p-4 border border-slate-300/10 dark:border-white/10 rounded-2xl">
           <Skeleton className="mb-2 w-32 h-3" />
           <Skeleton className="w-8 h-6" />
         </div>
-        <div className="bg-slate-950/60 p-4 border border-white/10 rounded-2xl">
+        <div className="bg-slate-50/60 dark:bg-slate-950/60 p-4 border border-slate-300/10 dark:border-white/10 rounded-2xl">
           <Skeleton className="mb-2 w-20 h-3" />
           <Skeleton className="w-12 h-6" />
         </div>
