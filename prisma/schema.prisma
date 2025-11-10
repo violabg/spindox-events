@@ -14,11 +14,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum ContestStatus {
-  active
-  inactive
-}
-
 enum QuestionType {
   SINGLE_CHOICE
   MULTIPLE_CHOICES
