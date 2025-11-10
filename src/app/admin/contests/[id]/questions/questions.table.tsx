@@ -17,7 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { AnswerModel } from '@/prisma/models/Answer';
 import { QuestionModel } from '@/prisma/models/Question';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { Edit, GripVertical, MoreHorizontal, MoveVertical, Trash2 } from 'lucide-react';
+import { Edit, GripVertical, MoreHorizontal, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -120,12 +120,9 @@ function QuestionActionsMenu({ question, contestId }: { question: QuestionWithAn
 export default function QuestionsTable({ contestId, questions }: QuestionsTableProps) {
   const [items, setItems] = useState<QuestionWithAnswers[]>(() => [...questions]);
   const [draggingId, setDraggingId] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isReordering, setIsReordering] = useState(false);
   const [dropTarget, setDropTarget] = useState<{ id: string; position: 'above' | 'below' } | null>(null);
 
   const onDragStart = (e: React.DragEvent, id: string) => {
-    if (!isReordering) return;
     e.dataTransfer.setData('text/plain', id);
     e.dataTransfer.effectAllowed = 'move';
     setDraggingId(id);
@@ -133,7 +130,6 @@ export default function QuestionsTable({ contestId, questions }: QuestionsTableP
   };
 
   const onDragOver = (e: React.DragEvent) => {
-    if (!isReordering) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
 
@@ -153,7 +149,6 @@ export default function QuestionsTable({ contestId, questions }: QuestionsTableP
   };
 
   const onDrop = async (e: React.DragEvent, targetId: string) => {
-    if (!isReordering) return;
     e.preventDefault();
     const draggedId = e.dataTransfer.getData('text/plain');
     if (!draggedId) return;
@@ -177,7 +172,6 @@ export default function QuestionsTable({ contestId, questions }: QuestionsTableP
 
     // Persist order to server
     try {
-      setIsSaving(true);
       const orderedIds = updated.map(i => i.id);
       const result = await reorderQuestionsAction(contestId, orderedIds);
       if (!result.success) {
@@ -192,34 +186,12 @@ export default function QuestionsTable({ contestId, questions }: QuestionsTableP
       toast.error('Failed to save order');
       setItems([...questions]);
     } finally {
-      setIsSaving(false);
       setDraggingId(null);
     }
   };
 
-  const toggleReorder = () => {
-    setIsReordering(v => {
-      const next = !v;
-      if (!next) {
-        // exiting reorder mode: clear any visual state
-        setDropTarget(null);
-        setDraggingId(null);
-      }
-      return next;
-    });
-  };
-
   return (
     <div>
-      {questions.length > 1 && (
-        <div className="flex justify-end mb-4 w-full">
-          <Button onClick={toggleReorder} variant={isReordering ? 'secondary' : 'outline'} size="sm" disabled={isSaving}>
-            <MoveVertical className="mr-2 w-4 h-4" />
-            {isReordering ? 'Done' : 'Reorder Questions'}
-          </Button>
-        </div>
-      )}
-
       <Table>
         <TableHeader>
           <TableRow>
@@ -244,18 +216,16 @@ export default function QuestionsTable({ contestId, questions }: QuestionsTableP
               <TableRow
                 key={question.id}
                 data-id={question.id}
-                draggable={isReordering}
+                draggable={true}
                 onDragStart={e => onDragStart(e, question.id)}
                 onDragOver={onDragOver}
                 onDrop={e => onDrop(e, question.id)}
                 className={`relative ${draggingId === question.id ? 'opacity-50' : ''}`}
               >
                 <TableCell className="flex items-center gap-3 font-medium">
-                  {isReordering && (
-                    <span className="text-muted-foreground cursor-grab" aria-hidden>
-                      <GripVertical className="w-4 h-4" />
-                    </span>
-                  )}
+                  <span className="text-muted-foreground cursor-grab" aria-hidden>
+                    <GripVertical className="w-4 h-4" />
+                  </span>
                   <span>{question.title}</span>
 
                   {/* Drop indicator (moved inside a td to avoid invalid HTML structure) */}
