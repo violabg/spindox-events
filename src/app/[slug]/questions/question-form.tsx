@@ -139,7 +139,7 @@ export default function QuestionForm({ contest }: Props) {
                 <p className="text-slate-400 text-xs uppercase tracking-[0.4em]">Question {currentStep}</p>
                 <h3 className="mt-1 md:mt-2 font-semibold text-white text-2xl">Stay focused and make your choice</h3>
               </div>
-              <div className="inline-flex items-center gap-2 bg-emerald-500/10 px-4 py-2 border border-emerald-400/30 rounded-full font-medium text-emerald-100 text-sm">
+              <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 border border-emerald-400/30 rounded-full font-medium text-emerald-100 text-sm">
                 <CheckCircle2 className="w-4 h-4" /> {progressPercentage}% complete
               </div>
             </div>
@@ -195,7 +195,7 @@ export default function QuestionForm({ contest }: Props) {
 
                   <Button
                     type="button"
-                    className={`bg-emerald-500 hover:bg-emerald-500/90 min-w-[150px] ${hasTimeExpired || currentStep === steps.length ? 'hidden' : ''}`}
+                    className={`bg-primary hover:bg-primary/90 min-w-[150px] ${hasTimeExpired || currentStep === steps.length ? 'hidden' : ''}`}
                     onClick={handleNext}
                     disabled={selectedAnswers.length === 0 || isPending || hasTimeExpired || currentStep === steps.length}
                   >
@@ -204,7 +204,7 @@ export default function QuestionForm({ contest }: Props) {
 
                   <Button
                     type="submit"
-                    className={`bg-emerald-500 hover:bg-emerald-500/90 min-w-[150px] ${hasTimeExpired || currentStep === steps.length ? '' : 'hidden'}`}
+                    className={`bg-primary hover:bg-primary/90 min-w-[150px] ${hasTimeExpired || currentStep === steps.length ? '' : 'hidden'}`}
                     disabled={isPending}
                   >
                     {isPending ? 'Submitting...' : hasTimeExpired ? 'Submit answers (time elapsed)' : 'Submit answers'}

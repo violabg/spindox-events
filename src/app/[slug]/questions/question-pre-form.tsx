@@ -81,7 +81,7 @@ export default function QuestionPreForm({ contest }: Props) {
             <CardTitle className="font-semibold text-white text-2xl">{contest.name}</CardTitle>
             <CardDescription className="text-slate-400">{contest.description || 'Select the best answers to climb the leaderboard.'}</CardDescription>
           </div>
-          <div className="inline-flex items-center gap-2 bg-emerald-500/10 px-4 py-1 border border-emerald-400/30 rounded-full font-medium text-emerald-200 text-sm">
+          <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-1 border border-emerald-400/30 rounded-full font-medium text-emerald-200 text-sm">
             <Trophy className="w-4 h-4" /> Ready to compete
           </div>
         </CardHeader>

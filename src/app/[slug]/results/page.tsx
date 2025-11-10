@@ -121,7 +121,7 @@ async function DynamicContent({ params }: Params) {
       <div
         className={`rounded-3xl border border-white/10 p-8 shadow-xl shadow-black/20 ${
           passed
-            ? 'bg-linear-to-br from-emerald-500/20 via-emerald-500/10 to-slate-900/60'
+            ? 'bg-linear-to-br from-primary/20 via-primary/10 to-slate-900/60'
             : 'bg-linear-to-br from-rose-500/25 via-rose-500/10 to-slate-900/60'
         }`}
       >
@@ -146,7 +146,7 @@ async function DynamicContent({ params }: Params) {
             </div>
           </div>
           {contest.mode === ContestMode.MULTIPLE ? (
-            <Button asChild size="lg" className="bg-emerald-500 hover:bg-emerald-500/90 text-slate-950">
+            <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-slate-950">
               <Link href={`/${slug}/questions`}>Retake contest</Link>
             </Button>
           ) : (
@@ -210,7 +210,7 @@ async function DynamicContent({ params }: Params) {
           <Card
             key={result.questionId}
             className={`border border-white/10 bg-slate-900/70 border-l-4 ${
-              result.isCorrect ? 'border-emerald-400 bg-emerald-500/5' : 'border-rose-400 bg-rose-500/5'
+              result.isCorrect ? 'border-emerald-400 bg-primary/5' : 'border-rose-400 bg-rose-500/5'
             }`}
           >
             <CardHeader>
@@ -224,7 +224,7 @@ async function DynamicContent({ params }: Params) {
                 </div>
                 <span
                   className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                    result.isCorrect ? 'bg-emerald-500/20 text-emerald-200' : 'bg-rose-500/20 text-rose-200'
+                    result.isCorrect ? 'bg-primary/20 text-emerald-200' : 'bg-rose-500/20 text-rose-200'
                   }`}
                 >
                   {result.isCorrect ? 'Correct' : 'Incorrect'}
@@ -244,7 +244,7 @@ async function DynamicContent({ params }: Params) {
                   </div>
                 </div>
               )}
-              <div className="bg-emerald-500/10 p-4 border border-emerald-400/30 rounded-2xl text-emerald-100">
+              <div className="bg-primary/10 p-4 border border-emerald-400/30 rounded-2xl text-emerald-100">
                 <p className="font-semibold text-emerald-50">Correct answer{result.correctAnswers.length > 1 ? 's' : ''}</p>
                 <div className="space-y-1 mt-2">
                   {result.correctAnswers.map(answer => (

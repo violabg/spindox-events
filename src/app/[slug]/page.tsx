@@ -55,7 +55,7 @@ async function ContestContent({ params }: ContestPageParams) {
           {contest.description || 'Get ready to test your knowledge and climb the leaderboard.'}
         </p>
         <div className="flex flex-wrap gap-3 mt-6 text-slate-200 text-sm">
-          <span className="inline-flex items-center gap-2 bg-emerald-500/10 px-4 py-1.5 border border-emerald-400/40 rounded-full">
+          <span className="inline-flex items-center gap-2 bg-primary/10 px-4 py-1.5 border border-emerald-400/40 rounded-full">
             <span className="bg-emerald-400 rounded-full w-2 h-2" aria-hidden />
             Active now
           </span>
@@ -70,7 +70,7 @@ async function ContestContent({ params }: ContestPageParams) {
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-4 mt-8">
-          <Button size="lg" className="bg-emerald-500 hover:bg-emerald-500/90" asChild>
+          <Button size="lg" className="bg-primary hover:bg-primary/90" asChild>
             <Link href={`/${slug}/questions`}>Enter Contest</Link>
           </Button>
           <p className="text-slate-400 text-sm">You&apos;ll have immediate access to all questions once you start.</p>
@@ -83,7 +83,7 @@ async function ContestContent({ params }: ContestPageParams) {
           <CardDescription className="text-slate-400">Know the rules before you begin</CardDescription>
         </CardHeader>
         <CardContent className="gap-6 grid sm:grid-cols-3">
-          <div className="bg-linear-to-br from-emerald-500/10 via-emerald-500/5 to-slate-950/70 shadow-emerald-500/10 shadow-inner p-5 border border-white/10 rounded-2xl">
+          <div className="bg-linear-to-br from-primary/10 via-primary/5 to-slate-950/70 shadow-inner shadow-primary/10 p-5 border border-white/10 rounded-2xl">
             <div className="flex items-center gap-3 text-emerald-200">
               <Sparkles className="w-5 h-5" />
               <p className="text-xs uppercase tracking-wide">Your mission</p>
