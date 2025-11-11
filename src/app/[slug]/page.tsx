@@ -1,5 +1,3 @@
-import { Suspense } from 'react';
-
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -9,20 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import prisma from '@/lib/prisma';
+import { PageWithParams } from '@/types/pageWithParams';
 
-type ContestPageParams = {
-  params: Promise<{ slug: string }>;
-};
-
-export default async function ContestPage({ params }: ContestPageParams) {
-  return (
-    <Suspense fallback={<ContestSkeleton />}>
-      <ContestContent params={params} />
-    </Suspense>
-  );
-}
-
-async function ContestContent({ params }: ContestPageParams) {
+export default async function ContestPage({ params }: PageWithParams<{ slug: string }>) {
   const { slug } = await params;
 
   const contest = await prisma.contest.findUnique({

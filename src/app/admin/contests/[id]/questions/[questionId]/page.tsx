@@ -10,14 +10,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { getContestById } from '@/queries/contests';
 import { getQuestionWithAnalytics } from '@/queries/questions';
+import { PageWithParams } from '@/types/pageWithParams';
 
 import AnswerAnalyticsTable from './answer-analytics.table';
 
-type PageProps = {
-  params: Promise<{ id: string; questionId: string }>;
-};
-
-export default async function QuestionDetailPage({ params }: PageProps) {
+export default async function QuestionDetailPage({ params }: PageWithParams<{ id: string; questionId: string }>) {
   const { id, questionId } = await params;
 
   const questionResult = await getQuestionWithAnswersAction(questionId);

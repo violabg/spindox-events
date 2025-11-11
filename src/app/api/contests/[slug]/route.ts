@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { getContestBySlug } from '@/queries/contests';
 
 export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
   try {
@@ -14,24 +15,7 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
     const { slug } = params;
 
     // Retrieve contest by slug
-    const contest = await prisma.contest.findUnique({
-      where: { slug },
-      include: {
-        questions: {
-          orderBy: { order: 'asc' },
-          include: {
-            answers: {
-              select: {
-                id: true,
-                content: true,
-                order: true,
-              },
-              orderBy: { order: 'asc' },
-            },
-          },
-        },
-      },
-    });
+    const contest = await getContestBySlug(slug);
 
     if (!contest) {
       return NextResponse.json({ error: 'Contest not found' }, { status: 404 });

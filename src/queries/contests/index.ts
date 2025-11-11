@@ -31,3 +31,18 @@ export const getContestById = cache(async (id: string) => {
     },
   });
 });
+
+export const getContestBySlug = cache(async (slug: string) => {
+  return prisma.contest.findUnique({
+    where: { slug: slug },
+    include: {
+      questions: {
+        include: { answers: { orderBy: { order: 'asc' } }, userAnswers: { orderBy: { createdAt: 'desc' } } },
+        orderBy: { order: 'asc' },
+      },
+      attempts: {
+        include: { userAnswers: { orderBy: { createdAt: 'desc' } } },
+      },
+    },
+  });
+});

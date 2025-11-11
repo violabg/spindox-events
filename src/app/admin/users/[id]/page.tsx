@@ -5,14 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDate } from '@/lib/date';
 import { getUserById } from '@/queries/users';
+import { PageWithParams } from '@/types/pageWithParams';
 
 import LinkedAccounts from '../linked-accounts';
 
-type PageProps = {
-  params: Promise<{ id: string }>;
-};
-
-export default async function UserDetailPage({ params }: PageProps) {
+export default async function UserDetailPage({ params }: PageWithParams<{ id: string }>) {
   const { id: userId } = await params;
 
   const user = await getUserById(userId, {

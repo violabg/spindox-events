@@ -3,14 +3,11 @@ import { notFound } from 'next/navigation';
 import { AdminLayout } from '@/components/admin';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getContestById } from '@/queries/contests';
+import { PageWithParams } from '@/types/pageWithParams';
 
 import ContestForm from '../../contest.form';
 
-interface EditContestPageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default async function EditContestPage({ params }: EditContestPageProps) {
+export default async function EditContestPage({ params }: PageWithParams<{ id: string }>) {
   const { id } = await params;
 
   const contest = await getContestById(id);

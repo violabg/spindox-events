@@ -4,14 +4,11 @@ import { AdminLayout } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getContestById } from '@/queries/contests';
+import { PageWithParams } from '@/types/pageWithParams';
 
 import QuestionForm from '../question.form';
 
-type PageProps = {
-  params: Promise<{ id: string }>;
-};
-
-export default async function NewQuestionPage({ params }: PageProps) {
+export default async function NewQuestionPage({ params }: PageWithParams<{ id: string }>) {
   const { id } = await params;
 
   const contest = await getContestById(id);

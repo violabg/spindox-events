@@ -10,12 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDate } from '@/lib/date';
 import { getContestById } from '@/queries/contests';
 import { getAttemptsByContest } from '@/queries/userAttempts';
+import { PageWithParams } from '@/types/pageWithParams';
 
-type PageProps = {
-  params: Promise<{ id: string }>;
-};
-
-export default async function ContestDetailPage({ params }: PageProps) {
+export default async function ContestDetailPage({ params }: PageWithParams<{ id: string }>) {
   const { id } = await params;
 
   const [contest, attempts] = await Promise.all([getContestById(id), getAttemptsByContest(id)]);

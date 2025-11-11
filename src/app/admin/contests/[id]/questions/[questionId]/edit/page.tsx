@@ -5,14 +5,11 @@ import { AdminLayout } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getContestById } from '@/queries/contests';
+import { PageWithParams } from '@/types/pageWithParams';
 
 import QuestionForm from '../../question.form';
 
-type PageProps = {
-  params: Promise<{ id: string; questionId: string }>;
-};
-
-export default async function EditQuestionPage({ params }: PageProps) {
+export default async function EditQuestionPage({ params }: PageWithParams<{ id: string; questionId: string }>) {
   const { id, questionId } = await params;
 
   const [questionResult, contest] = await Promise.all([getQuestionWithAnswersAction(questionId), getContestById(id)]);

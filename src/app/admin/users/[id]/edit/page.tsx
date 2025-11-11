@@ -2,14 +2,11 @@ import { notFound } from 'next/navigation';
 
 import { AdminLayout } from '@/components/admin';
 import { getUserById } from '@/queries/users';
+import { PageWithParams } from '@/types/pageWithParams';
 
 import UserForm from '../../user.form';
 
-type PageProps = {
-  params: Promise<{ id: string }>;
-};
-
-export default async function UserEditPage({ params }: PageProps) {
+export default async function UserEditPage({ params }: PageWithParams<{ id: string }>) {
   const { id: userId } = await params;
 
   const user = await getUserById(userId);

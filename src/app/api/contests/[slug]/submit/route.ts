@@ -4,8 +4,10 @@ import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { submitAnswersSchema } from '@/lib/schemas/contest.schema';
 import { QuestionType } from '@/prisma/enums';
+import { getContestBySlug } from '@/queries/contests';
+import { PageWithParams } from '@/types/pageWithParams';
 
-export async function POST(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+export async function POST(request: NextRequest, { params }: PageWithParams<{ slug: string }>) {
   try {
     // Check authentication
     const session = await auth.api.getSession({ headers: request.headers });
@@ -27,16 +29,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const startedAt = body.startedAt ? new Date(body.startedAt) : new Date();
 
     // Get contest
-    const contest = await prisma.contest.findUnique({
-      where: { slug },
-      include: {
-        questions: {
-          include: {
-            answers: true,
-          },
-        },
-      },
-    });
+    const contest = await getContestBySlug(slug);
 
     if (!contest) {
       return NextResponse.json({ error: 'Contest not found' }, { status: 404 });
