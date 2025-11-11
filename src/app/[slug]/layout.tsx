@@ -1,3 +1,4 @@
+import { CurrentUserAvatar } from '@/components/current-user-avatar';
 import { ThemeToggle } from '@/components/theme-toggle';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -27,9 +28,8 @@ export default async function Layout({ children }: Readonly<{ children: React.Re
               <Link href="/" className="hover:text-slate-900/90 dark:hover:text-white/90 transition">
                 Home
               </Link>
-              <span className="inline-flex bg-emerald-400/80 rounded-full w-2 h-2" aria-hidden />
-              <span className="text-slate-900/70 dark:text-white/70">Participate</span>
             </nav>
+            <CurrentUserAvatar />
             <ThemeToggle />
           </div>
         </div>
