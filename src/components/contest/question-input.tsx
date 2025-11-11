@@ -4,75 +4,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { QuestionType } from '@/prisma/enums';
-import { useTheme } from 'next-themes';
-import dynamic from 'next/dynamic';
 import { Controller, useFormContext } from 'react-hook-form';
-import ReactMarkdown from 'react-markdown';
-import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import AnswerDisplay from './answer-display';
 import { QuestionDisplay } from './question-display';
-
-const DynamicSyntaxHighlighter = dynamic(() => import('react-syntax-highlighter').then(mod => mod.Prism), { ssr: false });
 
 interface Answer {
   id: string;
   content: string;
-}
-
-interface AnswerDisplayProps {
-  content: string;
-}
-
-function AnswerDisplay({ content }: AnswerDisplayProps) {
-  const { theme } = useTheme();
-  const syntaxTheme = theme === 'dark' ? oneDark : oneLight;
-
-  return (
-    <div className="w-full max-w-none text-sm prose prose-sm">
-      <ReactMarkdown
-        components={{
-          // use `any` here because react-markdown's types for components differ
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          code: (props: any) => {
-            const { inline, className, children: codeChildren } = props;
-            const classAttr = className || '';
-            const match = /language-(\w+)/.exec(classAttr);
-            const code = String(codeChildren || '');
-
-            if (!inline && match) {
-              return (
-                <DynamicSyntaxHighlighter
-                  style={syntaxTheme}
-                  language={match[1]}
-                  PreTag="div"
-                  wrapLongLines={true}
-                  wrapLines={true}
-                  // ensure code blocks wrap on small screens
-                  codeTagProps={{
-                    style: {
-                      whiteSpace: 'pre-wrap',
-                      wordBreak: 'break-word',
-                      overflowWrap: 'anywhere',
-                    },
-                  }}
-                  {...props}
-                >
-                  {code.replace(/\n$/, '')}
-                </DynamicSyntaxHighlighter>
-              );
-            }
-
-            return (
-              <code className={className} {...props}>
-                {codeChildren}
-              </code>
-            );
-          },
-        }}
-      >
-        {content}
-      </ReactMarkdown>
-    </div>
-  );
 }
 
 interface QuestionInputProps {
