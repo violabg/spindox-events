@@ -5,8 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/prisma"
+  provider   = "prisma-client"
+  output     = "../src/prisma"
+  engineType = "client"
 }
 
 datasource db {
@@ -124,15 +125,15 @@ model Contest {
   id String @id @default(cuid())
 
   name                    String
-  slug                    String        @unique
+  slug                    String  @unique
   theme                   String?
   description             String?
-  active                  Boolean       @default(true)
-  timeLimit               Int           @default(0)
-  allowMultipleAttempts   Boolean       @default(false)
-  requireCompletedProfile Boolean       @default(false)
-  showFinalResults        Boolean       @default(false)
-  showLeaderboard         Boolean       @default(true)
+  active                  Boolean @default(true)
+  timeLimit               Int     @default(0)
+  allowMultipleAttempts   Boolean @default(false)
+  requireCompletedProfile Boolean @default(false)
+  showFinalResults        Boolean @default(false)
+  showLeaderboard         Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
