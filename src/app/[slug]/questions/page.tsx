@@ -19,17 +19,8 @@ export default async function ContestPage({ params }: PageWithParams<{ slug: str
   if (!contest || !contest.active) return notFound();
   const attempt = await getAttemptsByContest(contest.id);
 
-  const cansubmit = contest.allowMultipleAttempts || !attempt;
+  const canSubmit = contest.allowMultipleAttempts || !attempt;
 
-  // Check if user already submitted
-  // const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  // const checkResultPromise = await fetch(`${baseUrl}/api/contests/${contest.slug}/checkIfUserHasResults`, {
-  //   headers: headersInstance,
-  // });
-  // const result = await checkResultPromise.json();
-  // if (result.hasSubmitted) {
-  //   redirect(`/${slug}/results`);
-  // }
   return (
     <div className="space-y-8">
       <Card className="hidden sm:block bg-slate-100/70 dark:bg-slate-900/70 border border-slate-300/10 dark:border-white/10 text-slate-900 dark:text-slate-200">
@@ -60,7 +51,7 @@ export default async function ContestPage({ params }: PageWithParams<{ slug: str
         </CardContent>
       </Card>
 
-      {cansubmit ? (
+      {canSubmit ? (
         <QuestionForm contest={contest} />
       ) : (
         <Card className="bg-rose-500/10 border border-rose-400/30 text-rose-900 dark:text-rose-100">
