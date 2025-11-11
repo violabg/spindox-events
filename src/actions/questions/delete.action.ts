@@ -32,6 +32,7 @@ export async function deleteQuestionAction(questionId: string) {
     });
 
     // Revalidate the contest page and questions page
+    revalidatePath(`/admin/contests`);
     revalidatePath(`/admin/contests/${existingQuestion.contestId}`);
     revalidatePath(`/admin/contests/${existingQuestion.contestId}/questions`);
 

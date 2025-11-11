@@ -56,7 +56,7 @@ export async function updateContestAction(id: string, data: ContestData) {
     });
 
     // Revalidate the admin page and contest details page
-    revalidatePath('/admin');
+    revalidatePath('/admin/contests');
     revalidatePath(`/admin/contests/${validatedId}`);
 
     return {

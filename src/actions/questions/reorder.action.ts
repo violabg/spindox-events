@@ -23,7 +23,6 @@ export async function reorderQuestionsAction(contestId: string, orderedIds: stri
       }
     });
 
-    revalidatePath(`/admin/contests/${validated.contestId}`);
     revalidatePath(`/admin/contests/${validated.contestId}/questions`);
 
     return { success: true };

@@ -2,6 +2,7 @@
 
 import prisma from '@/lib/prisma';
 import { createContestSchema, type CreateContestData } from '@/schemas/contest.schema';
+import { revalidatePath } from 'next/cache';
 
 export async function createContestAction(data: CreateContestData) {
   try {
@@ -35,6 +36,8 @@ export async function createContestAction(data: CreateContestData) {
         showLeaderboard: validatedData.showLeaderboard,
       },
     });
+
+    revalidatePath('/admin/contests');
 
     return {
       success: true,

@@ -35,8 +35,8 @@ export async function updateUserProfileAction(userId: string, data: UpdateProfil
       },
     });
 
-    revalidatePath(`/admin/users/${userId}`);
     revalidatePath('/admin/users');
+    revalidatePath(`/admin/users/${userId}`);
 
     return {
       success: true,

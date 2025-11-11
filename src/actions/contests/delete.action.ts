@@ -24,7 +24,6 @@ export async function deleteContestAction(contestId: string) {
     });
 
     // Revalidate the admin page to refresh the data
-    revalidatePath('/admin');
     revalidatePath('/admin/contests');
 
     return {

@@ -52,7 +52,9 @@ export async function createQuestionAction(data: CreateQuestionData) {
     });
 
     // Revalidate the contest page
+    revalidatePath(`/admin/contests`);
     revalidatePath(`/admin/contests/${validatedData.contestId}`);
+    revalidatePath(`/admin/contests/${validatedData.contestId}/questions`);
 
     return {
       success: true,
