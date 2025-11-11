@@ -178,8 +178,6 @@ export default function QuestionsTable({ contestId, questions }: QuestionsTableP
         toast.error(result.error || 'Failed to save order');
         // rollback by resetting to original props
         setItems([...questions]);
-      } else {
-        toast.success('Order saved');
       }
     } catch (err) {
       console.error(err);
