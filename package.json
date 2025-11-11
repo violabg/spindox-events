@@ -12,7 +12,8 @@
     "format:check": "prettier --check .",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "prebuild": "npm run db:generate"
   },
   "dependencies": {
     "@ai-sdk/groq": "^2.0.28",
