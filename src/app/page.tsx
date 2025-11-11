@@ -33,9 +33,11 @@ export default async function HomePage() {
         </Card>
 
         {/* Sign In Button */}
-        <Button asChild size="lg" className="w-full">
-          <Link href="/login">Sign In</Link>
-        </Button>
+        {!session && (
+          <Button asChild size="lg" className="w-full">
+            <Link href="/login">Sign In</Link>
+          </Button>
+        )}
 
         {/* Admin Link */}
         {isAdmin && (
