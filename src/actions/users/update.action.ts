@@ -1,9 +1,10 @@
 'use server';
 
-import { auth } from '@/lib/auth';
-import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
+
+import { auth } from '@/lib/auth';
+import prisma from '@/lib/prisma';
 import { AgeRange, JobTitle } from '@/prisma/enums';
 
 type UpdateProfileData = {
@@ -35,8 +36,8 @@ export async function updateUserProfileAction(userId: string, data: UpdateProfil
       },
     });
 
-    revalidatePath(`/admin/users/${userId}`);
     revalidatePath('/admin/users');
+    revalidatePath(`/admin/users/${userId}`);
 
     return {
       success: true,

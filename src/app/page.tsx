@@ -1,11 +1,14 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { auth } from '@/lib/auth';
-import { QrCode } from 'lucide-react';
+import { Suspense } from 'react';
+
 import { headers } from 'next/headers';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Suspense } from 'react';
+
+import { QrCode } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { auth } from '@/lib/auth';
 
 export default async function HomePage() {
   const session = await auth.api.getSession({ headers: await headers() });

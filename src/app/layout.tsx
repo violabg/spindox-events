@@ -1,5 +1,6 @@
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
+
 import './globals.css';
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

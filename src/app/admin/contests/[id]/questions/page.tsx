@@ -1,17 +1,17 @@
-import { getContestById } from '@/queries/contests';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AdminLayout, EmptyTable } from '@/components/admin';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import QuestionsTable from './questions.table';
 import { notFound } from 'next/navigation';
 
-type PageProps = {
-  params: Promise<{ id: string }>;
-};
+import { Plus } from 'lucide-react';
 
-export default async function QuestionsPage({ params }: PageProps) {
+import { AdminLayout, EmptyTable } from '@/components/admin';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getContestById } from '@/queries/contests';
+import { PageWithParams } from '@/types/pageWithParams';
+
+import QuestionsTable from './questions.table';
+
+export default async function QuestionsPage({ params }: PageWithParams<{ id: string }>) {
   const { id } = await params;
 
   const contest = await getContestById(id);

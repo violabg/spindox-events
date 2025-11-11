@@ -1,15 +1,14 @@
-import { getContestById } from '@/queries/contests';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AdminLayout, EmptyTable } from '@/components/admin';
-import AttemptTable from './attempts.table';
 import { notFound } from 'next/navigation';
+
+import { AdminLayout, EmptyTable } from '@/components/admin';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getContestById } from '@/queries/contests';
 import { getUniqueUserAttemptsByContest } from '@/queries/userAttempts';
+import { PageWithParams } from '@/types/pageWithParams';
 
-type PageProps = {
-  params: Promise<{ id: string }>;
-};
+import AttemptTable from './attempts.table';
 
-export default async function AttemptsPage({ params }: PageProps) {
+export default async function AttemptsPage({ params }: PageWithParams<{ id: string }>) {
   const { id } = await params;
 
   const [contest, attempts] = await Promise.all([getContestById(id), getUniqueUserAttemptsByContest(id)]);

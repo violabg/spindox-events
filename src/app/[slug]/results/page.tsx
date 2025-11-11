@@ -1,13 +1,16 @@
+import { Suspense } from 'react';
+
+import { headers } from 'next/headers';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+
+import { CheckCircle, XCircle } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { QuestionType } from '@/prisma/enums';
-import { CheckCircle, XCircle } from 'lucide-react';
-import { headers } from 'next/headers';
-import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import { Suspense } from 'react';
 
 type Params = {
   params: {

@@ -1,7 +1,8 @@
 'use server';
 
-import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+
+import prisma from '@/lib/prisma';
 
 export async function deleteContestAction(contestId: string) {
   try {
@@ -24,7 +25,6 @@ export async function deleteContestAction(contestId: string) {
     });
 
     // Revalidate the admin page to refresh the data
-    revalidatePath('/admin');
     revalidatePath('/admin/contests');
 
     return {

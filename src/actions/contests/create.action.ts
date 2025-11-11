@@ -1,7 +1,9 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
+
 import prisma from '@/lib/prisma';
-import { createContestSchema, type CreateContestData } from '@/schemas/contest.schema';
+import { type CreateContestData, createContestSchema } from '@/schemas/contest.schema';
 
 export async function createContestAction(data: CreateContestData) {
   try {
@@ -35,6 +37,8 @@ export async function createContestAction(data: CreateContestData) {
         showLeaderboard: validatedData.showLeaderboard,
       },
     });
+
+    revalidatePath('/admin/contests');
 
     return {
       success: true,

@@ -1,7 +1,8 @@
-import { Card, CardContent } from '@/components/ui/card';
 import { AdminLayout, EmptyTable } from '@/components/admin';
-import UsersTable from './users.table';
+import { Card, CardContent } from '@/components/ui/card';
 import { getUsers } from '@/queries/users';
+
+import UsersTable from './users.table';
 
 export default async function UsersPage() {
   const users = await getUsers({

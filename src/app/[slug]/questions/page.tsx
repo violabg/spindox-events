@@ -1,185 +1,79 @@
-import { Skeleton } from '@/components/ui/skeleton';
-import prisma from '@/lib/prisma';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
-import QuestionPreForm from './question-pre-form';
 
-type ContestPageParams = {
-  params: Promise<{ slug: string }>;
-};
+import { ArrowRight, Trophy } from 'lucide-react';
 
-export default async function ContestPage({ params }: ContestPageParams) {
-  return (
-    <Suspense fallback={<QuestionFormSkeleton />}>
-      <DynamicContent params={params} />
-    </Suspense>
-  );
-}
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { getContestBySlug } from '@/queries/contests';
+import { getAttemptsByContest } from '@/queries/userAttempts';
+import { PageWithParams } from '@/types/pageWithParams';
 
-function QuestionFormSkeleton() {
-  return (
-    <div className="space-y-8">
-      {/* Contest info card skeleton - hidden on mobile */}
-      <div className="hidden sm:block bg-slate-100/70 dark:bg-slate-900/70 p-6 border border-slate-300/10 dark:border-white/10 rounded-lg text-slate-900 dark:text-slate-200">
-        <div className="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-3 mb-6">
-          <div className="flex-1">
-            <Skeleton className="mb-2 w-64 h-8" />
-            <Skeleton className="w-96 h-4" />
-          </div>
-          <Skeleton className="rounded-full w-40 h-8" />
-        </div>
-        <div className="gap-6 grid sm:grid-cols-3 text-slate-700 dark:text-slate-300 text-sm">
-          <div className="bg-slate-100/60 dark:bg-slate-900/60 p-4 border border-slate-300/10 dark:border-white/10 rounded-2xl">
-            <Skeleton className="mb-2 w-20 h-3" />
-            <Skeleton className="w-16 h-5" />
-          </div>
-          <div className="bg-slate-100/60 dark:bg-slate-900/60 p-4 border border-slate-300/10 dark:border-white/10 rounded-2xl">
-            <Skeleton className="mb-2 w-16 h-3" />
-            <Skeleton className="w-24 h-5" />
-          </div>
-          <div className="bg-slate-100/60 dark:bg-slate-900/60 p-4 border border-slate-300/10 dark:border-white/10 rounded-2xl">
-            <Skeleton className="mb-2 w-16 h-3" />
-            <Skeleton className="w-8 h-5" />
-          </div>
-        </div>
-      </div>
+import QuestionForm from './question-form';
 
-      <div className="gap-4 md:gap-8 grid grid-cols-1 md:grid-cols-[2fr_1fr] grid-rows-[auto_1fr_auto] md:grid-rows-1 grid-template-areas-['timer'_'questions'_'info'] md:grid-template-areas-['questions side']">
-        {/* Timer skeleton for mobile */}
-        <div className="md:hidden top-4 z-20 sticky grid-area-[timer] backdrop-blur-sm">
-          <Skeleton className="rounded-3xl w-full h-16" />
-        </div>
-
-        {/* Questions skeleton */}
-        <section className="space-y-6 grid-area-[questions]">
-          <div className="bg-slate-100/80 dark:bg-slate-900/80 shadow-black/20 shadow-xl dark:shadow-black/20 p-4 md:p-6 border border-slate-300/10 dark:border-white/10 rounded-3xl text-left">
-            <div className="flex flex-wrap justify-between items-center gap-4">
-              <div>
-                <Skeleton className="mb-2 w-24 h-3" />
-                <Skeleton className="w-64 h-6" />
-              </div>
-              <Skeleton className="rounded-full w-32 h-8" />
-            </div>
-
-            <div className="mt-4 md:mt-6">
-              <div className="hidden sm:flex gap-1 mb-2">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Skeleton key={i} className="flex-1 rounded-full h-2" />
-                ))}
-              </div>
-              <Skeleton className="w-20 h-4" />
-            </div>
-
-            <div className="space-y-6 md:space-y-8 mt-6 md:mt-8">
-              {/* Question input skeleton */}
-              <div className="space-y-4">
-                <Skeleton className="w-3/4 h-6" />
-                <div className="space-y-2">
-                  <Skeleton className="w-full h-4" />
-                  <Skeleton className="w-full h-4" />
-                  <Skeleton className="w-2/3 h-4" />
-                </div>
-                <div className="space-y-3 mt-4">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <Skeleton key={i} className="rounded-md w-full h-10" />
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex flex-wrap justify-between items-center gap-4 pt-4 md:pt-6 border-slate-300/10 dark:border-white/10 border-t">
-                <Skeleton className="w-48 h-4" />
-                <div className="flex flex-wrap gap-3">
-                  <Skeleton className="rounded-md w-32 h-10" />
-                  <Skeleton className="rounded-md w-36 h-10" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Info skeleton for mobile */}
-        <div className="md:hidden space-y-4 grid-area-[info]">
-          <ContestInfoSkeleton />
-        </div>
-
-        {/* Side skeleton for desktop */}
-        <div className="hidden gap-4 md:gap-8 md:grid grid-cols-1 grid-rows-[auto_1fr] grid-area-[side] grid-template-areas-['timer'_'info']">
-          <div className="top-4 z-20 sticky grid-area-[timer] backdrop-blur-sm">
-            <Skeleton className="rounded-3xl w-full h-16" />
-          </div>
-          <div className="space-y-4 grid-area-[info]">
-            <ContestInfoSkeleton />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ContestInfoSkeleton() {
-  return (
-    <div className="space-y-4 bg-slate-100/60 dark:bg-slate-900/60 p-4 md:p-6 border border-slate-300/10 dark:border-white/10 rounded-3xl text-slate-900 dark:text-slate-200">
-      <div className="flex items-center gap-3">
-        <Skeleton className="rounded w-5 h-5" />
-        <div className="flex-1">
-          <Skeleton className="mb-1 w-24 h-4" />
-          <Skeleton className="w-20 h-3" />
-        </div>
-      </div>
-      <div className="gap-4 grid text-sm">
-        <div className="bg-slate-50/60 dark:bg-slate-950/60 p-4 border border-slate-300/10 dark:border-white/10 rounded-2xl">
-          <Skeleton className="mb-2 w-32 h-3" />
-          <Skeleton className="w-8 h-6" />
-        </div>
-        <div className="bg-slate-50/60 dark:bg-slate-950/60 p-4 border border-slate-300/10 dark:border-white/10 rounded-2xl">
-          <Skeleton className="mb-2 w-20 h-3" />
-          <Skeleton className="w-12 h-6" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-async function DynamicContent({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ContestPage({ params }: PageWithParams<{ slug: string }>) {
   const { slug } = await params;
 
-  const contest = await prisma.contest.findUnique({
-    where: {
-      slug,
-      active: true,
-    },
-    include: {
-      questions: {
-        orderBy: { order: 'asc' },
-        select: {
-          id: true,
-          title: true,
-          content: true,
-          type: true,
-          order: true,
-          answers: {
-            orderBy: { order: 'asc' },
-            select: {
-              id: true,
-              content: true,
-              score: true,
-            },
-          },
-        },
-      },
-    },
-  });
+  const contest = await getContestBySlug(slug);
 
-  if (!contest) return notFound();
+  if (!contest || !contest.active) return notFound();
+  const attempt = await getAttemptsByContest(contest.id);
 
-  // Check if user already submitted
-  // const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  // const checkResultPromise = await fetch(`${baseUrl}/api/contests/${contest.slug}/checkIfUserHasResults`, {
-  //   headers: headersInstance,
-  // });
-  // const result = await checkResultPromise.json();
-  // if (result.hasSubmitted) {
-  //   redirect(`/${slug}/results`);
-  // }
-  return <QuestionPreForm contest={contest} />;
+  const canSubmit = contest.allowMultipleAttempts || !attempt;
+
+  return (
+    <div className="space-y-8">
+      <Card className="hidden sm:block bg-slate-100/70 dark:bg-slate-900/70 border border-slate-300/10 dark:border-white/10 text-slate-900 dark:text-slate-200">
+        <CardHeader className="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-3">
+          <div className="flex flex-col gap-2 mb-4">
+            <CardTitle className="font-semibold text-slate-900 dark:text-white text-2xl">{contest.name}</CardTitle>
+            <CardDescription className="text-slate-500 dark:text-slate-400">
+              {contest.description || 'Select the best answers to climb the leaderboard.'}
+            </CardDescription>
+          </div>
+          <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-1 border border-emerald-600/30 dark:border-emerald-400/30 rounded-full font-medium text-emerald-700 dark:text-emerald-200 text-sm">
+            <Trophy className="w-4 h-4" /> Ready to compete
+          </div>
+        </CardHeader>
+        <CardContent className="gap-6 grid sm:grid-cols-3 text-slate-700 dark:text-slate-300 text-sm">
+          <div className="bg-slate-100/60 dark:bg-slate-900/60 p-4 border border-slate-300/10 dark:border-white/10 rounded-2xl">
+            <p className="mb-1 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wide">Contest mode</p>
+            <p className="font-semibold text-slate-900 dark:text-white">{contest.allowMultipleAttempts ? 'Multiple attempts' : 'Single attempt'}</p>
+          </div>
+          <div className="bg-slate-100/60 dark:bg-slate-900/60 p-4 border border-slate-300/10 dark:border-white/10 rounded-2xl">
+            <p className="mb-1 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wide">Time limit</p>
+            <p className="font-semibold text-slate-900 dark:text-white">{contest.timeLimit ? `${contest.timeLimit} minutes` : 'No time limit'}</p>
+          </div>
+          <div className="bg-slate-100/60 dark:bg-slate-900/60 p-4 border border-slate-300/10 dark:border-white/10 rounded-2xl">
+            <p className="mb-1 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wide">Questions</p>
+            <p className="font-semibold text-slate-900 dark:text-white">{contest.questions.length}</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {canSubmit ? (
+        <QuestionForm contest={contest} />
+      ) : (
+        <Card className="bg-rose-500/10 border border-rose-400/30 text-rose-900 dark:text-rose-100">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-rose-800 dark:text-rose-50 text-lg">You already completed this contest</CardTitle>
+            <CardDescription className="text-rose-700/80 dark:text-rose-100/80">Revisit your performance and track your progress.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-3">
+              <p className="text-rose-700/70 dark:text-rose-100/70 text-sm">
+                Your answers are safely stored. Head to the results dashboard to review them.
+              </p>
+              <Button className="inline-flex items-center gap-2 bg-rose-500 hover:bg-rose-500/90" asChild>
+                <Link href={`/${contest.slug}/results`}>
+                  View results
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
 }

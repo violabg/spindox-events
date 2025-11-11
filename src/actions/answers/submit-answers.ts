@@ -1,9 +1,11 @@
 'use server';
+import { headers } from 'next/headers';
+
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { submitAnswersSchema } from '@/lib/schemas/contest.schema';
-import { headers } from 'next/headers';
 import { QuestionType } from '@/prisma/enums';
+import { getContestBySlug } from '@/queries/contests';
 
 export async function submitAnswersAction(data: { answers: { questionId: string; answerIds: string[] }[]; startedAt: string }, slug: string) {
   // Authenticate
@@ -23,16 +25,7 @@ export async function submitAnswersAction(data: { answers: { questionId: string;
   const { answers } = parsed.data;
 
   // Get contest
-  const contest = await prisma.contest.findUnique({
-    where: { slug },
-    include: {
-      questions: {
-        include: {
-          answers: true,
-        },
-      },
-    },
-  });
+  const contest = await getContestBySlug(slug);
 
   if (!contest) throw new Error('Contest not found');
 

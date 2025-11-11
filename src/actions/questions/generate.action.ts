@@ -4,9 +4,9 @@ import { generateQuestionWithAI } from '@/lib/ai';
 import {
   DIFFICULTY_SCORES,
   GenerateQuestionInputSchema,
+  type GenerateQuestionResult,
   GenerateQuestionResultSchema,
   calculateScores,
-  type GenerateQuestionResult,
 } from '@/lib/schemas/ai-question.schema';
 
 /**

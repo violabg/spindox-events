@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+
 import LoginForm from './login.form';
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {

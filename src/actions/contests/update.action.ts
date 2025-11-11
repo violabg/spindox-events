@@ -1,9 +1,11 @@
 'use server';
 
-import prisma from '@/lib/prisma';
-import { contestSchema, type ContestData } from '@/schemas/contest.schema';
 import { revalidatePath } from 'next/cache';
+
 import { z } from 'zod';
+
+import prisma from '@/lib/prisma';
+import { type ContestData, contestSchema } from '@/schemas/contest.schema';
 
 export async function updateContestAction(id: string, data: ContestData) {
   try {
@@ -56,7 +58,7 @@ export async function updateContestAction(id: string, data: ContestData) {
     });
 
     // Revalidate the admin page and contest details page
-    revalidatePath('/admin');
+    revalidatePath('/admin/contests');
     revalidatePath(`/admin/contests/${validatedId}`);
 
     return {

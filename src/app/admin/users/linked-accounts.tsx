@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+
 import { Trash2 } from 'lucide-react';
-import { ConfirmationDialog } from '@/components/admin';
-import { deleteAccountAction } from '@/actions/accounts/delete.action';
 import { toast } from 'sonner';
+
+import { deleteAccountAction } from '@/actions/accounts/delete.action';
+import { ConfirmationDialog } from '@/components/admin';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface Account {
   id: string;

@@ -1,15 +1,14 @@
 'use client';
 
-import Link from 'next/link';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react';
-import { MoreHorizontal, Eye, MessageSquare, Users, Edit, QrCode, Trash2, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
-import { QRCodeModal } from '@/components/modals';
-import { deleteContestAction } from '@/actions/contests/delete.action';
+
+import Link from 'next/link';
+
+import { Edit, ExternalLink, Eye, MessageSquare, MoreHorizontal, QrCode, Trash2, Users } from 'lucide-react';
 import { toast } from 'sonner';
+
+import { deleteContestAction } from '@/actions/contests/delete.action';
+import { QRCodeModal } from '@/components/modals';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +19,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { getContests } from '@/queries/contests';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 
 type ContestsTableProps = {
   contests: Awaited<ReturnType<typeof getContests>>;

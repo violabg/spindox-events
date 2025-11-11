@@ -1,17 +1,18 @@
-import { getContestById } from '@/queries/contests';
-import { getAllUserAttempts } from '@/queries/userAttempts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AdminLayout, EmptyTable } from '@/components/admin';
-import UserAnswerDetailTable from './user-answer-detail.table';
-import AttemptSelector from './attempt-selector';
 import { notFound } from 'next/navigation';
 
-type PageProps = {
-  params: Promise<{ id: string; userId: string }>;
-  searchParams: Promise<{ attemptId?: string }>;
-};
+import { AdminLayout, EmptyTable } from '@/components/admin';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getContestById } from '@/queries/contests';
+import { getAllUserAttempts } from '@/queries/userAttempts';
+import { PageWithParamsAndSearchParams } from '@/types/pageWithParams';
 
-export default async function AttemptDetailPage({ params, searchParams }: PageProps) {
+import AttemptSelector from './attempt-selector';
+import UserAnswerDetailTable from './user-answer-detail.table';
+
+export default async function AttemptDetailPage({
+  params,
+  searchParams,
+}: PageWithParamsAndSearchParams<{ id: string; userId: string }, { attemptId?: string }>) {
   const { id, userId } = await params;
   const { attemptId } = await searchParams;
 

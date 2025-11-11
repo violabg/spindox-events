@@ -3,6 +3,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import Image from 'next/image';
 import Link from 'next/link';
 
+
 export default async function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div className="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100">

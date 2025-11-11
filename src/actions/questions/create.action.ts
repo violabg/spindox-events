@@ -1,8 +1,9 @@
 'use server';
 
-import prisma from '@/lib/prisma';
-import { createQuestionSchema, type CreateQuestionData } from '@/schemas/question.schema';
 import { revalidatePath } from 'next/cache';
+
+import prisma from '@/lib/prisma';
+import { type CreateQuestionData, createQuestionSchema } from '@/schemas/question.schema';
 
 export async function createQuestionAction(data: CreateQuestionData) {
   try {
@@ -52,7 +53,9 @@ export async function createQuestionAction(data: CreateQuestionData) {
     });
 
     // Revalidate the contest page
+    revalidatePath(`/admin/contests`);
     revalidatePath(`/admin/contests/${validatedData.contestId}`);
+    revalidatePath(`/admin/contests/${validatedData.contestId}/questions`);
 
     return {
       success: true,

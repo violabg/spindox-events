@@ -1,6 +1,8 @@
-import { groq } from '@ai-sdk/groq';
 import { generateObject } from 'ai';
-import { AIResponseSchema, type AIResponse, type Difficulty, type Language } from './schemas/ai-question.schema';
+
+import { groq } from '@ai-sdk/groq';
+
+import { type AIResponse, AIResponseSchema, type Difficulty, type Language } from './schemas/ai-question.schema';
 
 /**
  * Generate a question and answers using Groq LLM

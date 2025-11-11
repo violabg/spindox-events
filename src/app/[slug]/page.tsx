@@ -1,47 +1,19 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import prisma from '@/lib/prisma';
-import { LogInIcon, Sparkles, Timer, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
 
-type ContestPageParams = {
-  params: Promise<{ slug: string }>;
-};
+import { LogInIcon, Sparkles, Timer, Trophy } from 'lucide-react';
 
-export default async function ContestPage({ params }: ContestPageParams) {
-  return (
-    <Suspense fallback={<ContestSkeleton />}>
-      <ContestContent params={params} />
-    </Suspense>
-  );
-}
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { getContestBySlug } from '@/queries/contests';
+import { PageWithParams } from '@/types/pageWithParams';
 
-async function ContestContent({ params }: ContestPageParams) {
+export default async function ContestPage({ params }: PageWithParams<{ slug: string }>) {
   const { slug } = await params;
 
-  const contest = await prisma.contest.findUnique({
-    where: {
-      slug,
-      active: true,
-    },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      allowMultipleAttempts: true,
-      timeLimit: true,
-      _count: {
-        select: {
-          questions: true,
-        },
-      },
-    },
-  });
+  const contest = await getContestBySlug(slug);
+  if (!contest || !contest.active) return notFound();
 
-  if (!contest) return notFound();
   return (
     <div className="space-y-8">
       <div className="bg-linear-to-br from-slate-100/60 dark:from-slate-900/60 via-slate-100/40 dark:via-slate-900/40 to-slate-100/60 dark:to-slate-900/60 shadow-black/30 shadow-inner dark:shadow-black/30 p-8 border border-slate-300/5 dark:border-white/5 rounded-3xl">
@@ -62,7 +34,7 @@ async function ContestContent({ params }: ContestPageParams) {
             </strong>
           </span>
           <span className="inline-flex items-center gap-2 bg-slate-200/60 dark:bg-slate-800/60 px-4 py-1.5 border border-slate-500/40 dark:border-slate-500/40 rounded-full">
-            Questions: <strong className="font-semibold text-slate-900 dark:text-white">{contest._count.questions}</strong>
+            Questions: <strong className="font-semibold text-slate-900 dark:text-white">{contest.questions.length}</strong>
           </span>
           <span className="inline-flex items-center gap-2 bg-slate-200/60 dark:bg-slate-800/60 px-4 py-1.5 border border-slate-500/40 dark:border-slate-500/40 rounded-full">
             Time limit:{' '}
@@ -114,38 +86,6 @@ async function ContestContent({ params }: ContestPageParams) {
                 : 'No ticking clock today—take a deep breath and plan each answer.'}
             </p>
           </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function ContestSkeleton() {
-  return (
-    <div className="space-y-8">
-      <div className="bg-slate-900/60 p-8 border border-white/5 rounded-3xl">
-        <Skeleton className="mb-4 w-40 h-3" />
-        <Skeleton className="mb-4 w-3/4 h-10" />
-        <Skeleton className="mb-6 w-2/3 h-4" />
-        <div className="flex flex-wrap gap-3">
-          {Array.from({ length: 4 }).map((_, idx) => (
-            <Skeleton key={idx} className="w-32 h-9" />
-          ))}
-        </div>
-        <Skeleton className="mt-6 w-40 h-11" />
-      </div>
-      <Card className="bg-slate-900/60 border border-white/5">
-        <CardHeader>
-          <Skeleton className="mb-2 w-40 h-5" />
-          <Skeleton className="w-56 h-4" />
-        </CardHeader>
-        <CardContent className="gap-4 grid sm:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, idx) => (
-            <div key={idx} className="space-y-2">
-              <Skeleton className="w-24 h-3" />
-              <Skeleton className="w-32 h-4" />
-            </div>
-          ))}
         </CardContent>
       </Card>
     </div>

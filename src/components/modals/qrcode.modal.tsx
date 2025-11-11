@@ -1,13 +1,17 @@
 'use client';
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Copy, ExternalLink } from 'lucide-react';
-import Link from 'next/link';
-import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
-import { Button } from '../ui/button';
+
 import Image from 'next/image';
+import Link from 'next/link';
+
+import { Copy, ExternalLink } from 'lucide-react';
+import QRCode from 'qrcode';
+import { toast } from 'sonner';
+
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
+import { Button } from '../ui/button';
 
 type QRCodeModalProps = {
   contestSlug: string;
