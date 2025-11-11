@@ -1,18 +1,31 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { LogInIcon, Sparkles, Timer, Trophy } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { auth } from '@/lib/auth';
+import prisma from '@/lib/prisma';
 import { getContestBySlug } from '@/queries/contests';
 import { PageWithParams } from '@/types/pageWithParams';
+import { headers } from 'next/headers';
 
 export default async function ContestPage({ params }: PageWithParams<{ slug: string }>) {
   const { slug } = await params;
 
   const contest = await getContestBySlug(slug);
   if (!contest || !contest.active) return notFound();
+
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  const user = await prisma.user.findUnique({ where: { id: session?.user.id } });
+
+  const missingProfile = !user?.ageRange || !user?.companyName || !user?.jobTitle || !user?.firstName || !user?.lastName;
+
+  if (contest?.requireCompletedProfile && missingProfile) {
+    redirect(`/${slug}/profile?needRedirect=true`);
+  }
 
   return (
     <div className="space-y-8">

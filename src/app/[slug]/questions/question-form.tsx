@@ -15,28 +15,16 @@ import Timer from '@/components/contest/timer';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { Stepper, StepperIndicator, StepperItem, StepperTrigger } from '@/components/ui/stepper';
+import { formatTime } from '@/lib/date';
 import { submitAnswersClientSchema } from '@/lib/schemas/contest.schema';
+import { getContestBySlug } from '@/queries/contests';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { Contest } from './question-pre-form';
-
 type Props = {
-  contest: Contest;
+  contest: NonNullable<Awaited<ReturnType<typeof getContestBySlug>>>;
 };
 
 type FormData = z.infer<typeof submitAnswersClientSchema>;
-
-const formatIsoToTime = (value?: string | null) => {
-  if (!value) return null;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
-
-  return `${hours}:${minutes}:${seconds}`;
-};
 
 export default function QuestionForm({ contest }: Props) {
   const [currentStep, setCurrentStep] = useState(1);
@@ -85,7 +73,7 @@ export default function QuestionForm({ contest }: Props) {
     return null;
   }
 
-  const formattedStartTime = formatIsoToTime(startedAt);
+  const formattedStartTime = formatTime(startedAt);
   const startLabel = formattedStartTime ? `Started ${formattedStartTime}` : 'Started just now';
 
   const onSubmit: SubmitHandler<FormData> = data => {
