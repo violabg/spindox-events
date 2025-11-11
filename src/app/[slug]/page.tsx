@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton';
 import prisma from '@/lib/prisma';
 import { LogInIcon, Sparkles, Timer, Trophy } from 'lucide-react';
-import { cacheLife, cacheTag } from 'next/cache';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -21,8 +20,6 @@ export default async function ContestPage({ params }: ContestPageParams) {
 }
 
 async function ContestContent({ params }: ContestPageParams) {
-  'use cache';
-  cacheLife('hours');
   const { slug } = await params;
 
   const contest = await prisma.contest.findUnique({
@@ -45,7 +42,6 @@ async function ContestContent({ params }: ContestPageParams) {
   });
 
   if (!contest) return notFound();
-  cacheTag(`contest-${contest.id}`);
   return (
     <div className="space-y-8">
       <div className="bg-linear-to-br from-slate-100/60 dark:from-slate-900/60 via-slate-100/40 dark:via-slate-900/40 to-slate-100/60 dark:to-slate-900/60 shadow-black/30 shadow-inner dark:shadow-black/30 p-8 border border-slate-300/5 dark:border-white/5 rounded-3xl">

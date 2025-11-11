@@ -1,7 +1,7 @@
 'use server';
 
 import prisma from '@/lib/prisma';
-import { revalidatePath, updateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 const reorderQuestionsSchema = z.object({
@@ -23,7 +23,6 @@ export async function reorderQuestionsAction(contestId: string, orderedIds: stri
       }
     });
 
-    updateTag(`contest-${validated.contestId}`);
     revalidatePath(`/admin/contests/${validated.contestId}`);
     revalidatePath(`/admin/contests/${validated.contestId}/questions`);
 
