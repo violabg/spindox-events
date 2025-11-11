@@ -10,7 +10,6 @@ import { getAttemptsByContest } from '@/queries/userAttempts';
 import { PageWithParams } from '@/types/pageWithParams';
 
 import QuestionForm from './question-form';
-import QuestionPreForm from './question-pre-form';
 
 export default async function ContestPage({ params }: PageWithParams<{ slug: string }>) {
   const { slug } = await params;
