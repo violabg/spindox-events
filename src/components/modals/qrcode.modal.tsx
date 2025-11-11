@@ -70,7 +70,7 @@ export function QRCodeModal({ contestSlug, contestName, open, onOpenChange }: QR
                   <Copy />
                 </Button>
                 <Button variant="outline" size="icon" asChild aria-label="Open link">
-                  <Link href={`/${contestSlug}`}>
+                  <Link href={`/${contestSlug}`} target="_blank">
                     <ExternalLink />
                   </Link>
                 </Button>
