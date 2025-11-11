@@ -110,6 +110,7 @@ export default function ContestForm({ contestId, initialData }: ContestFormProps
           description="URL-friendly identifier (automatically generated from name, but you can customize it)"
           placeholder="contest-slug"
           maxLength={50}
+          disabled={isEditMode}
         />
       </div>
 
