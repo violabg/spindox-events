@@ -8,6 +8,9 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 export default async function HomePage() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  const isAdmin = session?.user?.role === 'admin';
+
   return (
     <div className="flex flex-col justify-center items-center bg-linear-to-b from-background to-muted p-4 min-h-screen">
       <div className="space-y-8 w-full max-w-md text-center">
@@ -30,32 +33,21 @@ export default async function HomePage() {
           </CardContent>
         </Card>
         <Suspense fallback={<div>Loading...</div>}>
-          <DynamicContent />
+          {/* Sign In Button */}
+          {!session && (
+            <Button asChild size="lg" className="w-full">
+              <Link href="/login">Sign In</Link>
+            </Button>
+          )}
+
+          {/* Admin Link */}
+          {isAdmin && (
+            <Button asChild variant="outline" size="lg" className="w-full">
+              <Link href="/admin">Admin Dashboard</Link>
+            </Button>
+          )}
         </Suspense>
       </div>
     </div>
-  );
-}
-
-async function DynamicContent() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  const isAdmin = session?.user?.role === 'admin';
-
-  return (
-    <>
-      {/* Sign In Button */}
-      {!session && (
-        <Button asChild size="lg" className="w-full">
-          <Link href="/login">Sign In</Link>
-        </Button>
-      )}
-
-      {/* Admin Link */}
-      {isAdmin && (
-        <Button asChild variant="outline" size="lg" className="w-full">
-          <Link href="/admin">Admin Dashboard</Link>
-        </Button>
-      )}
-    </>
   );
 }

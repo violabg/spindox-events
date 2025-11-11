@@ -1,6 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import prisma from '@/lib/prisma';
-import { cacheLife, cacheTag } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import QuestionPreForm from './question-pre-form';
@@ -142,8 +141,6 @@ function ContestInfoSkeleton() {
 }
 
 async function DynamicContent({ params }: { params: Promise<{ slug: string }> }) {
-  'use cache';
-  cacheLife('hours');
   const { slug } = await params;
 
   const contest = await prisma.contest.findUnique({
@@ -184,6 +181,5 @@ async function DynamicContent({ params }: { params: Promise<{ slug: string }> })
   // if (result.hasSubmitted) {
   //   redirect(`/${slug}/results`);
   // }
-  cacheTag(`contest-${contest.id}`);
   return <QuestionPreForm contest={contest} />;
 }
