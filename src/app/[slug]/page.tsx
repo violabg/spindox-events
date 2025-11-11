@@ -1,11 +1,14 @@
+import { Suspense } from 'react';
+
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+
+import { LogInIcon, Sparkles, Timer, Trophy } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import prisma from '@/lib/prisma';
-import { LogInIcon, Sparkles, Timer, Trophy } from 'lucide-react';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
 
 type ContestPageParams = {
   params: Promise<{ slug: string }>;

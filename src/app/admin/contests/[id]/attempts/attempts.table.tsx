@@ -1,11 +1,13 @@
 'use client';
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { getUniqueUserAttemptsByContest } from '@/queries/userAttempts';
-import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react';
-import { MoreHorizontal, Eye } from 'lucide-react';
 import Link from 'next/link';
+
+import { Eye, MoreHorizontal } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { getUniqueUserAttemptsByContest } from '@/queries/userAttempts';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 
 type AttemptTableProps = {
   attempts: Awaited<ReturnType<typeof getUniqueUserAttemptsByContest>>;

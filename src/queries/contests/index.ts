@@ -1,5 +1,6 @@
-import prisma from '@/lib/prisma';
 import { cache } from 'react';
+
+import prisma from '@/lib/prisma';
 
 export const getContests = cache(async () => {
   return prisma.contest.findMany({

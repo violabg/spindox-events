@@ -1,14 +1,17 @@
 'use client';
 
+import { useState } from 'react';
+import { FaGithub } from 'react-icons/fa';
+import { FcGoogle } from 'react-icons/fc';
+
+import Image from 'next/image';
+
+import { Loader2 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { authClient } from '@/lib/auth-client';
-import { Loader2 } from 'lucide-react';
-import Image from 'next/image';
-import { FaGithub } from 'react-icons/fa';
-import { FcGoogle } from 'react-icons/fc';
-import { useState } from 'react';
 
 export default function LoginForm({ callbackURL }: { callbackURL?: string }) {
   const [isLoading, setIsLoading] = useState(false);

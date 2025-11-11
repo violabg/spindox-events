@@ -1,8 +1,9 @@
-import { useTheme } from 'next-themes';
-import dynamic from 'next/dynamic';
 import { HTMLAttributes } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+import { useTheme } from 'next-themes';
+import dynamic from 'next/dynamic';
 
 const DynamicSyntaxHighlighter = dynamic(() => import('react-syntax-highlighter').then(mod => mod.Prism), { ssr: false });
 

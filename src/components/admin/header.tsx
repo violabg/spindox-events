@@ -1,10 +1,12 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, LogOut, Grid2x2, Users } from 'lucide-react';
 import Link from 'next/link';
-import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
+
+import { ArrowLeft, Grid2x2, LogOut, Users } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { authClient } from '@/lib/auth-client';
 
 interface AdminHeaderProps {
   title: string;

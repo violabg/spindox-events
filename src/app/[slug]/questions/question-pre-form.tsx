@@ -1,13 +1,17 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
+import { useRouter } from 'next/navigation';
+
+import { ArrowRight, Trophy } from 'lucide-react';
+
 import { CheckUserHasResultsResponse } from '@/app/api/contests/checkIfUserHasResults/route';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { authClient } from '@/lib/auth-client';
 import { Prisma } from '@/prisma/client';
-import { ArrowRight, Trophy } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+
 import QuestionForm from './question-form';
 
 export type Contest = Prisma.ContestGetPayload<{

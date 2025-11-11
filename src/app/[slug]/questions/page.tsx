@@ -1,7 +1,10 @@
+import { Suspense } from 'react';
+
+import { notFound } from 'next/navigation';
+
 import { Skeleton } from '@/components/ui/skeleton';
 import prisma from '@/lib/prisma';
-import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
+
 import QuestionPreForm from './question-pre-form';
 
 type ContestPageParams = {

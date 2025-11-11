@@ -1,7 +1,8 @@
+import { NextRequest, NextResponse } from 'next/server';
+
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { submitAnswersSchema } from '@/lib/schemas/contest.schema';
-import { NextRequest, NextResponse } from 'next/server';
 import { QuestionType } from '@/prisma/enums';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {

@@ -1,6 +1,7 @@
-import { ThemeToggle } from '@/components/theme-toggle';
 import Image from 'next/image';
 import Link from 'next/link';
+
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default async function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (

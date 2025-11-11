@@ -1,9 +1,12 @@
+import Link from 'next/link';
+
+import { Plus } from 'lucide-react';
+
 import { AdminLayout, EmptyTable } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { getContests } from '@/queries/contests';
-import { Plus } from 'lucide-react';
-import Link from 'next/link';
+
 import ContestsTable from './contests.table';
 
 export default async function ContestsPage() {

@@ -1,13 +1,13 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { getUsers } from '@/queries/users';
-import { Eye, Edit, MoreHorizontal, Trash2 } from 'lucide-react';
-import Link from 'next/link';
-import { formatDate } from '@/lib/date';
-import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react';
 import { useState } from 'react';
+
+import Link from 'next/link';
+
+import { Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { deleteUserAction } from '@/actions/users/delete.action';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,8 +18,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { deleteUserAction } from '@/actions/users/delete.action';
-import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { formatDate } from '@/lib/date';
+import { getUsers } from '@/queries/users';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 
 type UsersTableProps = {
   users: Awaited<ReturnType<typeof getUsers<{ attempts: true; sessions: true }>>>;

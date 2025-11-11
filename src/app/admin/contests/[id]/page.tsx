@@ -1,12 +1,14 @@
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+
+import { Edit, ExternalLink } from 'lucide-react';
+
+import { AdminLayout } from '@/components/admin';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { AdminLayout } from '@/components/admin';
-import { notFound } from 'next/navigation';
-import { getContestById } from '@/queries/contests';
 import { formatDate } from '@/lib/date';
-import Link from 'next/link';
-import { ExternalLink, Edit } from 'lucide-react';
+import { getContestById } from '@/queries/contests';
 import { getAttemptsByContest } from '@/queries/userAttempts';
 
 type PageProps = {

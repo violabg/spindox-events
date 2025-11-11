@@ -1,16 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { FieldSelect, FieldInput, FieldCheckbox } from '@/components/admin';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { updateUserProfileAction } from '@/actions/users/update.action';
-import { toast } from 'sonner';
+
 import { useRouter } from 'next/navigation';
+
+import { toast } from 'sonner';
+import { z } from 'zod';
+
+import { updateUserProfileAction } from '@/actions/users/update.action';
+import { FieldCheckbox, FieldInput, FieldSelect } from '@/components/admin';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Prisma } from '@/prisma/client';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const userEditSchema = z.object({
   firstName: z.string().optional().nullable(),

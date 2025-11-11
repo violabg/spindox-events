@@ -1,9 +1,11 @@
-import { getContestById } from '@/queries/contests';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AdminLayout, EmptyTable } from '@/components/admin';
-import AttemptTable from './attempts.table';
 import { notFound } from 'next/navigation';
+
+import { AdminLayout, EmptyTable } from '@/components/admin';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getContestById } from '@/queries/contests';
 import { getUniqueUserAttemptsByContest } from '@/queries/userAttempts';
+
+import AttemptTable from './attempts.table';
 
 type PageProps = {
   params: Promise<{ id: string }>;

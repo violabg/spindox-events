@@ -1,8 +1,9 @@
 'use server';
+import { headers } from 'next/headers';
+
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { submitAnswersSchema } from '@/lib/schemas/contest.schema';
-import { headers } from 'next/headers';
 import { QuestionType } from '@/prisma/enums';
 
 export async function submitAnswersAction(data: { answers: { questionId: string; answerIds: string[] }[]; startedAt: string }, slug: string) {

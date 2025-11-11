@@ -1,10 +1,12 @@
+import { notFound } from 'next/navigation';
+
+import { AdminLayout, EmptyTable } from '@/components/admin';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getContestById } from '@/queries/contests';
 import { getAllUserAttempts } from '@/queries/userAttempts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AdminLayout, EmptyTable } from '@/components/admin';
-import UserAnswerDetailTable from './user-answer-detail.table';
+
 import AttemptSelector from './attempt-selector';
-import { notFound } from 'next/navigation';
+import UserAnswerDetailTable from './user-answer-detail.table';
 
 type PageProps = {
   params: Promise<{ id: string; userId: string }>;

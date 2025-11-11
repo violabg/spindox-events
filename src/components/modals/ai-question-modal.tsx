@@ -1,5 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+
+import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+
 import { generateQuestion } from '@/actions/questions/generate.action';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -9,10 +15,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { GenerateQuestionInputSchema, type GeneratedQuestion } from '@/lib/schemas/ai-question.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2 } from 'lucide-react';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 
 interface AIQuestionModalProps {
   open: boolean;

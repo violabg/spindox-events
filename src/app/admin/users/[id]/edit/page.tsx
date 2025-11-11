@@ -1,6 +1,8 @@
-import { AdminLayout } from '@/components/admin';
 import { notFound } from 'next/navigation';
+
+import { AdminLayout } from '@/components/admin';
 import { getUserById } from '@/queries/users';
+
 import UserForm from '../../user.form';
 
 type PageProps = {
