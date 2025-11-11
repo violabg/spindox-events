@@ -2,7 +2,7 @@
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useRouter } from 'next/navigation';
-import { getAllUserAttempts } from '@/queries/allUserAttempts';
+import { getAllUserAttempts } from '@/queries/userAttempts';
 
 type AttemptSelectorProps = {
   attempts: Awaited<ReturnType<typeof getAllUserAttempts>>;

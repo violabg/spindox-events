@@ -1,5 +1,5 @@
 import { getContestById } from '@/queries/contests';
-import { getAllUserAttempts } from '@/queries/allUserAttempts';
+import { getAllUserAttempts } from '@/queries/userAttempts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AdminLayout, EmptyTable } from '@/components/admin';
 import UserAnswerDetailTable from './user-answer-detail.table';

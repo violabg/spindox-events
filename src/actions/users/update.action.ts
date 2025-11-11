@@ -7,6 +7,8 @@ import { headers } from 'next/headers';
 import { AgeRange, JobTitle } from '@/prisma/enums';
 
 type UpdateProfileData = {
+  firstName?: string | null;
+  lastName?: string | null;
   role: string;
   ageRange?: AgeRange | null;
   companyName?: string | null;
@@ -24,6 +26,8 @@ export async function updateUserProfileAction(userId: string, data: UpdateProfil
     await prisma.user.update({
       where: { id: userId },
       data: {
+        firstName: data.firstName || null,
+        lastName: data.lastName || null,
         role: data.role,
         ageRange: data.ageRange || null,
         companyName: data.companyName || null,

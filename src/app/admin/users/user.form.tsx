@@ -13,6 +13,8 @@ import { useRouter } from 'next/navigation';
 import type { Prisma } from '@/prisma/client';
 
 const userEditSchema = z.object({
+  firstName: z.string().optional().nullable(),
+  lastName: z.string().optional().nullable(),
   isAdmin: z.boolean(),
   ageRange: z.enum(['UNDER_18', 'BETWEEN_18_30', 'BETWEEN_31_50', 'OVER_50']).optional().nullable(),
   companyName: z.string().optional().nullable(),
@@ -34,6 +36,8 @@ export default function UserForm({ user }: UserFormProps) {
   const form = useForm<UserEditData>({
     resolver: zodResolver(userEditSchema),
     defaultValues: {
+      firstName: user.firstName || undefined,
+      lastName: user.lastName || undefined,
       isAdmin: user.role === 'admin',
       ageRange: user.ageRange || undefined,
       companyName: user.companyName || undefined,
@@ -45,6 +49,8 @@ export default function UserForm({ user }: UserFormProps) {
     setIsSubmitting(true);
     try {
       const result = await updateUserProfileAction(user.id, {
+        firstName: data.firstName,
+        lastName: data.lastName,
         role: data.isAdmin ? 'admin' : 'user',
         ageRange: data.ageRange,
         companyName: data.companyName,
@@ -84,6 +90,8 @@ export default function UserForm({ user }: UserFormProps) {
             </div>
           </div>
           <div className="grid grid-cols-3 gap-4">
+            <FieldInput name="firstName" control={form.control} label="First Name" description="User's first name" placeholder="Enter first name" />
+            <FieldInput name="lastName" control={form.control} label="Last Name" description="User's last name" placeholder="Enter last name" />
             <FieldInput
               name="companyName"
               control={form.control}
@@ -91,6 +99,8 @@ export default function UserForm({ user }: UserFormProps) {
               description="User's company or organization"
               placeholder="Enter company name"
             />
+          </div>
+          <div className="grid grid-cols-3 gap-4">
             <FieldSelect
               name="ageRange"
               control={form.control}

@@ -7,7 +7,7 @@ import { AdminLayout, EmptyTable } from '@/components/admin';
 import { Edit } from 'lucide-react';
 import { getQuestionWithAnswersAction } from '@/actions/questions/get.action';
 import { getContestById } from '@/queries/contests';
-import { getQuestionWithAnalytics } from '@/queries/questionWithAnalytics';
+import { getQuestionWithAnalytics } from '@/queries/questions';
 import AnswerAnalyticsTable from './answer-analytics.table';
 
 type PageProps = {
