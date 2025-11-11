@@ -1,6 +1,8 @@
+import { cache } from 'react';
+
 import prisma from '@/lib/prisma';
 
-export async function getAllUserAttempts(contestId: string, userId: string) {
+export const getAllUserAttempts = cache(async (contestId: string, userId: string) => {
   const attempts = await prisma.userAttempts.findMany({
     where: {
       userId,
@@ -20,9 +22,9 @@ export async function getAllUserAttempts(contestId: string, userId: string) {
   });
 
   return attempts;
-}
+});
 
-export async function getAttemptsByContest(contestId: string) {
+export const getAttemptsByContest = cache(async (contestId: string) => {
   const attempts = await prisma.userAttempts.findMany({
     where: { contestId },
     include: { user: true },
@@ -30,13 +32,13 @@ export async function getAttemptsByContest(contestId: string) {
   });
 
   return attempts;
-}
+});
 
 /**
  * Get unique users and their latest/best attempt for a contest
  * Useful for admin leaderboard view where multiple attempts per user are possible
  */
-export async function getUniqueUserAttemptsByContest(contestId: string) {
+export const getUniqueUserAttemptsByContest = cache(async (contestId: string) => {
   const attempts = await prisma.userAttempts.findMany({
     where: { contestId },
     include: { user: true },
@@ -52,9 +54,9 @@ export async function getUniqueUserAttemptsByContest(contestId: string) {
   }
 
   return Array.from(uniqueAttempts.values());
-}
+});
 
-export async function getUserAnswersByAttempt(contestId: string, userId: string, attemptId?: string) {
+export const getUserAnswersByAttempt = cache(async (contestId: string, userId: string, attemptId?: string) => {
   if (attemptId) {
     // Get specific attempt by ID
     const attempt = await prisma.userAttempts.findUnique({
@@ -101,4 +103,4 @@ export async function getUserAnswersByAttempt(contestId: string, userId: string,
   });
 
   return attempt;
-}
+});

@@ -1,67 +1,28 @@
-import { Suspense } from 'react';
-
 import { headers } from 'next/headers';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { notFound, redirect, unauthorized } from 'next/navigation';
 
 import { CheckCircle, XCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { auth } from '@/lib/auth';
-import prisma from '@/lib/prisma';
 import { QuestionType } from '@/prisma/enums';
+import { getContestBySlug } from '@/queries/contests';
+import { getUserAnswersByAttempt } from '@/queries/userAttempts';
+import { PageWithParams } from '@/types/pageWithParams';
 
-type Params = {
-  params: {
-    slug: string;
-  };
-};
-
-export default async function Page({ params }: Params) {
-  return (
-    <Suspense fallback={<ResultsSkeleton />}>
-      <DynamicContent params={params} />
-    </Suspense>
-  );
-}
-
-async function DynamicContent({ params }: Params) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user) {
-    throw new Error('Unauthorized');
-  }
+export default async function ResultsPage({ params }: PageWithParams<{ slug: string }>) {
   const { slug } = await params;
 
-  const contest = await prisma.contest.findUnique({
-    where: { slug: slug },
-    include: {
-      questions: {
-        include: {
-          answers: true,
-        },
-        orderBy: { order: 'asc' },
-      },
-    },
-  });
+  const contest = await getContestBySlug(slug);
+  if (!contest) notFound();
 
-  if (!contest) {
-    throw new Error('Contest not found');
-  }
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) unauthorized();
 
   // Get the latest attempt for this user
-  const attempt = await prisma.userAttempts.findFirst({
-    where: {
-      userId: session.user.id,
-      contestId: contest.id,
-    },
-    include: {
-      userAnswers: true,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
+  const attempt = await getUserAnswersByAttempt(contest.id, session.user.id);
 
   if (!attempt) {
     // If the user has no attempt, redirect them back to the contest page
@@ -263,20 +224,6 @@ async function DynamicContent({ params }: Params) {
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ResultsSkeleton() {
-  return (
-    <div className="space-y-8">
-      <div className="bg-slate-100/60 dark:bg-slate-900/60 border border-slate-300/10 dark:border-white/10 rounded-3xl h-40" />
-      <div className="bg-slate-100/60 dark:bg-slate-900/60 border border-slate-300/10 dark:border-white/10 rounded-3xl h-48" />
-      <div className="space-y-4">
-        {Array.from({ length: 3 }).map((_, idx) => (
-          <div key={idx} className="bg-slate-100/60 dark:bg-slate-900/60 border border-slate-300/10 dark:border-white/10 rounded-2xl h-32" />
         ))}
       </div>
     </div>
